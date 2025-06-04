@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worship Song Selection | Luther House Chapel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8f7f5; 
+            color: #3a3a3a; 
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Cinzel', serif;
+        }
+        
+        .worship-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23e2dfd8' d='M50 0C22.4 0 0 22.4 0 50s22.4 50 50 50 50-22.4 50-50S77.6 0 50 0zm0 90c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z'/%3E%3C/svg%3E");
+        }
+        
+        .music-note {
+            position: absolute;
+            opacity: 0.07;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .btn-primary {
+            background-color: #4a6da7; 
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(74, 109, 167, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5d97; 
+            box-shadow: 0 0 20px rgba(74, 109, 167, 0.6);
+        }
+        
+        .btn-secondary {
+            background-color: #6b9ac4; 
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(107, 154, 196, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5b8ab4; 
+            box-shadow: 0 0 15px rgba(107, 154, 196, 0.5);
+        }
+        
+        .btn-clear {
+            background-color: #e2e2e2; 
+            color: #555555;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-clear:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .song-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+            animation: waterfall 0.5s ease forwards; 
+            opacity: 0; 
+        }
+        
+        .song-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4a6da7; 
+        }
+        
+        .song-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #4a6da7, #6b9ac4, #a5c8e4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .song-card:hover::after {
+            opacity: 1;
+        }
+        
+        select, input[type="text"], input[type="search"] { 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.3s ease;
+        }
+        
+        select:focus, input[type="text"]:focus, input[type="search"]:focus { 
+            border-color: #4a6da7; 
+            box-shadow: 0 0 0 3px rgba(74, 109, 167, 0.2);
+        }
+        
+        .water-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .water-effect::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: water 15s linear infinite;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        @keyframes water {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 5px rgba(74, 109, 167, 0.3);
+        }
+        
+        .glow-icon {
+            filter: drop-shadow(0 0 3px rgba(74, 109, 167, 0.5));
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px; 
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #a5c8e4; 
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6b9ac4; 
+        }
+        
+        .playlist-sidebar {
+            background: linear-gradient(180deg, #4a6da7 0%, #6b9ac4 100%);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .playlist-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .playlist-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid #a5c8e4; 
+        }
+        
+        @keyframes waterfall {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .waterfall-animation {
+            animation: waterfall 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .waterfall-delay-1 { animation-delay: 0.1s; }
+        .waterfall-delay-2 { animation-delay: 0.2s; }
+        .waterfall-delay-3 { animation-delay: 0.3s; }
+        .waterfall-delay-4 { animation-delay: 0.4s; }
+        .waterfall-delay-5 { animation-delay: 0.5s; }
+        
+        .bible-dropdown { position: relative; }
+        .bible-dropdown-content {
+            position: absolute; top: 100%; left: 0; width: 100%;
+            max-height: 250px; overflow-y: auto; background-color: white;
+            border: 1px solid #e2e8f0; border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50; display: none;
+        }
+        .bible-dropdown-content.show { display: block; }
+        .bible-dropdown-item { padding: 0.5rem 1rem; cursor: pointer; transition: background-color 0.2s; }
+        .bible-dropdown-item:hover { background-color: #f3f4f6; }
+        .bible-dropdown-item.active { background-color: #e5edff; color: #4a6da7; }
+        
+        .autosuggest-dropdown { 
+            position: absolute; top: 100%; left: 0; width: 100%;
+            max-height: 200px; overflow-y: auto; background-color: white;
+            border: 1px solid #e2e8f0; border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50; display: none; 
+        }
+        .autosuggest-dropdown.show { display: block; }
+        .autosuggest-item { padding: 0.5rem 1rem; cursor: pointer; transition: background-color 0.2s; }
+        .autosuggest-item:hover { background-color: #f3f4f6; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 109, 167, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(74, 109, 167, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 109, 167, 0); }
+        }
+        .pulse { animation: pulse 2s infinite; }
+
+        #loadingIndicator {
+            display: none; 
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 2rem;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            border-radius: 0.5rem;
+            z-index: 9999;
+        }
+        @keyframes pulseOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .loading-text-animated { animation: pulseOpacity 1.5s infinite ease-in-out; }
+
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.75); 
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { 
+            background-color: #fff; 
+            padding: 1.5rem; border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%; max-width: 700px; 
+            max-height: 90vh; display: flex; flex-direction: column;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem;}
+        .modal-title { font-size: 1.25rem; font-weight: 600; color: #3a3a3a;  }
+        .modal-close-button { background: none; border: none; font-size: 1.75rem; color: #6b7280; cursor: pointer; line-height: 1; }
+        .modal-close-button:hover { color: #3a3a3a; }
+        .modal-body { overflow-y: auto; flex-grow: 1; } 
+        .modal-body iframe { width: 100%; border: none; border-radius: 0.25rem; min-height: 60vh; }
+
+        .song-detail-lyrics {
+            white-space: pre-wrap; 
+            font-family: 'Lora', serif; 
+            line-height: 1.5; 
+            font-size: 1.125rem; 
+            color: #4b5563; 
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 0.5rem; 
+        }
+        .doc-ribbon-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.2s ease-in-out;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .doc-ribbon-button:hover {
+            transform: translateY(-1px);
+        }
+        .doc-ribbon-button i {
+            margin-right: 0.5rem;
+        }
+        .open-pdf-button { background-color: #dc2626; color: white !important; } 
+        .open-pdf-button:hover { background-color: #b91c1c; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); } 
+        
+        .open-word-button { background-color: #2563eb; color: white !important; } 
+        .open-word-button:hover { background-color: #1d4ed8; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); } 
+        
+        .open-generic-doc-button { background-color: #4b5563; color: white !important; } 
+        .open-generic-doc-button:hover { background-color: #374151; box-shadow: 0 0 10px rgba(75, 85, 99, 0.5); } 
+
+        #songDetailMetaLHC > div { 
+            min-width: 150px; 
+        }
+
+        /* Styles for drag and drop */
+        .setlist-song-item.dragging {
+            opacity: 0.6;
+            background: #dbeafe; /* Tailwind blue-100 */
+            transform: scale(1.03); /* Slightly larger */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* More pronounced shadow */
+        }
+        .drag-over-target {
+            border-top: 3px dashed #3a5d97 !important; /* Primary blue, thicker */
+            margin-top: -3px; /* Adjust to keep spacing consistent */
+            padding-top: 3px;
+        }
+
+        /* Animation for modal song results */
+        @keyframes bubbleIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-song-item-animate {
+            animation: bubbleIn 0.3s ease-out forwards;
+            opacity: 0; /* Start hidden for animation */
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- Background Music Notes -->
+    <div class="min-h-screen worship-bg relative">
+        <svg class="music-note" style="top: 10%; left: 5%;" width="80" height="80" viewBox="0 0 24 24"> 
+            <path fill="#4a6da7" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+        <svg class="music-note" style="top: 30%; right: 8%;" width="60" height="60" viewBox="0 0 24 24"> 
+            <path fill="#6b9ac4" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+        <svg class="music-note" style="bottom: 15%; left: 15%;" width="70" height="70" viewBox="0 0 24 24"> 
+            <path fill="#a5c8e4" d="M6 18.573V4h2v10.5c.5-.333 1.167-.5 2-.5 1.5 0 2.75.75 2.75 2.25S11.5 18.5 10 18.5c-1.5 0-3-.5-4-.5v.073zM14 18.5c-1 0-1.5-.5-1.5-1s.5-1 1.5-1 2 .5 2 1.5c0 .5-1 .5-2 .5z"/>
+        </svg>
+        <svg class="music-note" style="top: 60%; right: 20%;" width="50" height="50" viewBox="0 0 24 24"> 
+            <path fill="#4a6da7" d="M6 18.573V4h2v10.5c.5-.333 1.167-.5 2-.5 1.5 0 2.75.75 2.75 2.25S11.5 18.5 10 18.5c-1.5 0-3-.5-4-.5v.073zM14 18.5c-1 0-1.5-.5-1.5-1s.5-1 1.5-1 2 .5 2 1.5c0 .5-1 .5-2 .5z"/>
+        </svg>
+
+        <!-- Main Layout: Sidebar + Content -->
+        <div class="flex">
+            <!-- Playlist Sidebar -->
+            <div id="playlistSidebar" class="playlist-sidebar w-64 fixed h-screen text-white z-30 custom-scrollbar overflow-y-auto">
+                <div class="p-4">
+                    <div class="mb-6 text-center">
+                        <button id="createSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
+                            <i class="fas fa-plus-circle mr-2"></i> Create Song List
+                        </button>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3 flex items-center">
+                        <i class="fas fa-list-ul mr-2"></i> Your Playlists
+                    </h3>
+                    <div id="playlistItemsContainer" class="space-y-1">
+                        <p class="text-xs text-blue-200 italic px-2">No playlists created yet.</p>
+                    </div>
+                    <!-- Current Playlist Info (Placeholder) -->
+                    <h3 class="text-lg font-semibold mt-6 mb-3 flex items-center"><i class="fas fa-music mr-2"></i> Current List</h3>
+                    <div id="currentPlaylistInfo" class="bg-white/10 rounded-lg p-3 mb-4">
+                        <p class="text-sm font-medium mb-2">No songs selected</p>
+                        <p class="text-xs text-blue-100">Search and add songs to create a new list</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div id="mainPageContainer" class="ml-64 flex-1"> 
+                <!-- Header -->
+                <header class="bg-white shadow-sm sticky top-0 z-20"> 
+                    <div class="container mx-auto px-6 py-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg">
+                                    <i class="fas fa-church text-xl"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h1 class="text-2xl font-semibold text-[#3a3a3a] glow-text">Luther House Chapel</h1>
+                                    <p class="text-sm text-gray-500">Worship Song Selection Tool</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="btn-primary text-white px-4 py-2 rounded-md flex items-center"> 
+                                    <i class="fas fa-question-circle mr-2 glow-icon"></i> Help 
+                                </button>
+                                <button id="mySongListsBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"> 
+                                    <i class="fas fa-music mr-2 glow-icon"></i> My Song Lists 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Song Finder View -->
+                <div id="songFinderView">
+                    <main class="container mx-auto px-6 py-8">
+                        <!-- Search and Filter Section -->
+                        <div class="bg-white rounded-lg shadow-md p-6 mb-8 water-effect">
+                            <h2 class="text-xl font-semibold mb-6 text-[#3a3a3a] flex items-center">
+                                <i class="fas fa-search mr-2 text-[#4a6da7] glow-icon"></i> Find Worship Songs
+                            </h2>
+                            <!-- Search Input -->
+                            <div class="mb-6">
+                                <div class="flex relative">
+                                    <div class="relative flex-grow">
+                                        <input type="text" id="search" placeholder="Enter keywords, scripture reference, or song title" class="w-full p-3 rounded-l-md bg-gray-50 border-r-0">
+                                        <div id="autosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div>
+                                    </div>
+                                    <button id="searchBtn" class="btn-primary text-white px-6 py-3 rounded-none flex items-center"> 
+                                        <i class="fas fa-search mr-2"></i> Search 
+                                    </button>
+                                    <button id="clearBtn" class="btn-clear px-6 py-3 rounded-r-md flex items-center ml-2"> 
+                                        <i class="fas fa-times mr-2"></i> Clear 
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Filter Dropdowns -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6"> 
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Song Theme</label>
+                                    <select id="theme" class="w-full p-2 rounded-md bg-gray-50">
+                                        <option value="">All Themes</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Musical Key</label>
+                                    <select id="key" class="w-full p-2 rounded-md bg-gray-50">
+                                        <option value="">All Keys</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Song Style</label>
+                                    <select id="style" class="w-full p-2 rounded-md bg-gray-50">
+                                        <option value="">All Styles</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="tempoFilter" class="block text-sm font-medium text-gray-700 mb-1">Tempo</label>
+                                    <select id="tempoFilter" class="w-full p-2 rounded-md bg-gray-50">
+                                        <option value="">All Tempos</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="liturgicalSeasonFilter" class="block text-sm font-medium text-gray-700 mb-1">Liturgical Seasons</label>
+                                    <select id="liturgicalSeasonFilter" class="w-full p-2 rounded-md bg-gray-50">
+                                        <option value="">All Seasons</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Scripture Reference Input -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1"> 
+                                    <i class="fas fa-bible mr-1 text-[#4a6da7]"></i> Scripture Reference (ESV) 
+                                </label>
+                                <div class="bible-dropdown relative">
+                                    <div class="flex">
+                                        <input type="text" id="biblePassage" placeholder="Search for a Bible passage (e.g. John 3:16)" class="w-full p-2 rounded-md bg-gray-50">
+                                        <button id="bibleSearchBtn" class="ml-2 btn-secondary text-white px-3 py-2 rounded-md flex items-center"> 
+                                            <i class="fas fa-book-open"></i> 
+                                        </button>
+                                    </div>
+                                    <div id="bibleDropdown" class="bible-dropdown-content custom-scrollbar">
+                                        <!-- Bible passages inserted by JS -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Song Results Section -->
+                        <div id="songResults" class="bg-white rounded-lg shadow-md p-6 water-effect hidden">
+                            <div class="flex justify-between items-center mb-6 waterfall-animation waterfall-delay-1">
+                                <h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center">
+                                    <i class="fas fa-music mr-2 text-[#4a6da7] glow-icon"></i> Song Results 
+                                    <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500">(0 songs)</span>
+                                </h2>
+                                <div class="flex items-center">
+                                    <label class="text-sm text-gray-600 mr-2">Sort by:</label>
+                                    <select id="sortBy" class="p-1 text-sm rounded border border-gray-200">
+                                        <option value="relevance">Relevance</option>
+                                        <option value="title">Title (A-Z)</option>
+                                        <option value="popularity">Popularity</option>
+                                        <option value="newest">Newest First</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="activeFilters" class="mb-4 flex flex-wrap gap-2 waterfall-animation waterfall-delay-2"></div>
+                            <div id="songCardsContainer" class="h-[500px] overflow-y-auto custom-scrollbar pr-2 waterfall-animation waterfall-delay-3"></div>
+                            <div class="mt-6 flex justify-between items-center waterfall-animation waterfall-delay-4">
+                                <div>
+                                    <span class="text-sm text-gray-600">
+                                        Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs
+                                    </span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <div id="pagination"></div>
+                                    <button id="clearResultsBtn" class="btn-clear px-4 py-1 rounded-md flex items-center ml-4">
+                                        <i class="fas fa-times-circle mr-2"></i> Clear Results
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Empty State (No Search Yet or No Results) -->
+                        <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center water-effect">
+                            <div class="flex justify-center mb-4">
+                                <svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3>
+                            <p class="text-gray-600 mb-6">Use the search and filters above to find songs for your worship service</p>
+                            <button id="startSearchingBtnEmptyState" class="btn-primary text-white px-6 py-3 rounded-md flex items-center mx-auto"> 
+                                <i class="fas fa-search mr-2"></i> Start Searching 
+                            </button>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- Song Detail Page View -->
+                <div id="songDetailPageView" class="hidden container mx-auto px-6 py-8">
+                     <button id="backToSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md mb-6 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Song List
+                    </button>
+                    <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                        <div id="songDetailHeaderLHC" class="mb-4 border-b pb-4"></div>
+                        <div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm"></div>
+                        <div id="songDetailDocsLHC" class="mb-6">
+                             <h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-x-8 gap-y-8">
+                            <div>
+                                <h3 class="text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3>
+                                <div id="songDetailLyricsLHC" class="song-detail-lyrics custom-scrollbar p-2 bg-gray-50 rounded"></div>
+                            </div>
+                            <div>
+                                <div id="songDetailYouTubeLHC" class="mb-6"></div>
+                                <div id="songDetailMp3LHC"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Worship Setlist Page View -->
+                <div id="worshipSetlistPageView" class="hidden container mx-auto px-6 py-8">
+                     <div class="flex justify-between items-center mb-6">
+                        <button id="backToSongListFromSetlistBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Song List
+                        </button>
+                        <button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Songs
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
+                        <div id="setlistSongsContainer" class="custom-scrollbar"> 
+                            <p class="text-gray-500">Songs in this setlist will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <footer class="bg-[#3a3a3a] text-white py-6 mt-12">
+                    <div class="container mx-auto px-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center">
+                            <div class="mb-4 md:mb-0">
+                                <h3 class="text-lg font-semibold">Luther House Chapel</h3>
+                                <p class="text-sm text-gray-300">Worship Ministry Song Database</p>
+                            </div>
+                            <div class="flex space-x-4">
+                                <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-youtube"></i></a>
+                                <a href="#" class="text-gray-300 hover:text-white"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center text-sm text-gray-400"><p>© 2024 Luther House Chapel. All rights reserved.</p></div>
+                    </div>
+                </footer>
+            </div> <!-- End mainPageContainer -->
+        </div> <!-- End flex -->
+    </div> <!-- End worship-bg -->
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-75 flex flex-col justify-center items-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+        <p class="text-white text-lg mt-4 loading-text-animated">Loading Songs...</p>
+    </div>
+
+    <!-- Add to Existing List Modal -->
+    <div id="addToListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-[#3a3a3a]">Add "<span id="songToAddNameModal"></span>" to...</h3>
+                <button id="addToListModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div class="mb-4">
+                <label for="playlistSelectModal" class="block text-sm font-medium text-gray-700 mb-1">Select Playlist:</label>
+                <select id="playlistSelectModal" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50"></select>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmAddToListBtnModal" class="btn-primary text-white px-4 py-2 rounded-md">Add to Playlist</button>
+                <button id="cancelAddToListBtnModal" class="btn-clear px-4 py-2 rounded-md">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+            <div class="modal-header flex justify-between items-center mb-4 border-b pb-3">
+                <h3 id="modalTitle" class="text-xl font-semibold text-[#3a3a3a]">Document Preview</h3>
+                <button id="modalCloseButton" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div id="modalBody" class="modal-body flex-grow overflow-y-auto custom-scrollbar">
+                <!-- Iframe or content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Playlist Modal -->
+    <div id="createPlaylistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3>
+                <button id="createPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="newPlaylistName" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="newPlaylistName" placeholder="E.g., Sunday Morning Worship" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                </div>
+                <div>
+                    <label for="newPlaylistSubtitle" class="block text-sm font-medium text-gray-700 mb-1">Subtitle / Date / Remarks</label>
+                    <input type="text" id="newPlaylistSubtitle" placeholder="E.g., June 9th, 2025 or Special Service" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                </div>
+
+                <div class="border-t pt-4">
+                    <h4 class="text-md font-semibold text-gray-700 mb-2">Add Songs:</h4>
+                    <div class="relative mb-2">
+                        <input type="text" id="modalSongSearchInput" placeholder="Search for songs to add..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                        <div id="modalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-50">
+                            <!-- Autosuggest items for modal search will appear here -->
+                        </div>
+                    </div>
+                    <div id="modalSelectedSongsContainer" class="min-h-[100px] max-h-[200px] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
+                        <p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet. Search above to add songs.</p>
+                        <!-- Selected songs will be listed here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6">
+                <button id="saveNewPlaylistBtn" class="btn-primary text-white px-4 py-2 rounded-md">
+                    <i class="fas fa-save mr-2"></i>Save Playlist
+                </button>
+                <button id="cancelNewPlaylistBtn" class="btn-clear px-4 py-2 rounded-md">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Songs to Setlist Modal -->
+    <div id="addSongsToSetlistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-semibold text-[#3a3a3a]">Add Songs to Setlist</h3>
+                <button id="addSongsToSetlistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-2">
+                <!-- Search and Filters within Modal -->
+                <div class="mb-4">
+                    <input type="text" id="modalSetlistSongSearchInput" placeholder="Search songs by title, artist, lyrics..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                    <div id="modalSetlistAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[60]"></div> <!-- Higher z-index -->
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Theme</label>
+                        <select id="modalSetlistThemeFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Themes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Key</label>
+                        <select id="modalSetlistKeyFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Keys</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Style</label>
+                        <select id="modalSetlistStyleFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Styles</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tempo</label>
+                        <select id="modalSetlistTempoFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Tempos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Liturgical Season</label>
+                        <select id="modalSetlistLiturgicalSeasonFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Seasons</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Scripture</label>
+                        <input type="text" id="modalSetlistScriptureFilter" placeholder="e.g., John 3:16" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                </div>
+                 <div class="flex space-x-2 mb-4">
+                    <button id="modalSetlistApplyFiltersBtn" class="flex-grow btn-primary text-white px-4 py-2 rounded-md">Search</button>
+                    <button id="modalSetlistClearFiltersBtn" class="btn-clear px-4 py-2 rounded-md text-sm">Clear</button>
+                </div>
+
+
+                <!-- Song Results in Modal -->
+                <div id="modalSetlistSongResultsContainer" class="min-h-[200px] max-h-[40vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
+                    <p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-4 pt-4 border-t">
+                <button id="closeAddSongsToSetlistModalBtn" class="btn-clear px-4 py-2 rounded-md">Done</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- START OF SCRIPT ---
+        console.log("LHC Worship Site Script Initializing... (v3.9 - YouTube Syntax Fix)");
+
+        // --- Global Variables ---
+        let allSongsData = []; 
+        let sitePlaylists = []; 
+        let currentSongForPlaylist = null; 
+        const songsJsonUrl = "https://script.google.com/macros/s/AKfycbwoHlz98GgsMUdtgUxx01BjzD1C3NIEs3ojFC-4p2qMV0CTc46XxGd8ZxJ8C6MpaC1U/exec"; 
+        let draggedSongId = null; // For drag and drop
+        let cameFromPlaylistId = null; // For "Back to Setlist" button
+
+        // --- DOM Element Variables ---
+        let loadingIndicator, mainPageContainer, songFinderView, songDetailPageView, worshipSetlistPageView,
+            searchBtn, clearBtn, clearResultsBtn, themeSelect, keySelect, styleSelect, searchInput, 
+            biblePassageInput, bibleSearchBtn, songResultsDiv, emptyStateDiv, 
+            songCardsContainer, resultCountSpan, showingCountSpan, totalCountSpan, activeFiltersContainer, 
+            sortBySelect, liturgicalSeasonFilter, tempoFilter, songDetailHeaderLHC, songDetailMetaLHC, 
+            songDetailDocsLHC, songDetailLyricsLHC, songDetailYouTubeLHC, songDetailMp3LHC, backToSongListBtn,
+            setlistNameDisplay, setlistSongsContainer, backToSongListFromSetlistBtn, playlistItemsContainer,
+            createSongListBtn, mySongListsBtn, currentPlaylistInfo, addToListModal, songToAddNameModalSpan,
+            playlistSelectModal, confirmAddToListBtnModal, cancelAddToListBtnModal, addToListModalCloseBtn,
+            previewModal, modalTitle, modalBody, modalCloseButton, startSearchingBtnEmptyState, autosuggestDropdownEl,
+            addSongsToCurrentSetlistBtn; // Button on setlist page
+
+        // New Playlist Modal Elements
+        let createPlaylistModal, newPlaylistNameInput, newPlaylistSubtitleInput,
+            modalSongSearchInput, modalAutosuggestDropdownEl, modalSelectedSongsContainer,
+            saveNewPlaylistBtn, cancelNewPlaylistBtn, createPlaylistModalCloseBtn;
+        
+        let songsForNewPlaylist = []; // Temp array for songs in the new playlist modal
+
+        // Add Songs to Setlist Modal Elements
+        let addSongsToSetlistModal, addSongsToSetlistModalCloseBtn, closeAddSongsToSetlistModalBtn,
+            modalSetlistSongSearchInput, modalSetlistAutosuggestDropdown,
+            modalSetlistThemeFilter, modalSetlistKeyFilter, modalSetlistStyleFilter,
+            modalSetlistTempoFilter, modalSetlistLiturgicalSeasonFilter, modalSetlistScriptureFilter,
+            modalSetlistApplyFiltersBtn, modalSetlistClearFiltersBtn, modalSetlistSongResultsContainer;
+
+
+        // --- Function to Assign DOM References ---
+        function assignDOMReferences() {
+            console.log("Assigning DOM references...");
+            loadingIndicator = document.getElementById('loadingIndicator');
+            mainPageContainer = document.getElementById('mainPageContainer'); 
+            songFinderView = document.getElementById('songFinderView');
+            songDetailPageView = document.getElementById('songDetailPageView');
+            worshipSetlistPageView = document.getElementById('worshipSetlistPageView');
+
+            searchBtn = document.getElementById('searchBtn');
+            clearBtn = document.getElementById('clearBtn');
+            clearResultsBtn = document.getElementById('clearResultsBtn');
+            themeSelect = document.getElementById('theme');
+            keySelect = document.getElementById('key');
+            styleSelect = document.getElementById('style');
+            searchInput = document.getElementById('search');
+            biblePassageInput = document.getElementById('biblePassage');
+            bibleSearchBtn = document.getElementById('bibleSearchBtn');
+            songResultsDiv = document.getElementById('songResults');
+            emptyStateDiv = document.getElementById('emptyState');
+            songCardsContainer = document.getElementById('songCardsContainer');
+            resultCountSpan = document.getElementById('resultCount');
+            showingCountSpan = document.getElementById('showingCount');
+            totalCountSpan = document.getElementById('totalCount');
+            activeFiltersContainer = document.getElementById('activeFilters');
+            sortBySelect = document.getElementById('sortBy');
+            liturgicalSeasonFilter = document.getElementById('liturgicalSeasonFilter'); 
+            tempoFilter = document.getElementById('tempoFilter'); 
+            autosuggestDropdownEl = document.getElementById('autosuggestDropdown');
+            
+            songDetailHeaderLHC = document.getElementById('songDetailHeaderLHC');
+            songDetailMetaLHC = document.getElementById('songDetailMetaLHC');
+            songDetailDocsLHC = document.getElementById('songDetailDocsLHC');
+            songDetailLyricsLHC = document.getElementById('songDetailLyricsLHC');
+            songDetailYouTubeLHC = document.getElementById('songDetailYouTubeLHC');
+            songDetailMp3LHC = document.getElementById('songDetailMp3LHC'); 
+            backToSongListBtn = document.getElementById('backToSongListBtn');
+
+            setlistNameDisplay = document.getElementById('setlistNameDisplay');
+            setlistSongsContainer = document.getElementById('setlistSongsContainer');
+            backToSongListFromSetlistBtn = document.getElementById('backToSongListFromSetlistBtn');
+            playlistItemsContainer = document.getElementById('playlistItemsContainer');
+            createSongListBtn = document.getElementById('createSongListBtn');
+            mySongListsBtn = document.getElementById('mySongListsBtn');
+            currentPlaylistInfo = document.getElementById('currentPlaylistInfo');
+            addSongsToCurrentSetlistBtn = document.getElementById('addSongsToCurrentSetlistBtn');
+            
+            addToListModal = document.getElementById('addToListModal');
+            songToAddNameModalSpan = document.getElementById('songToAddNameModal');
+            playlistSelectModal = document.getElementById('playlistSelectModal');
+            confirmAddToListBtnModal = document.getElementById('confirmAddToListBtnModal');
+            cancelAddToListBtnModal = document.getElementById('cancelAddToListBtnModal');
+            addToListModalCloseBtn = document.getElementById('addToListModalCloseBtn');
+            
+            previewModal = document.getElementById('previewModal');
+            modalTitle = document.getElementById('modalTitle');
+            modalBody = document.getElementById('modalBody');
+            modalCloseButton = document.getElementById('modalCloseButton');
+            startSearchingBtnEmptyState = document.getElementById('startSearchingBtnEmptyState');
+
+            createPlaylistModal = document.getElementById('createPlaylistModal');
+            newPlaylistNameInput = document.getElementById('newPlaylistName');
+            newPlaylistSubtitleInput = document.getElementById('newPlaylistSubtitle');
+            modalSongSearchInput = document.getElementById('modalSongSearchInput');
+            modalAutosuggestDropdownEl = document.getElementById('modalAutosuggestDropdown'); 
+            modalSelectedSongsContainer = document.getElementById('modalSelectedSongsContainer');
+            saveNewPlaylistBtn = document.getElementById('saveNewPlaylistBtn');
+            cancelNewPlaylistBtn = document.getElementById('cancelNewPlaylistBtn');
+            createPlaylistModalCloseBtn = document.getElementById('createPlaylistModalCloseBtn');
+
+            // Add Songs to Setlist Modal elements
+            addSongsToSetlistModal = document.getElementById('addSongsToSetlistModal');
+            addSongsToSetlistModalCloseBtn = document.getElementById('addSongsToSetlistModalCloseBtn');
+            closeAddSongsToSetlistModalBtn = document.getElementById('closeAddSongsToSetlistModalBtn');
+            modalSetlistSongSearchInput = document.getElementById('modalSetlistSongSearchInput');
+            modalSetlistAutosuggestDropdown = document.getElementById('modalSetlistAutosuggestDropdown');
+            modalSetlistThemeFilter = document.getElementById('modalSetlistThemeFilter');
+            modalSetlistKeyFilter = document.getElementById('modalSetlistKeyFilter');
+            modalSetlistStyleFilter = document.getElementById('modalSetlistStyleFilter');
+            modalSetlistTempoFilter = document.getElementById('modalSetlistTempoFilter');
+            modalSetlistLiturgicalSeasonFilter = document.getElementById('modalSetlistLiturgicalSeasonFilter');
+            modalSetlistScriptureFilter = document.getElementById('modalSetlistScriptureFilter');
+            modalSetlistApplyFiltersBtn = document.getElementById('modalSetlistApplyFiltersBtn');
+            modalSetlistClearFiltersBtn = document.getElementById('modalSetlistClearFiltersBtn');
+            modalSetlistSongResultsContainer = document.getElementById('modalSetlistSongResultsContainer');
+
+
+            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal) {
+                console.error("CRITICAL DOM INIT ERROR: Essential elements like searchBtn or modals are missing.");
+            }
+            console.log("DOM references assigned.");
+        }
+
+        // --- Utility Functions ---
+        function escapeHtml(unsafe) { 
+            if (typeof unsafe !== 'string') {
+                if (unsafe === null || typeof unsafe === 'undefined') return '';
+                return String(unsafe);
+            }
+            return unsafe
+                .replace(/&/g, "&") 
+                .replace(/</g, "<")
+                .replace(/>/g, ">")
+ 		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;"); 
+        }
+
+        function getYouTubeVideoId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // --- Page View Management ---
+        function showAppView(viewIdToShow) {
+            console.log("Attempting to show view:", viewIdToShow);
+            if(songFinderView) songFinderView.style.display = 'none';
+            if(songDetailPageView) songDetailPageView.style.display = 'none';
+            if(worshipSetlistPageView) worshipSetlistPageView.style.display = 'none';
+
+            const viewElement = document.getElementById(viewIdToShow);
+            if (viewElement) {
+                viewElement.style.display = 'block';
+                console.log(viewIdToShow + " displayed.");
+                if (mainPageContainer) mainPageContainer.scrollTop = 0;
+            } else {
+                console.error("View element not found:", viewIdToShow);
+                if(songFinderView) songFinderView.style.display = 'block';
+            }
+        }
+
+        // --- Data Fetching and Initialization ---
+        async function fetchSongDataAndInitialize() {
+            if (loadingIndicator) loadingIndicator.style.display = 'flex';
+            console.log("Fetching songs from:", songsJsonUrl);
+            try {
+                const response = await fetch(songsJsonUrl);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}. Details: ${errorText}`);
+                }
+                const data = await response.json();
+                if (!Array.isArray(data)) {
+                    throw new Error("Fetched data is not an array.");
+                }
+                allSongsData = data.map((song, index) => ({
+                    id: escapeHtml(song.title || 'N/A').replace(/\s+/g, '-').toLowerCase() + '-' + 
+                        escapeHtml(song.artist || 'Unknown').replace(/\s+/g, '-').toLowerCase() + '-' + 
+                        index,
+                    title: escapeHtml(song.title || 'Untitled Song'),
+                    artist: escapeHtml(song.artist || 'Unknown Artist'),
+                    key: escapeHtml(song.key || 'N/A'),
+                    style: escapeHtml(song.category || song.style || 'N/A'),
+                    themes: Array.isArray(song.theme) ? song.theme.map(t => escapeHtml(String(t))) : (song.theme ? [escapeHtml(String(song.theme))] : []),
+                    scripture: Array.isArray(song.scripture) ? song.scripture.map(s => escapeHtml(String(s))) : (song.scripture && String(song.scripture).trim() !== '' ? [escapeHtml(String(song.scripture))] : []),
+                    keywords: (song.lyrics || '').toLowerCase().split(/\s+/).filter(word => word && word.length > 2).slice(0,20),
+                    lyrics: escapeHtml(song.lyrics || ''),
+                    docLinks: Array.isArray(song.docLinks) ? song.docLinks.map(doc => ({...doc, url: escapeHtml(doc.url), name: escapeHtml(doc.name), type: escapeHtml(doc.type) })) : (song.docUrl ? [{url: escapeHtml(song.docUrl), type: escapeHtml(song.docType || 'unknown'), name: 'Document'}] : []),
+                    youtubeUrl: escapeHtml(song.youtubeUrl || ''),
+                    hasPhysicalCopy: song.hasPhysicalCopy === true || String(song.hasPhysicalCopy).toLowerCase() === 'true',
+                    mp3Url: escapeHtml(song.mp3Url || ''),
+                    tempo: escapeHtml(song.tempo || 'N/A'),
+                    liturgicalSeason: escapeHtml(song.liturgicalSeason || 'N/A')
+                }));
+                console.log("Songs loaded and mapped:", allSongsData.length);
+                resetToInitialEmptyState(false);
+                populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter); // Populate main filters
+                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter); // Main search autosuggest
+                loadPlaylists();
+            } catch (error) {
+                console.error("Error in fetchSongDataAndInitialize:", error);
+                if (emptyStateDiv) {
+                    emptyStateDiv.innerHTML = `<p class="text-red-500 font-semibold">Error loading songs!</p><p class="text-gray-600 text-sm">${error.message}</p>`;
+                    emptyStateDiv.classList.remove('hidden');
+                }
+            } finally {
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // --- Filter Dropdown Population (Refactored) ---
+        function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
+            const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
+                const value = song[key];
+                if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(v => v && v !== "N/A");
+                if (value && String(value).trim() !== "" && String(value).trim() !== "N/A") {
+                    return String(value).split(/\s*(?:,|\band\b)\s*/i).map(v => v.trim()).filter(v => v);
+                }
+                return [];
+            }))].sort((a,b) => a.localeCompare(b));
+
+            const populateSelect = (selectElement, optionsSet) => {
+                if (!selectElement) return;
+                const firstOption = selectElement.options[0]; // Preserve "All..." option
+                selectElement.innerHTML = ""; 
+                if (firstOption) selectElement.appendChild(firstOption); 
+                optionsSet.forEach(optionValue => {
+                    const opt = document.createElement("option");
+                    opt.value = optionValue.toLowerCase(); 
+                    opt.textContent = optionValue;
+                    selectElement.appendChild(opt);
+                });
+            };
+            populateSelect(targetThemeSelect, uniqueValues('themes'));
+            populateSelect(targetKeySelect, uniqueValues('key'));
+            populateSelect(targetStyleSelect, uniqueValues('style'));
+            populateSelect(targetTempoFilter, uniqueValues('tempo'));
+            populateSelect(targetLiturgicalSeasonFilter, uniqueValues('liturgicalSeason'));
+            console.log("Filter dropdowns populated for target elements.");
+        }
+
+        // --- Search and Filter Logic (Main Page) ---
+        function performSearchAndFilter() {
+            if (!allSongsData) return;
+            const filters = {
+                theme: themeSelect ? themeSelect.value : '',
+                key: keySelect ? keySelect.value : '',
+                style: styleSelect ? styleSelect.value : '',
+                searchTerm: searchInput ? searchInput.value.toLowerCase().trim() : '',
+                scripture: biblePassageInput ? biblePassageInput.value.toLowerCase().trim() : '',
+                liturgicalSeason: liturgicalSeasonFilter ? liturgicalSeasonFilter.value : '',
+                tempo: tempoFilter ? tempoFilter.value : ''
+            };
+
+            const noFiltersApplied = Object.values(filters).every(val => val === '');
+            if (noFiltersApplied) {
+                generateSongCards(allSongsData);
+                updateResultCounts(allSongsData.length, allSongsData.length);
+                if (songResultsDiv) songResultsDiv.classList.remove('hidden');
+                if (emptyStateDiv) emptyStateDiv.classList.add('hidden');
+                updateActiveFiltersDisplay(filters);
+                return;
+            }
+
+            const filteredSongs = allSongsData.filter(song => {
+                if (filters.searchTerm) {
+                    const term = filters.searchTerm;
+                    const titleMatch = song.title.toLowerCase().startsWith(term);
+                    const artistMatch = song.artist && song.artist.toLowerCase().startsWith(term);
+                    const lyricsMatch = song.lyrics && song.lyrics.toLowerCase().includes(term);
+                    if (!(titleMatch || artistMatch || lyricsMatch)) return false;
+                }
+                if (filters.theme && !(Array.isArray(song.themes) ? song.themes.map(t=>t.toLowerCase()) : [String(song.themes||'').toLowerCase()]).includes(filters.theme)) return false;
+                if (filters.key && !String(song.key||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(k=>k.trim()).includes(filters.key)) return false;
+                if (filters.style && !(song.style && song.style.toLowerCase() === filters.style)) return false;
+                if (filters.scripture && !(Array.isArray(song.scripture) ? song.scripture.some(s=>String(s).toLowerCase().includes(filters.scripture)) : (song.scripture && String(song.scripture).toLowerCase().includes(filters.scripture)))) return false;
+                if (filters.liturgicalSeason && !String(song.liturgicalSeason||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(ls=>ls.trim()).includes(filters.liturgicalSeason)) return false;
+                if (filters.tempo && !(song.tempo && song.tempo.toLowerCase() === filters.tempo)) return false;
+                return true;
+            });
+
+            generateSongCards(filteredSongs);
+            updateResultCounts(filteredSongs.length, filteredSongs.length);
+            if (songResultsDiv) songResultsDiv.classList.toggle('hidden', filteredSongs.length === 0);
+            if (emptyStateDiv) {
+                emptyStateDiv.classList.toggle('hidden', filteredSongs.length > 0);
+                if (filteredSongs.length === 0) {
+                     emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">No Songs Found</h3><p class="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>`;
+                }
+            }
+            updateActiveFiltersDisplay(filters);
+        }
+
+        function updateResultCounts(showing, total) {
+            if (resultCountSpan) resultCountSpan.textContent = `(${total} songs)`;
+            if (showingCountSpan) showingCountSpan.textContent = total > 0 ? `1-${Math.min(6, total)}` : '0-0'; // Assuming page size 6 for now
+            if (totalCountSpan) totalCountSpan.textContent = total;
+        }
+        
+        // --- Song Card Generation ---
+        function generateSongCards(songs) {
+            if (!songCardsContainer) return;
+            songCardsContainer.innerHTML = '';
+            if (songs.length === 0) return;
+            songs.forEach((song, index) => {
+                const songCard = document.createElement('div');
+                songCard.className = `song-card p-4 mb-3 bg-gray-50 rounded-md hover:bg-white border border-gray-100 waterfall-animation`;
+                songCard.style.animationDelay = `${0.05 * index}s`;
+                songCard.dataset.songId = song.id;
+                const themesString = Array.isArray(song.themes) ? song.themes.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ') : (song.themes || 'N/A');
+                songCard.innerHTML = `
+                    <div class="flex justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg text-[#3a5d97] cursor-pointer hover:underline song-title-clickable">${song.title}</h3>
+                            <p class="text-gray-600 text-sm">${song.artist}</p>
+                            <div class="flex flex-wrap mt-1 text-xs text-gray-500">
+                                <span class="mr-3 mb-1"><i class="fas fa-music mr-1 text-[#4a6da7]"></i> Key: ${song.key}</span>
+                                <span class="mr-3 mb-1"><i class="fas fa-guitar mr-1 text-[#4a6da7]"></i> ${song.style}</span>
+                                <span class="mb-1"><i class="fas fa-tag mr-1 text-[#4a6da7]"></i> ${themesString}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-between items-end">
+                            <button class="p-1 text-gray-500 hover:text-[#4a6da7] view-song-details-btn" title="View Details"><i class="fas fa-info-circle"></i></button>
+                            <button class="text-xs text-white bg-[#6b9ac4] hover:bg-[#5b8ab4] px-2 py-1 rounded add-to-playlist-btn mt-2"><i class="fas fa-plus mr-1"></i> Add to List</button>
+                        </div>
+                    </div>`;
+                songCardsContainer.appendChild(songCard);
+                songCard.querySelector('.song-title-clickable').addEventListener('click', () => displaySongDetailPage(song));
+                songCard.querySelector('.view-song-details-btn').addEventListener('click', () => displaySongDetailPage(song));
+                songCard.querySelector('.add-to-playlist-btn').addEventListener('click', () => { currentSongForPlaylist = song; openAddToListModal(); });
+            });
+        }
+
+        // --- Active Filter Pills Display ---
+        function updateActiveFiltersDisplay(filters) {
+            if (!activeFiltersContainer) return;
+            activeFiltersContainer.innerHTML = '';
+            const createPill = (type, displayValue, filterKey) => {
+                const pill = document.createElement('span');
+                pill.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800';
+                pill.innerHTML = `${type}: ${escapeHtml(displayValue)} <button class="ml-1.5 text-blue-600 hover:text-blue-800 remove-filter-btn" data-filter-key="${filterKey}">×</button>`;
+                pill.querySelector('.remove-filter-btn').addEventListener('click', function() {
+                    const key = this.dataset.filterKey;
+                    if (key === 'searchTerm' && searchInput) searchInput.value = '';
+                    else if (key === 'scripture' && biblePassageInput) biblePassageInput.value = '';
+                    else if (document.getElementById(key)) document.getElementById(key).value = ''; // For select elements by ID
+                    else { 
+                        if(key === 'theme' && themeSelect) themeSelect.value = '';
+                        else if(key === 'key' && keySelect) keySelect.value = '';
+                        else if(key === 'style' && styleSelect) styleSelect.value = '';
+                        else if(key === 'liturgicalSeasonFilter' && liturgicalSeasonFilter) liturgicalSeasonFilter.value = ''; // Match ID
+                        else if(key === 'tempoFilter' && tempoFilter) tempoFilter.value = ''; // Match ID
+                    }
+                    performSearchAndFilter();
+                });
+                activeFiltersContainer.appendChild(pill);
+            };
+
+            if (filters.searchTerm) createPill('Search', filters.searchTerm, 'searchTerm');
+            if (filters.theme && themeSelect.options[themeSelect.selectedIndex]?.text !== "All Themes") createPill('Theme', themeSelect.options[themeSelect.selectedIndex]?.text, 'theme');
+            if (filters.key && keySelect.options[keySelect.selectedIndex]?.text !== "All Keys") createPill('Key', keySelect.options[keySelect.selectedIndex]?.text, 'key');
+            if (filters.style && styleSelect.options[styleSelect.selectedIndex]?.text !== "All Styles") createPill('Style', styleSelect.options[styleSelect.selectedIndex]?.text, 'style');
+            if (filters.scripture) createPill('Scripture', filters.scripture, 'scripture');
+            if (filters.liturgicalSeason && liturgicalSeasonFilter.options[liturgicalSeasonFilter.selectedIndex]?.text !== "All Seasons") createPill('Season', liturgicalSeasonFilter.options[liturgicalSeasonFilter.selectedIndex]?.text, 'liturgicalSeasonFilter');
+            if (filters.tempo && tempoFilter.options[tempoFilter.selectedIndex]?.text !== "All Tempos") createPill('Tempo', tempoFilter.options[tempoFilter.selectedIndex]?.text, 'tempoFilter');
+        }
+        
+        // --- Song Detail Page ---
+        function displaySongDetailPage(song, fromPlaylistId = null) { 
+            if (!song) return;
+            cameFromPlaylistId = fromPlaylistId; 
+
+            songDetailHeaderLHC.innerHTML = `<h1 class="text-3xl md:text-4xl font-bold text-[#3a5d97] mb-1">${song.title}</h1><p class="text-xl text-gray-600">by ${song.artist}</p>`;
+            const themesString = Array.isArray(song.themes) && song.themes.length > 0 ? song.themes.map(t => `<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs mr-1 mb-1 inline-block">${t}</span>`).join('') : 'N/A';
+            const scriptureString = Array.isArray(song.scripture) && song.scripture.length > 0 ? song.scripture.map(s => `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs mr-1 mb-1 inline-block">${s}</span>`).join('') : 'N/A';
+            const physicalCopyHTML = song.hasPhysicalCopy ? '<span class="text-green-600 ml-2"><i class="fas fa-check-circle"></i> In Cabinet</span>' : '<span class="text-red-600 ml-2"><i class="fas fa-times-circle"></i> Not In Cabinet</span>';
+
+            songDetailMetaLHC.innerHTML = `
+                <div><strong>Key:</strong> ${song.key}</div>
+                <div><strong>Style:</strong> ${song.style}</div>
+                <div><strong>Tempo:</strong> ${song.tempo || 'N/A'}</div>
+                <div class="col-span-full sm:col-span-2 md:col-span-3"><strong>Themes:</strong> ${themesString}</div>
+                <div class="col-span-full sm:col-span-2 md:col-span-3"><strong>Scripture:</strong> ${scriptureString}</div>
+                <div class="col-span-full sm:col-span-2 md:col-span-3"><strong>Physical Copy:</strong> ${physicalCopyHTML}</div>`;
+            
+            songDetailDocsLHC.innerHTML = `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>`;
+            const docList = document.createElement('div'); docList.className = "flex flex-wrap gap-2";
+            if (song.docLinks && song.docLinks.length > 0) {
+                song.docLinks.forEach(doc => {
+                     if (doc.url) {
+                        const docTypeLower = doc.type ? doc.type.toLowerCase() : '';
+                        let iconClass = 'fa-file-alt'; let buttonClass = 'open-generic-doc-button'; let buttonText = doc.name || 'Open Document';
+                        if (docTypeLower === 'pdf') { iconClass = 'fa-file-pdf'; buttonClass = 'open-pdf-button'; buttonText = doc.name || 'Open PDF'; }
+                        else if (docTypeLower === 'word') { iconClass = 'fa-file-word'; buttonClass = 'open-word-button'; buttonText = doc.name || 'Open Word Doc'; }
+                        const docButton = document.createElement('button');
+                        docButton.className = `doc-ribbon-button ${buttonClass}`;
+                        docButton.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(buttonText)}`;
+                        docButton.addEventListener('click', () => openPreviewModal(doc.url, doc.type, doc.name || song.title));
+                        docList.appendChild(docButton);
+                    }
+                });
+            } else { docList.innerHTML = `<p class="text-gray-500 text-sm">No documents linked.</p>`; }
+            songDetailDocsLHC.appendChild(docList);
+
+            songDetailLyricsLHC.textContent = song.lyrics || 'Lyrics not available.';
+            
+            if (song.youtubeUrl) {
+                const videoId = getYouTubeVideoId(song.youtubeUrl);
+                // Corrected YouTube URL template literal
+                songDetailYouTubeLHC.innerHTML = videoId ? `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen on YouTube:</h4><iframe class="w-full aspect-video rounded-md shadow-md" src="https://www.youtube.com/embed/$${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : '<p class="text-sm text-gray-500">YouTube video not available or URL is invalid.</p>';
+            } else { songDetailYouTubeLHC.innerHTML = '<p class="text-sm text-gray-500">No YouTube video linked.</p>';}
+            
+            if (song.mp3Url && songDetailMp3LHC) {
+                songDetailMp3LHC.innerHTML = `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen to MP3:</h4><audio controls class="w-full"><source src="${escapeHtml(song.mp3Url)}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
+            } else if(songDetailMp3LHC) {
+                 songDetailMp3LHC.innerHTML = '';
+            }
+
+            if (backToSongListBtn) {
+                if (cameFromPlaylistId) {
+                    backToSongListBtn.innerHTML = `<i class="fas fa-arrow-left mr-2"></i> Back to Setlist`;
+                } else {
+                    backToSongListBtn.innerHTML = `<i class="fas fa-arrow-left mr-2"></i> Back to Song List`;
+                }
+            }
+            showAppView('songDetailPageView');
+        }
+
+        // --- Modals (Preview, Add to List) ---
+        function openPreviewModal(url, docType, title) {
+            if (!previewModal || !modalTitle || !modalBody) { console.error("Modal elements not found!"); return; }
+            modalTitle.textContent = `Preview: ${escapeHtml(title)}`;
+            modalBody.innerHTML = '';
+            let embedUrl = url;
+            if (url.includes("drive.google.com") && url.includes("/file/d/") && !url.includes("/preview") && !url.includes("/embed")) {
+                const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (fileIdMatch && fileIdMatch[1]) embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+            } else if (docType && docType.toLowerCase() !== 'pdf' && (url.toLowerCase().match(/\.(doc|docx|ppt|pptx|xls|xlsx)$/))) {
+                embedUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+            }
+            modalBody.innerHTML = `<iframe class="w-full h-full min-h-[60vh]" src="${embedUrl}" title="Document Preview"></iframe>`;
+            previewModal.classList.remove('hidden');
+        }
+        function openAddToListModal() {
+            if (!addToListModal || !currentSongForPlaylist || !songToAddNameModalSpan || !playlistSelectModal) return;
+            songToAddNameModalSpan.textContent = currentSongForPlaylist.title;
+            playlistSelectModal.innerHTML = ''; 
+            if (sitePlaylists.length === 0) {
+                playlistSelectModal.innerHTML = '<option value="">No playlists available. Create one first.</option>';
+                if(confirmAddToListBtnModal) confirmAddToListBtnModal.disabled = true;
+            } else {
+                sitePlaylists.forEach(playlist => {
+                    const option = document.createElement('option'); option.value = playlist.id; option.textContent = playlist.name;
+                    playlistSelectModal.appendChild(option);
+                });
+                if(confirmAddToListBtnModal) confirmAddToListBtnModal.disabled = false;
+            }
+            addToListModal.classList.remove('hidden');
+        }
+
+        // --- Reset UI State ---
+        function resetToInitialEmptyState(performFilterAfter = false) {
+            if (themeSelect) themeSelect.value = ''; if (keySelect) keySelect.value = ''; if (styleSelect) styleSelect.value = '';
+            if (searchInput) searchInput.value = ''; if (biblePassageInput) biblePassageInput.value = '';
+            if (liturgicalSeasonFilter) liturgicalSeasonFilter.value = ''; if (tempoFilter) tempoFilter.value = '';
+            if (activeFiltersContainer) activeFiltersContainer.innerHTML = '';
+            if (songCardsContainer) songCardsContainer.innerHTML = '';
+            updateResultCounts(0,0);
+            if (songResultsDiv) songResultsDiv.classList.add('hidden');
+            if (emptyStateDiv) {
+                emptyStateDiv.classList.remove('hidden');
+                emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above.</p><button id="startSearchingBtnEmptyState" class="btn-primary text-white px-6 py-3 rounded-md flex items-center mx-auto"> <i class="fas fa-search mr-2"></i> Start Searching </button>`;
+                const btn = document.getElementById('startSearchingBtnEmptyState');
+                if(btn && searchInput) btn.addEventListener('click', () => searchInput.focus());
+            }
+            if (performFilterAfter) performSearchAndFilter();
+        }
+        
+        // --- Autosuggest & Bible Dropdown Init (Refactored for reusability) ---
+        function initBiblePassageDropdown() {
+            const biblePassages = [ "Genesis 1:1", "Psalm 23", "John 3:16", "Romans 8:28", "Philippians 4:13" ];
+            const bibleDropdownContent = document.getElementById('bibleDropdown');
+            if (!bibleDropdownContent || !biblePassageInput || !bibleSearchBtn) return;
+            biblePassages.forEach(passage => {
+                const item = document.createElement('div'); item.className = 'bible-dropdown-item'; item.textContent = passage;
+                item.addEventListener('click', function() { biblePassageInput.value = passage; bibleDropdownContent.classList.remove('show'); performSearchAndFilter(); });
+                bibleDropdownContent.appendChild(item);
+            });
+            biblePassageInput.addEventListener('focus', () => bibleDropdownContent.classList.add('show'));
+            biblePassageInput.addEventListener('input', function() {
+                const value = this.value.toLowerCase(); const items = bibleDropdownContent.querySelectorAll('.bible-dropdown-item');
+                items.forEach(item => { item.style.display = item.textContent.toLowerCase().includes(value) ? 'block' : 'none'; });
+                bibleDropdownContent.classList.add('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (biblePassageInput && bibleDropdownContent && bibleSearchBtn && !biblePassageInput.contains(e.target) && !bibleDropdownContent.contains(e.target) && !bibleSearchBtn.contains(e.target)) {
+                    bibleDropdownContent.classList.remove('show');
+                }
+            });
+            if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', () => { if (bibleDropdownContent) bibleDropdownContent.classList.toggle('show'); });
+        }
+
+        function initAutosuggest(inputElement, dropdownElement, onSelectCallback) {
+            if (!inputElement || !dropdownElement) return;
+            dropdownElement.innerHTML = ''; 
+            if (allSongsData.length > 0) {
+                const suggestions = [...new Set(allSongsData.flatMap(s => [s.title, s.artist].filter(Boolean)))].sort();
+                suggestions.forEach(text => { 
+                    const item = document.createElement('div'); item.className = 'autosuggest-item'; item.textContent = text; 
+                    item.addEventListener('click', () => { 
+                        inputElement.value = text; 
+                        dropdownElement.classList.remove('show');
+                        if (onSelectCallback) onSelectCallback(); // Call the provided callback
+                    });
+                    dropdownElement.appendChild(item);
+                });
+            }
+            inputElement.addEventListener('focus', function() { if (this.value.length > 0 && dropdownElement.children.length > 0) dropdownElement.classList.add('show'); });
+            inputElement.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                if (value.length > 0 && dropdownElement) {
+                    const items = dropdownElement.querySelectorAll('.autosuggest-item'); let hasMatches = false;
+                    items.forEach(item => {
+                        if (item.textContent.toLowerCase().startsWith(value)) { item.style.display = 'block'; hasMatches = true; } 
+                        else { item.style.display = 'none'; }
+                    });
+                    dropdownElement.classList.toggle('show', hasMatches);
+                } else if(dropdownElement) { dropdownElement.classList.remove('show'); }
+            });
+            // Global click listener to hide autosuggest should be managed carefully if multiple instances exist
+            // For now, this might affect other autosuggest dropdowns if not handled contextually.
+            document.addEventListener('click', (e) => {
+                if (dropdownElement && inputElement && !inputElement.contains(e.target) && !dropdownElement.contains(e.target)) {
+                    dropdownElement.classList.remove('show');
+                }
+            });
+        }
+
+
+        // --- Playlist Functionality (Sidebar & Setlist Page) ---
+        function loadPlaylists() {
+            const stored = localStorage.getItem('lhcSitePlaylists');
+            sitePlaylists = stored ? JSON.parse(stored) : [];
+            renderPlaylistSidebar();
+        }
+        function savePlaylists() {
+            localStorage.setItem('lhcSitePlaylists', JSON.stringify(sitePlaylists));
+        }
+        function renderPlaylistSidebar() {
+            if (!playlistItemsContainer) return;
+            playlistItemsContainer.innerHTML = sitePlaylists.length === 0 ? '<p class="text-xs text-blue-200 italic px-2">No playlists yet.</p>' : '';
+            sitePlaylists.forEach(playlist => {
+                const itemCount = playlist.songs?.length || 0;
+                const div = document.createElement('div');
+                div.className = 'playlist-item p-2 rounded flex items-center justify-between cursor-pointer';
+                div.dataset.playlistId = playlist.id; 
+                div.innerHTML = `<div><p class="font-medium">${escapeHtml(playlist.name)}</p><p class="text-xs text-blue-100">${itemCount} song${itemCount !== 1 ? 's' : ''}${playlist.subtitle ? ' - ' + escapeHtml(playlist.subtitle) : ''}</p></div><button class="text-blue-100 hover:text-white delete-playlist-btn p-1" title="Delete Playlist"><i class="fas fa-trash-alt"></i></button>`;
+                div.addEventListener('click', (e) => { if (!e.target.closest('.delete-playlist-btn')) displayWorshipSetlistPage(playlist.id); });
+                div.querySelector('.delete-playlist-btn').addEventListener('click', (e) => { e.stopPropagation(); deletePlaylist(playlist.id); });
+                playlistItemsContainer.appendChild(div);
+            });
+        }
+        function deletePlaylist(playlistId) {
+            if (window.confirm("Are you sure you want to delete this playlist? This action cannot be undone.")) {
+                sitePlaylists = sitePlaylists.filter(p => p.id !== playlistId);
+                savePlaylists(); renderPlaylistSidebar();
+                if (worshipSetlistPageView?.dataset.currentPlaylistId === playlistId) showAppView('songFinderView');
+            }
+        }
+        
+        // Drag and Drop Handlers for Playlist Songs
+        function handleDragStart(e) {
+            draggedSongId = e.target.dataset.songId;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedSongId); 
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); 
+            e.dataTransfer.dropEffect = 'move';
+            const targetItem = e.target.closest('.setlist-song-item');
+            if (targetItem && targetItem.dataset.songId !== draggedSongId) {
+                document.querySelectorAll('.drag-over-target').forEach(el => el.classList.remove('drag-over-target'));
+                targetItem.classList.add('drag-over-target');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            const targetItem = e.target.closest('.setlist-song-item');
+            if (targetItem) {
+                targetItem.classList.remove('drag-over-target');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetItem = e.target.closest('.setlist-song-item');
+            document.querySelectorAll('.drag-over-target').forEach(el => el.classList.remove('drag-over-target'));
+            
+            if (!targetItem || targetItem.dataset.songId === draggedSongId) {
+                document.querySelectorAll('.setlist-song-item.dragging').forEach(el => el.classList.remove('dragging'));
+                draggedSongId = null;
+                return;
+            }
+
+            const currentPlaylistId = worshipSetlistPageView.dataset.currentPlaylistId;
+            const playlist = sitePlaylists.find(p => p.id === currentPlaylistId);
+            if (!playlist || !draggedSongId) return;
+
+            const draggedIndex = playlist.songs.findIndex(s => s.id === draggedSongId);
+            const targetIndex = playlist.songs.findIndex(s => s.id === targetItem.dataset.songId);
+
+            if (draggedIndex === -1 || targetIndex === -1) return;
+
+            const [draggedSong] = playlist.songs.splice(draggedIndex, 1);
+            playlist.songs.splice(targetIndex, 0, draggedSong);
+
+            savePlaylists();
+            displayWorshipSetlistPage(currentPlaylistId); 
+            draggedSongId = null;
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over-target').forEach(el => el.classList.remove('drag-over-target'));
+            draggedSongId = null;
+        }
+
+
+        function displayWorshipSetlistPage(playlistId) {
+            const playlist = sitePlaylists.find(p => p.id === playlistId);
+            if (!playlist) { showAppView('songFinderView'); return; }
+            if(setlistNameDisplay) setlistNameDisplay.textContent = `Setlist: ${escapeHtml(playlist.name)}${playlist.subtitle ? ' - ' + escapeHtml(playlist.subtitle) : ''}`;
+            if(setlistSongsContainer) {
+                setlistSongsContainer.innerHTML = ''; 
+                if (playlist.songs?.length > 0) {
+                    playlist.songs.forEach((song, index) => {
+                        const songItem = document.createElement('div');
+                        songItem.className = 'setlist-song-item p-3 mb-2 bg-gray-100 rounded-md shadow flex justify-between items-center cursor-grab';
+                        songItem.draggable = true;
+                        songItem.dataset.songId = song.id; 
+
+                        let chordsButtonsHtml = ''; 
+                        const pdfDocs = song.docLinks?.filter(doc => doc.type && doc.type.toLowerCase() === 'pdf');
+                        if (pdfDocs && pdfDocs.length > 0) {
+                            pdfDocs.forEach((pdfDoc, pdfIndex) => {
+                                const buttonText = pdfDoc.name ? escapeHtml(pdfDoc.name) : `Song Chords ${pdfDocs.length > 1 ? pdfIndex + 1 : ''}`;
+                                chordsButtonsHtml += `<button class="text-xs text-red-600 hover:text-red-800 open-chords-pdf-btn flex items-center ml-3 mb-1" data-pdf-url="${escapeHtml(pdfDoc.url)}" data-pdf-name="${escapeHtml(pdfDoc.name || song.title + ' - ' + buttonText)}" title="Open ${buttonText}">
+                                                            <i class="fas fa-file-pdf mr-1"></i> ${buttonText}
+                                                        </button>`;
+                            });
+                        }
+                        
+                        songItem.innerHTML = `
+                            <div class="flex-grow">
+                                <h4 class="font-semibold text-md text-[#3a5d97] cursor-pointer hover:underline song-title-in-setlist" data-song-id="${song.id}">${index + 1}. ${song.title}</h4>
+                                <p class="text-sm text-gray-500">${song.artist} (Key: ${song.key})</p>
+                            </div>
+                            <div class="flex items-center flex-wrap"> 
+                                ${chordsButtonsHtml}
+                                <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-1 ml-3" data-song-id="${song.id}" title="Remove from this list">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>`;
+                        
+                        songItem.addEventListener('dragstart', handleDragStart);
+                        songItem.addEventListener('dragend', handleDragEnd);
+
+                        songItem.querySelector('.remove-from-playlist-btn').addEventListener('click', () => removeSongFromPlaylist(playlist.id, song.id));
+                        songItem.querySelector('.song-title-in-setlist').addEventListener('click', () => { 
+                            const fullSong = allSongsData.find(s => s.id === song.id); 
+                            if(fullSong) displaySongDetailPage(fullSong, playlist.id); 
+                        });
+                        
+                        const chordsBtns = songItem.querySelectorAll('.open-chords-pdf-btn'); 
+                        chordsBtns.forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                openPreviewModal(this.dataset.pdfUrl, 'pdf', this.dataset.pdfName);
+                            });
+                        });
+                        setlistSongsContainer.appendChild(songItem);
+                    });
+                    setlistSongsContainer.addEventListener('dragover', handleDragOver);
+                    setlistSongsContainer.addEventListener('dragleave', handleDragLeave); 
+                    setlistSongsContainer.addEventListener('drop', handleDrop);
+
+                } else { setlistSongsContainer.innerHTML = '<p class="text-gray-500 italic">This playlist is empty.</p>'; }
+            }
+            if(worshipSetlistPageView) worshipSetlistPageView.dataset.currentPlaylistId = playlist.id;
+            showAppView('worshipSetlistPageView');
+        }
+        function removeSongFromPlaylist(playlistId, songId) {
+            const playlist = sitePlaylists.find(p => p.id === playlistId);
+            if (playlist) {
+                playlist.songs = playlist.songs.filter(s => s.id !== songId);
+                savePlaylists(); renderPlaylistSidebar(); displayWorshipSetlistPage(playlistId); 
+            }
+        }
+
+        // --- Create New Playlist Modal Functions ---
+        function openCreatePlaylistModal() {
+            if (!createPlaylistModal || !newPlaylistNameInput || !newPlaylistSubtitleInput || !modalSelectedSongsContainer) return;
+            newPlaylistNameInput.value = ''; newPlaylistSubtitleInput.value = ''; modalSongSearchInput.value = '';
+            songsForNewPlaylist = []; renderModalSelectedSongs(); 
+            if (modalAutosuggestDropdownEl) modalAutosuggestDropdownEl.classList.remove('show');
+            createPlaylistModal.classList.remove('hidden'); newPlaylistNameInput.focus();
+        }
+        function closeCreatePlaylistModal() { if (createPlaylistModal) createPlaylistModal.classList.add('hidden'); }
+        function renderModalSelectedSongs() {
+            if (!modalSelectedSongsContainer) return;
+            modalSelectedSongsContainer.innerHTML = songsForNewPlaylist.length === 0 ? '<p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet.</p>' : '';
+            songsForNewPlaylist.forEach((song, index) => {
+                const div = document.createElement('div'); div.className = 'flex justify-between items-center p-1.5 bg-white border-b text-sm';
+                div.innerHTML = `<span class="truncate" title="${escapeHtml(song.title)} by ${escapeHtml(song.artist)}">${index + 1}. ${escapeHtml(song.title)} (${escapeHtml(song.artist)})</span><button class="text-red-500 hover:text-red-700 remove-song-from-modal-btn" data-song-id="${song.id}" title="Remove"><i class="fas fa-times-circle"></i></button>`;
+                div.querySelector('.remove-song-from-modal-btn').addEventListener('click', () => removeSongFromNewPlaylist(song.id));
+                modalSelectedSongsContainer.appendChild(div);
+            });
+        }
+        function addSongToNewPlaylist(song) {
+            if (!song || songsForNewPlaylist.find(s => s.id === song.id)) return;
+            songsForNewPlaylist.push(song); renderModalSelectedSongs();
+        }
+        function removeSongFromNewPlaylist(songId) {
+            songsForNewPlaylist = songsForNewPlaylist.filter(s => s.id !== songId);
+            renderModalSelectedSongs();
+        }
+        function handleSaveNewPlaylist() {
+            if (!newPlaylistNameInput || !newPlaylistSubtitleInput) return;
+            const name = newPlaylistNameInput.value.trim();
+            if (!name) { alert("Playlist name is required."); newPlaylistNameInput.focus(); return; } 
+            const newPl = { id: `playlist-${Date.now()}`, name, subtitle: newPlaylistSubtitleInput.value.trim(), songs: [...songsForNewPlaylist] };
+            sitePlaylists.push(newPl); savePlaylists(); renderPlaylistSidebar(); 
+            closeCreatePlaylistModal(); 
+            alert(`Playlist "${name}" created!`); 
+        }
+
+        // --- Add Songs to Setlist Modal Functions ---
+        function openAddSongsToSetlistModal() {
+            if (!addSongsToSetlistModal || !modalSetlistSongSearchInput) return;
+            // Populate filters for this modal
+            populateFilterDropdowns(
+                modalSetlistThemeFilter, 
+                modalSetlistKeyFilter, 
+                modalSetlistStyleFilter, 
+                modalSetlistTempoFilter, 
+                modalSetlistLiturgicalSeasonFilter
+            );
+            modalSetlistSongSearchInput.value = '';
+            if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.value = '';
+            if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = '';
+            if(modalSetlistSongResultsContainer) modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
+            
+            addSongsToSetlistModal.classList.remove('hidden');
+            modalSetlistSongSearchInput.focus();
+        }
+
+        function closeAddSongsToSetlistModal() {
+            if (addSongsToSetlistModal) addSongsToSetlistModal.classList.add('hidden');
+        }
+
+        function performModalSetlistSongSearchAndFilter() {
+            if (!allSongsData || !modalSetlistSongResultsContainer) return;
+
+            const filters = {
+                theme: modalSetlistThemeFilter ? modalSetlistThemeFilter.value : '',
+                key: modalSetlistKeyFilter ? modalSetlistKeyFilter.value : '',
+                style: modalSetlistStyleFilter ? modalSetlistStyleFilter.value : '',
+                searchTerm: modalSetlistSongSearchInput ? modalSetlistSongSearchInput.value.toLowerCase().trim() : '',
+                scripture: modalSetlistScriptureFilter ? modalSetlistScriptureFilter.value.toLowerCase().trim() : '',
+                liturgicalSeason: modalSetlistLiturgicalSeasonFilter ? modalSetlistLiturgicalSeasonFilter.value : '',
+                tempo: modalSetlistTempoFilter ? modalSetlistTempoFilter.value : ''
+            };
+            
+            const filteredSongs = allSongsData.filter(song => {
+                if (filters.searchTerm && !(song.title.toLowerCase().includes(filters.searchTerm) || (song.artist && song.artist.toLowerCase().includes(filters.searchTerm)) || (song.lyrics && song.lyrics.toLowerCase().includes(filters.searchTerm)))) return false;
+                if (filters.theme && !(Array.isArray(song.themes) ? song.themes.map(t=>t.toLowerCase()) : [String(song.themes||'').toLowerCase()]).includes(filters.theme)) return false;
+                if (filters.key && !String(song.key||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(k=>k.trim()).includes(filters.key)) return false;
+                if (filters.style && !(song.style && song.style.toLowerCase() === filters.style)) return false;
+                if (filters.scripture && !(Array.isArray(song.scripture) ? song.scripture.some(s=>String(s).toLowerCase().includes(filters.scripture)) : (song.scripture && String(song.scripture).toLowerCase().includes(filters.scripture)))) return false;
+                if (filters.liturgicalSeason && !String(song.liturgicalSeason||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(ls=>ls.trim()).includes(filters.liturgicalSeason)) return false;
+                if (filters.tempo && !(song.tempo && song.tempo.toLowerCase() === filters.tempo)) return false;
+                return true;
+            });
+            renderModalSetlistSongResults(filteredSongs);
+        }
+
+        function renderModalSetlistSongResults(songs) {
+            if (!modalSetlistSongResultsContainer) return;
+            modalSetlistSongResultsContainer.innerHTML = '';
+            if (songs.length === 0) {
+                modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No songs match your criteria.</p>';
+                return;
+            }
+            songs.forEach((song,index) => { // Added index for animation delay
+                const div = document.createElement('div');
+                // Added animation class
+                div.className = 'modal-song-item-animate flex justify-between items-center p-2 border-b hover:bg-gray-100 text-sm';
+                div.style.animationDelay = `${index * 0.05}s`; // Staggered animation
+                // Increased font size for title
+                div.innerHTML = `
+                    <div>
+                        <p class="font-medium text-gray-700 text-base">${escapeHtml(song.title)}</p> 
+                        <p class="text-xs text-gray-500">${escapeHtml(song.artist)}</p>
+                    </div>
+                    <button class="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded add-song-from-modal-btn" data-song-id="${song.id}">
+                        <i class="fas fa-plus mr-1"></i> Add
+                    </button>
+                `;
+                div.querySelector('.add-song-from-modal-btn').addEventListener('click', function() {
+                    handleAddSongFromModalToCurrentSetlist(this.dataset.songId);
+                });
+                modalSetlistSongResultsContainer.appendChild(div);
+            });
+        }
+        
+        function handleAddSongFromModalToCurrentSetlist(songIdToAdd) {
+            const songToAdd = allSongsData.find(s => s.id === songIdToAdd);
+            const currentPlaylistId = worshipSetlistPageView.dataset.currentPlaylistId;
+            if (!songToAdd || !currentPlaylistId) {
+                console.error("Song or current playlist not found for adding.");
+                return;
+            }
+            const playlist = sitePlaylists.find(p => p.id === currentPlaylistId);
+            if (playlist) {
+                if (!playlist.songs.find(s => s.id === songToAdd.id)) {
+                    playlist.songs.push(songToAdd);
+                    savePlaylists();
+                    renderPlaylistSidebar(); // Update counts in sidebar
+                    displayWorshipSetlistPage(currentPlaylistId); // Refresh the main setlist view
+                    // Optionally, give feedback in the modal, e.g., disable button or show "Added"
+                    const addButton = modalSetlistSongResultsContainer.querySelector(`.add-song-from-modal-btn[data-song-id="${songIdToAdd}"]`);
+                    if(addButton){
+                        addButton.textContent = 'Added';
+                        addButton.disabled = true;
+                        addButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        addButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    }
+                } else {
+                    console.log(`Song "${songToAdd.title}" is already in the setlist.`);
+                    // Optionally provide feedback that it's already added
+                }
+            }
+        }
+
+
+        // --- Event Listeners Setup ---
+        function setupEventListeners() {
+            console.log("Setting up event listeners...");
+            // Main search/filter
+            if (searchBtn) searchBtn.addEventListener('click', performSearchAndFilter);
+            if (searchInput) searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(); });
+            [themeSelect, keySelect, styleSelect, liturgicalSeasonFilter, tempoFilter].forEach(sel => { if (sel) sel.addEventListener('change', performSearchAndFilter); });
+            if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', performSearchAndFilter);
+            if (biblePassageInput) biblePassageInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(); });
+            if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(true));
+            if (clearResultsBtn) clearResultsBtn.addEventListener('click', () => resetToInitialEmptyState(false));
+            
+            // Navigation & Modals
+            if (backToSongListBtn) {
+                backToSongListBtn.addEventListener('click', () => {
+                    if (cameFromPlaylistId) {
+                        const playlistToReturnTo = sitePlaylists.find(p => p.id === cameFromPlaylistId);
+                        if (playlistToReturnTo) {
+                            displayWorshipSetlistPage(cameFromPlaylistId);
+                        } else { 
+                            showAppView('songFinderView');
+                        }
+                        cameFromPlaylistId = null; 
+                    } else {
+                        showAppView('songFinderView');
+                    }
+                });
+            }
+            if (backToSongListFromSetlistBtn) backToSongListFromSetlistBtn.addEventListener('click', () => showAppView('songFinderView'));
+            if (mySongListsBtn) mySongListsBtn.addEventListener('click', () => { if(sitePlaylists.length > 0) displayWorshipSetlistPage(sitePlaylists[0].id); else { if(setlistNameDisplay) setlistNameDisplay.textContent = `Worship Setlists`; if(setlistSongsContainer) setlistSongsContainer.innerHTML = '<p class="text-gray-500">No playlists yet.</p>'; showAppView('worshipSetlistPageView'); } });
+            if (playlistItemsContainer) playlistItemsContainer.addEventListener('click', (e) => { const item = e.target.closest('.playlist-item'); if (item && !e.target.closest('.delete-playlist-btn')) displayWorshipSetlistPage(item.dataset.playlistId); });
+            
+            // Create Playlist Modal
+            if (createSongListBtn) createSongListBtn.addEventListener('click', openCreatePlaylistModal);
+            if (createPlaylistModalCloseBtn) createPlaylistModalCloseBtn.addEventListener('click', closeCreatePlaylistModal);
+            if (cancelNewPlaylistBtn) cancelNewPlaylistBtn.addEventListener('click', closeCreatePlaylistModal);
+            if (saveNewPlaylistBtn) saveNewPlaylistBtn.addEventListener('click', handleSaveNewPlaylist);
+            if (createPlaylistModal) createPlaylistModal.addEventListener('click', (e) => { if(e.target === createPlaylistModal) closeCreatePlaylistModal(); });
+            if (modalSongSearchInput && modalAutosuggestDropdownEl) { // Autosuggest for Create Playlist Modal
+                initAutosuggest(modalSongSearchInput, modalAutosuggestDropdownEl, (selectedSongText) => {
+                    const parts = selectedSongText.split(' - ');
+                    const title = parts[0];
+                    const artist = parts.length > 1 ? parts.slice(1).join(' - ') : undefined; 
+                    const songToAdd = allSongsData.find(s => s.title === title && (!artist || s.artist === artist));
+                    if (songToAdd) {
+                        addSongToNewPlaylist(songToAdd);
+                        modalSongSearchInput.value = ''; 
+                        modalAutosuggestDropdownEl.classList.remove('show'); 
+                        modalSongSearchInput.focus();
+                    }
+                });
+            }
+
+            // Add Songs to Setlist Modal
+            if(addSongsToCurrentSetlistBtn) addSongsToCurrentSetlistBtn.addEventListener('click', openAddSongsToSetlistModal);
+            if(addSongsToSetlistModalCloseBtn) addSongsToSetlistModalCloseBtn.addEventListener('click', closeAddSongsToSetlistModal);
+            if(closeAddSongsToSetlistModalBtn) closeAddSongsToSetlistModalBtn.addEventListener('click', closeAddSongsToSetlistModal);
+            if(addSongsToSetlistModal) addSongsToSetlistModal.addEventListener('click', (e) => { if(e.target === addSongsToSetlistModal) closeAddSongsToSetlistModal(); });
+            if(modalSetlistApplyFiltersBtn) modalSetlistApplyFiltersBtn.addEventListener('click', performModalSetlistSongSearchAndFilter);
+            if(modalSetlistClearFiltersBtn) { // Event listener for the new Clear button in modal
+                modalSetlistClearFiltersBtn.addEventListener('click', () => {
+                    if(modalSetlistSongSearchInput) modalSetlistSongSearchInput.value = '';
+                    if(modalSetlistThemeFilter) modalSetlistThemeFilter.value = '';
+                    if(modalSetlistKeyFilter) modalSetlistKeyFilter.value = '';
+                    if(modalSetlistStyleFilter) modalSetlistStyleFilter.value = '';
+                    if(modalSetlistTempoFilter) modalSetlistTempoFilter.value = '';
+                    if(modalSetlistLiturgicalSeasonFilter) modalSetlistLiturgicalSeasonFilter.value = '';
+                    if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.value = '';
+                    if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = '';
+                    if(modalSetlistSongResultsContainer) modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
+                    // Optionally, re-run search to show all songs or default state
+                    // performModalSetlistSongSearchAndFilter(); 
+                });
+            }
+            
+            if (modalSetlistSongSearchInput && modalSetlistAutosuggestDropdown) {
+                 initAutosuggest(modalSetlistSongSearchInput, modalSetlistAutosuggestDropdown, () => {
+                    performModalSetlistSongSearchAndFilter(); 
+                 });
+            }
+            if(modalSetlistSongSearchInput) modalSetlistSongSearchInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') performModalSetlistSongSearchAndFilter(); });
+            if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.addEventListener('keyup', (e) => { if(e.key === 'Enter') performModalSetlistSongSearchAndFilter(); });
+            [modalSetlistThemeFilter, modalSetlistKeyFilter, modalSetlistStyleFilter, modalSetlistTempoFilter, modalSetlistLiturgicalSeasonFilter].forEach(sel => {
+                if(sel) sel.addEventListener('change', performModalSetlistSongSearchAndFilter);
+            });
+
+
+            // Add to Existing List Modal
+            if (addToListModalCloseBtn) addToListModalCloseBtn.addEventListener('click', () => addToListModal.classList.add('hidden'));
+            if (cancelAddToListBtnModal) cancelAddToListBtnModal.addEventListener('click', () => addToListModal.classList.add('hidden'));
+            if (confirmAddToListBtnModal) confirmAddToListBtnModal.addEventListener('click', () => {
+                 const playlistId = playlistSelectModal.value; if (!playlistId || !currentSongForPlaylist) { alert("Please select a playlist."); return; } 
+                 const playlist = sitePlaylists.find(p => p.id === playlistId);
+                 if (playlist) { if (!playlist.songs.find(s => s.id === currentSongForPlaylist.id)) { playlist.songs.push(currentSongForPlaylist); savePlaylists(); renderPlaylistSidebar(); if (worshipSetlistPageView.style.display === 'block' && worshipSetlistPageView.dataset.currentPlaylistId === playlist.id) displayWorshipSetlistPage(playlist.id); alert(`Added.`); } else { alert(`Already in list.`);}} 
+                 addToListModal.classList.add('hidden'); currentSongForPlaylist = null;
+            });
+            if (addToListModal) addToListModal.addEventListener('click', (e) => { if(e.target === addToListModal) addToListModal.classList.add('hidden'); });
+
+            // Preview Modal
+            if (modalCloseButton) modalCloseButton.addEventListener('click', () => { if (previewModal) previewModal.classList.add('hidden'); if (modalBody) modalBody.innerHTML = ''; });
+            if (previewModal) previewModal.addEventListener('click', (e) => { if (e.target === previewModal) { previewModal.classList.add('hidden'); if (modalBody) modalBody.innerHTML = ''; } });
+
+            console.log("Event listeners set up.");
+        }
+
+        // --- DOMContentLoaded: Initialize App ---
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log("DOM fully loaded. Initializing script...");
+            assignDOMReferences(); 
+            if (!searchBtn) { 
+                console.error("CRITICAL: searchBtn not found. App cannot initialize properly.");
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
+                return; 
+            }
+            await fetchSongDataAndInitialize(); 
+            initBiblePassageDropdown(); 
+            // initAutosuggest(); // Main autosuggest is now called from fetchSongDataAndInitialize
+            setupEventListeners(); 
+            showAppView('songFinderView'); 
+            console.log("Initial setup complete.");
+        });
+    </script>
+</body>
+</html>
