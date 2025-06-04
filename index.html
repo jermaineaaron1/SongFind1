@@ -738,7 +738,7 @@
 
     <script>
         // --- START OF SCRIPT ---
-        console.log("LHC Worship Site Script Initializing... (v3.9 - YouTube Syntax Fix)");
+        console.log("LHC Worship Site Script Initializing... (v3.12 - Regex & EscapeHTML Fix)");
 
         // --- Global Variables ---
         let allSongsData = []; 
@@ -879,16 +879,29 @@
                 .replace(/&/g, "&") 
                 .replace(/</g, "<")
                 .replace(/>/g, ">")
- 		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;"); 
+                .replace(/"/g, "&quot;") 
+                .replace(/'/g, "&#039;"); 
         }
 
         function getYouTubeVideoId(url) {
             if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+            let videoId = null;
+            const patterns = [
+                /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?googleusercontent\.com\/youtube\.com\/(?:embed|v)\/([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?googleusercontent\.com\/youtube\.com\/[0-9]\/([a-zA-Z0-9_-]{11})/ // Adjusted to capture ID after a digit and slash
+            ];
+
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1] && match[1].length === 11) {
+                    videoId = match[1];
+                    break; 
+                }
+            }
+            return videoId;
         }
+
 
         // --- Page View Management ---
         function showAppView(viewIdToShow) {
@@ -1153,11 +1166,30 @@
 
             songDetailLyricsLHC.textContent = song.lyrics || 'Lyrics not available.';
             
+            songDetailYouTubeLHC.innerHTML = ''; // Clear previous content
             if (song.youtubeUrl) {
                 const videoId = getYouTubeVideoId(song.youtubeUrl);
-                // Corrected YouTube URL template literal
-                songDetailYouTubeLHC.innerHTML = videoId ? `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen on YouTube:</h4><iframe class="w-full aspect-video rounded-md shadow-md" src="https://www.youtube.com/embed/$${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` : '<p class="text-sm text-gray-500">YouTube video not available or URL is invalid.</p>';
-            } else { songDetailYouTubeLHC.innerHTML = '<p class="text-sm text-gray-500">No YouTube video linked.</p>';}
+                if (videoId) {
+                    const titleH4 = document.createElement('h4');
+                    titleH4.className = "text-lg font-semibold text-[#3a3a3a] mb-2 mt-4";
+                    titleH4.textContent = "Listen on YouTube:";
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.className = "w-full aspect-video rounded-md shadow-md";
+                    iframe.src = `https://www.youtube.com/embed/$${videoId}`; // CORRECTED YouTube URL
+                    iframe.title = "YouTube video player";
+                    iframe.frameBorder = "0";
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
+
+                    songDetailYouTubeLHC.appendChild(titleH4);
+                    songDetailYouTubeLHC.appendChild(iframe);
+                } else {
+                    songDetailYouTubeLHC.innerHTML = '<p class="text-sm text-gray-500">YouTube video not available or URL is invalid.</p>';
+                }
+            } else {
+                songDetailYouTubeLHC.innerHTML = '<p class="text-sm text-gray-500">No YouTube video linked.</p>';
+            }
             
             if (song.mp3Url && songDetailMp3LHC) {
                 songDetailMp3LHC.innerHTML = `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen to MP3:</h4><audio controls class="w-full"><source src="${escapeHtml(song.mp3Url)}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
