@@ -247,23 +247,33 @@
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { 
             background-color: #fff; 
-            padding: 1.5rem; border-radius: 0.5rem;
+            padding: 1rem; /* Mobile Friendly Change: Reduced base padding */
+            sm:padding: 1.5rem; /* Mobile Friendly Change: Original padding for sm and up */
+            border-radius: 0.5rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 90%; max-width: 700px; 
-            max-height: 90vh; display: flex; flex-direction: column;
+            width: 90%; 
+            max-width: 700px; 
+            max-height: 85vh; /* Mobile Friendly Change: Adjusted max height */
+            sm:max-height: 90vh; /* Mobile Friendly Change: Original max height for sm and up */
+            display: flex; flex-direction: column;
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem;}
-        .modal-title { font-size: 1.25rem; font-weight: 600; color: #3a3a3a;  }
+        .modal-title { font-size: 1.125rem; sm:font-size: 1.25rem; font-weight: 600; color: #3a3a3a;  } /* Mobile Friendly Change: Slightly smaller title on mobile */
         .modal-close-button { background: none; border: none; font-size: 1.75rem; color: #6b7280; cursor: pointer; line-height: 1; }
         .modal-close-button:hover { color: #3a3a3a; }
         .modal-body { overflow-y: auto; flex-grow: 1; } 
-        .modal-body iframe { width: 100%; border: none; border-radius: 0.25rem; min-height: 60vh; }
+        .modal-body iframe { 
+            width: 100%; border: none; border-radius: 0.25rem; 
+            min-height: 50vh; /* Mobile Friendly Change: Adjusted min-height */
+            md:min-height: 60vh; /* Mobile Friendly Change: Adjusted min-height */
+        }
 
         .song-detail-lyrics {
             white-space: pre-wrap; 
             font-family: 'Lora', serif; 
             line-height: 1.5; 
-            font-size: 1.125rem; 
+            font-size: 1rem; /* Mobile Friendly Change: Slightly smaller base for mobile */
+            md:font-size: 1.125rem; /* Mobile Friendly Change: Original size for md up */
             color: #4b5563; 
             max-height: 60vh;
             overflow-y: auto;
@@ -272,19 +282,23 @@
         .doc-ribbon-button {
             display: inline-flex;
             align-items: center;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem; /* Mobile Friendly Change: Adjusted padding slightly */
+            sm:padding: 0.5rem 1rem;
             border-radius: 0.375rem;
             font-weight: 500;
             color: white;
             transition: all 0.2s ease-in-out;
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
+            font-size: 0.875rem; /* Mobile Friendly Change: Ensure text fits */
+            sm:font-size: 1rem;
         }
         .doc-ribbon-button:hover {
             transform: translateY(-1px);
         }
         .doc-ribbon-button i {
-            margin-right: 0.5rem;
+            margin-right: 0.25rem; /* Mobile Friendly Change: Slightly less margin */
+            sm:margin-right: 0.5rem;
         }
         .open-pdf-button { background-color: #dc2626; color: white !important; } 
         .open-pdf-button:hover { background-color: #b91c1c; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); } 
@@ -328,31 +342,53 @@
             opacity: 0; /* Start hidden for animation */
         }
 
+        /* Mobile Friendly Change: Sidebar overlay for main content when sidebar is open on mobile */
+        body.sidebar-open-mobile #mainPageContainer::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 25; /* Below sidebar (z-30), above main content */
+            display: block;
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            body.sidebar-open-mobile #mainPageContainer::before {
+                display: none;
+            }
+        }
 
     </style>
 </head>
 <body>
-    <!-- Background Music Notes -->
     <div class="min-h-screen worship-bg relative">
-        <svg class="music-note" style="top: 10%; left: 5%;" width="80" height="80" viewBox="0 0 24 24"> 
+        <svg class="music-note hidden sm:block" style="top: 10%; left: 5%;" width="80" height="80" viewBox="0 0 24 24"> 
             <path fill="#4a6da7" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
         </svg>
-        <svg class="music-note" style="top: 30%; right: 8%;" width="60" height="60" viewBox="0 0 24 24"> 
+        <svg class="music-note hidden sm:block" style="top: 30%; right: 8%;" width="60" height="60" viewBox="0 0 24 24"> 
             <path fill="#6b9ac4" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
         </svg>
-        <svg class="music-note" style="bottom: 15%; left: 15%;" width="70" height="70" viewBox="0 0 24 24"> 
+        <svg class="music-note hidden sm:block" style="bottom: 15%; left: 15%;" width="70" height="70" viewBox="0 0 24 24"> 
             <path fill="#a5c8e4" d="M6 18.573V4h2v10.5c.5-.333 1.167-.5 2-.5 1.5 0 2.75.75 2.75 2.25S11.5 18.5 10 18.5c-1.5 0-3-.5-4-.5v.073zM14 18.5c-1 0-1.5-.5-1.5-1s.5-1 1.5-1 2 .5 2 1.5c0 .5-1 .5-2 .5z"/>
         </svg>
-        <svg class="music-note" style="top: 60%; right: 20%;" width="50" height="50" viewBox="0 0 24 24"> 
+        <svg class="music-note hidden sm:block" style="top: 60%; right: 20%;" width="50" height="50" viewBox="0 0 24 24"> 
             <path fill="#4a6da7" d="M6 18.573V4h2v10.5c.5-.333 1.167-.5 2-.5 1.5 0 2.75.75 2.75 2.25S11.5 18.5 10 18.5c-1.5 0-3-.5-4-.5v.073zM14 18.5c-1 0-1.5-.5-1.5-1s.5-1 1.5-1 2 .5 2 1.5c0 .5-1 .5-2 .5z"/>
         </svg>
 
-        <!-- Main Layout: Sidebar + Content -->
+        <button id="mobileMenuButton" class="lg:hidden fixed top-4 left-4 z-40 p-3 bg-[#4a6da7] text-white rounded-md shadow-lg">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+
         <div class="flex">
-            <!-- Playlist Sidebar -->
-            <div id="playlistSidebar" class="playlist-sidebar w-64 fixed h-screen text-white z-30 custom-scrollbar overflow-y-auto">
+            <div id="playlistSidebar" class="playlist-sidebar w-72 lg:w-64 fixed lg:sticky lg:top-0 h-screen text-white z-30 custom-scrollbar overflow-y-auto
+                                         transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
                 <div class="p-4">
-                    <div class="mb-6 text-center">
+                    <button id="closeMobileMenuButton" class="lg:hidden absolute top-3 right-3 p-2 text-white hover:text-blue-200">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                    <div class="mt-8 lg:mt-0 mb-6 text-center">
                         <button id="createSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
                             <i class="fas fa-plus-circle mr-2"></i> Create Song List
                         </button>
@@ -363,7 +399,6 @@
                     <div id="playlistItemsContainer" class="space-y-1">
                         <p class="text-xs text-blue-200 italic px-2">No playlists created yet.</p>
                     </div>
-                    <!-- Current Playlist Info (Placeholder) -->
                     <h3 class="text-lg font-semibold mt-6 mb-3 flex items-center"><i class="fas fa-music mr-2"></i> Current List</h3>
                     <div id="currentPlaylistInfo" class="bg-white/10 rounded-lg p-3 mb-4">
                         <p class="text-sm font-medium mb-2">No songs selected</p>
@@ -372,118 +407,109 @@
                 </div>
             </div>
             
-            <!-- Main Content Area -->
-            <div id="mainPageContainer" class="ml-64 flex-1"> 
-                <!-- Header -->
+            <div id="mainPageContainer" class="flex-1 lg:ml-64 transition-all duration-300 ease-in-out"> 
                 <header class="bg-white shadow-sm sticky top-0 z-20"> 
-                    <div class="container mx-auto px-6 py-6">
+                    <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                         <div class="flex flex-col md:flex-row justify-between items-center">
-                            <div class="flex items-center mb-4 md:mb-0">
-                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg">
-                                    <i class="fas fa-church text-xl"></i>
+                            <div class="flex items-center mb-3 md:mb-0">
+                                <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg">
+                                    <i class="fas fa-church text-lg md:text-xl"></i>
                                 </div>
                                 <div class="ml-3">
-                                    <h1 class="text-2xl font-semibold text-[#3a3a3a] glow-text">Luther House Chapel</h1>
-                                    <p class="text-sm text-gray-500">Worship Song Selection Tool</p>
+                                    <h1 class="text-xl md:text-2xl font-semibold text-[#3a3a3a] glow-text">Luther House Chapel</h1>
+                                    <p class="text-xs md:text-sm text-gray-500">Worship Song Selection Tool</p>
                                 </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button class="btn-primary text-white px-4 py-2 rounded-md flex items-center"> 
-                                    <i class="fas fa-question-circle mr-2 glow-icon"></i> Help 
+                             <div class="flex space-x-2 w-full md:w-auto justify-around md:justify-end">
+                                <button class="btn-primary text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md flex items-center text-xs sm:text-sm"> 
+                                    <i class="fas fa-question-circle mr-1 sm:mr-2 glow-icon"></i> Help 
                                 </button>
-                                <button id="mySongListsBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"> 
-                                    <i class="fas fa-music mr-2 glow-icon"></i> My Song Lists 
+                                <button id="mySongListsBtn" class="btn-secondary text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md flex items-center text-xs sm:text-sm"> 
+                                    <i class="fas fa-music mr-1 sm:mr-2 glow-icon"></i> My Song Lists 
                                 </button>
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <!-- Song Finder View -->
                 <div id="songFinderView">
-                    <main class="container mx-auto px-6 py-8">
-                        <!-- Search and Filter Section -->
-                        <div class="bg-white rounded-lg shadow-md p-6 mb-8 water-effect">
-                            <h2 class="text-xl font-semibold mb-6 text-[#3a3a3a] flex items-center">
+                    <main class="container mx-auto px-4 sm:px-6 py-6 sm:py-8"> {/* Mobile Friendly Change: Adjusted padding */}
+                        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8 water-effect"> {/* Mobile Friendly Change: Adjusted padding */}
+                            <h2 class="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-[#3a3a3a] flex items-center">
                                 <i class="fas fa-search mr-2 text-[#4a6da7] glow-icon"></i> Find Worship Songs
                             </h2>
-                            <!-- Search Input -->
                             <div class="mb-6">
-                                <div class="flex relative">
-                                    <div class="relative flex-grow">
-                                        <input type="text" id="search" placeholder="Enter keywords, scripture reference, or song title" class="w-full p-3 rounded-l-md bg-gray-50 border-r-0">
+                                <div class="flex flex-wrap sm:flex-nowrap items-center">
+                                    <div class="relative flex-grow w-full sm:w-auto mb-2 sm:mb-0 sm:mr-2">
+                                        <input type="text" id="search" placeholder="Keywords, scripture, title" class="w-full p-3 rounded-l-md bg-gray-50 text-sm sm:text-base">
                                         <div id="autosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div>
                                     </div>
-                                    <button id="searchBtn" class="btn-primary text-white px-6 py-3 rounded-none flex items-center"> 
+                                    <button id="searchBtn" class="btn-primary text-white px-4 sm:px-6 py-3 rounded-md sm:rounded-none flex items-center mb-2 sm:mb-0 w-full sm:w-auto justify-center text-sm sm:text-base"> 
                                         <i class="fas fa-search mr-2"></i> Search 
                                     </button>
-                                    <button id="clearBtn" class="btn-clear px-6 py-3 rounded-r-md flex items-center ml-2"> 
+                                    <button id="clearBtn" class="btn-clear px-4 sm:px-6 py-3 rounded-md sm:rounded-r-md flex items-center w-full sm:w-auto justify-center sm:ml-2 text-sm sm:text-base"> 
                                         <i class="fas fa-times mr-2"></i> Clear 
                                     </button>
                                 </div>
                             </div>
-                            <!-- Filter Dropdowns -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6"> 
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6"> 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Song Theme</label>
-                                    <select id="theme" class="w-full p-2 rounded-md bg-gray-50">
+                                    <select id="theme" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <option value="">All Themes</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Musical Key</label>
-                                    <select id="key" class="w-full p-2 rounded-md bg-gray-50">
+                                    <select id="key" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <option value="">All Keys</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Song Style</label>
-                                    <select id="style" class="w-full p-2 rounded-md bg-gray-50">
+                                    <select id="style" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <option value="">All Styles</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label for="tempoFilter" class="block text-sm font-medium text-gray-700 mb-1">Tempo</label>
-                                    <select id="tempoFilter" class="w-full p-2 rounded-md bg-gray-50">
+                                    <select id="tempoFilter" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <option value="">All Tempos</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label for="liturgicalSeasonFilter" class="block text-sm font-medium text-gray-700 mb-1">Liturgical Seasons</label>
-                                    <select id="liturgicalSeasonFilter" class="w-full p-2 rounded-md bg-gray-50">
+                                    <select id="liturgicalSeasonFilter" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <option value="">All Seasons</option>
                                     </select>
                                 </div>
                             </div>
-                            <!-- Scripture Reference Input -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-1"> 
                                     <i class="fas fa-bible mr-1 text-[#4a6da7]"></i> Scripture Reference (ESV) 
                                 </label>
                                 <div class="bible-dropdown relative">
                                     <div class="flex">
-                                        <input type="text" id="biblePassage" placeholder="Search for a Bible passage (e.g. John 3:16)" class="w-full p-2 rounded-md bg-gray-50">
+                                        <input type="text" id="biblePassage" placeholder="E.g. John 3:16" class="w-full p-2 rounded-md bg-gray-50 text-sm sm:text-base">
                                         <button id="bibleSearchBtn" class="ml-2 btn-secondary text-white px-3 py-2 rounded-md flex items-center"> 
                                             <i class="fas fa-book-open"></i> 
                                         </button>
                                     </div>
                                     <div id="bibleDropdown" class="bible-dropdown-content custom-scrollbar">
-                                        <!-- Bible passages inserted by JS -->
-                                    </div>
+                                        </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Song Results Section -->
-                        <div id="songResults" class="bg-white rounded-lg shadow-md p-6 water-effect hidden">
-                            <div class="flex justify-between items-center mb-6 waterfall-animation waterfall-delay-1">
-                                <h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center">
+                        <div id="songResults" class="bg-white rounded-lg shadow-md p-4 sm:p-6 water-effect hidden"> {/* Mobile Friendly Change: Adjusted padding */}
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 waterfall-animation waterfall-delay-1">
+                                <h2 class="text-lg sm:text-xl font-semibold text-[#3a3a3a] flex items-center mb-2 sm:mb-0">
                                     <i class="fas fa-music mr-2 text-[#4a6da7] glow-icon"></i> Song Results 
                                     <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500">(0 songs)</span>
                                 </h2>
                                 <div class="flex items-center">
-                                    <label class="text-sm text-gray-600 mr-2">Sort by:</label>
-                                    <select id="sortBy" class="p-1 text-sm rounded border border-gray-200">
+                                    <label class="text-xs sm:text-sm text-gray-600 mr-2">Sort by:</label>
+                                    <select id="sortBy" class="p-1 text-xs sm:text-sm rounded border border-gray-200">
                                         <option value="relevance">Relevance</option>
                                         <option value="title">Title (A-Z)</option>
                                         <option value="popularity">Popularity</option>
@@ -493,51 +519,49 @@
                             </div>
                             <div id="activeFilters" class="mb-4 flex flex-wrap gap-2 waterfall-animation waterfall-delay-2"></div>
                             <div id="songCardsContainer" class="h-[500px] overflow-y-auto custom-scrollbar pr-2 waterfall-animation waterfall-delay-3"></div>
-                            <div class="mt-6 flex justify-between items-center waterfall-animation waterfall-delay-4">
-                                <div>
-                                    <span class="text-sm text-gray-600">
+                            <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center waterfall-animation waterfall-delay-4">
+                                <div class="mb-2 sm:mb-0">
+                                    <span class="text-xs sm:text-sm text-gray-600">
                                         Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs
                                     </span>
                                 </div>
-                                <div class="flex space-x-2">
-                                    <div id="pagination"></div>
-                                    <button id="clearResultsBtn" class="btn-clear px-4 py-1 rounded-md flex items-center ml-4">
+                                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 items-stretch sm:items-center w-full sm:w-auto">
+                                    <div id="pagination" class="flex justify-center sm:justify-start"></div>
+                                    <button id="clearResultsBtn" class="btn-clear px-4 py-1.5 sm:py-1 rounded-md flex items-center justify-center text-xs sm:text-sm"> {/* Mobile Friendly Change: Adjusted padding */}
                                         <i class="fas fa-times-circle mr-2"></i> Clear Results
                                     </button>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Empty State (No Search Yet or No Results) -->
-                        <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center water-effect">
+                        <div id="emptyState" class="bg-white rounded-lg shadow-md p-6 sm:p-10 text-center water-effect"> {/* Mobile Friendly Change: Adjusted padding */}
                             <div class="flex justify-center mb-4">
-                                <svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-16 w-16 sm:h-20 sm:w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3>
-                            <p class="text-gray-600 mb-6">Use the search and filters above to find songs for your worship service</p>
-                            <button id="startSearchingBtnEmptyState" class="btn-primary text-white px-6 py-3 rounded-md flex items-center mx-auto"> 
+                            <h3 class="text-lg sm:text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3>
+                            <p class="text-gray-600 mb-6 text-sm sm:text-base">Use the search and filters above to find songs for your worship service</p>
+                            <button id="startSearchingBtnEmptyState" class="btn-primary text-white px-4 py-2 sm:px-6 sm:py-3 rounded-md flex items-center mx-auto text-sm sm:text-base"> 
                                 <i class="fas fa-search mr-2"></i> Start Searching 
                             </button>
                         </div>
                     </main>
                 </div>
 
-                <!-- Song Detail Page View -->
-                <div id="songDetailPageView" class="hidden container mx-auto px-6 py-8">
-                     <button id="backToSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md mb-6 flex items-center">
+                <div id="songDetailPageView" class="hidden container mx-auto px-4 sm:px-6 py-6 sm:py-8"> {/* Mobile Friendly Change: Adjusted padding */}
+                    <button id="backToSongListBtn" class="btn-secondary text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md mb-6 flex items-center text-sm sm:text-base">
                         <i class="fas fa-arrow-left mr-2"></i> Back to Song List
                     </button>
-                    <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6 lg:p-8"> {/* Mobile Friendly Change: Adjusted padding */}
                         <div id="songDetailHeaderLHC" class="mb-4 border-b pb-4"></div>
-                        <div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm"></div>
+                        <div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 text-sm"></div>
                         <div id="songDetailDocsLHC" class="mb-6">
-                             <h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>
+                            <h4 class="text-md sm:text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div class="grid md:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-6 md:gap-y-8">
                             <div>
-                                <h3 class="text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3>
+                                <h3 class="text-lg sm:text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3>
                                 <div id="songDetailLyricsLHC" class="song-detail-lyrics custom-scrollbar p-2 bg-gray-50 rounded"></div>
                             </div>
                             <div>
@@ -548,29 +572,27 @@
                     </div>
                 </div>
 
-                <!-- Worship Setlist Page View -->
-                <div id="worshipSetlistPageView" class="hidden container mx-auto px-6 py-8">
-                     <div class="flex justify-between items-center mb-6">
-                        <button id="backToSongListFromSetlistBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center">
+                <div id="worshipSetlistPageView" class="hidden container mx-auto px-4 sm:px-6 py-6 sm:py-8"> {/* Mobile Friendly Change: Adjusted padding */}
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                        <button id="backToSongListFromSetlistBtn" class="btn-secondary text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md flex items-center mb-2 sm:mb-0 text-sm sm:text-base">
                             <i class="fas fa-arrow-left mr-2"></i> Back to Song List
                         </button>
-                        <button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center">
+                        <button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base">
                             <i class="fas fa-plus mr-2"></i> Add Songs
                         </button>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6"> {/* Mobile Friendly Change: Adjusted padding */}
+                        <h2 id="setlistNameDisplay" class="text-xl sm:text-2xl md:text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
                         <div id="setlistSongsContainer" class="custom-scrollbar"> 
                             <p class="text-gray-500">Songs in this setlist will appear here.</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Footer -->
                 <footer class="bg-[#3a3a3a] text-white py-6 mt-12">
-                    <div class="container mx-auto px-6">
+                    <div class="container mx-auto px-4 sm:px-6"> {/* Mobile Friendly Change: Adjusted padding */}
                         <div class="flex flex-col md:flex-row justify-between items-center">
-                            <div class="mb-4 md:mb-0">
+                            <div class="mb-4 md:mb-0 text-center md:text-left">
                                 <h3 class="text-lg font-semibold">Luther House Chapel</h3>
                                 <p class="text-sm text-gray-300">Worship Ministry Song Database</p>
                             </div>
@@ -584,21 +606,15 @@
                         <div class="mt-6 text-center text-sm text-gray-400"><p>© 2024 Luther House Chapel. All rights reserved.</p></div>
                     </div>
                 </footer>
-            </div> <!-- End mainPageContainer -->
-        </div> <!-- End flex -->
-    </div> <!-- End worship-bg -->
-
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-75 flex flex-col justify-center items-center z-50">
+            </div> </div> </div> <div id="loadingIndicator" class="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-75 flex flex-col justify-center items-center z-50">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
         <p class="text-white text-lg mt-4 loading-text-animated">Loading Songs...</p>
     </div>
 
-    <!-- Add to Existing List Modal -->
     <div id="addToListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-[#3a3a3a]">Add "<span id="songToAddNameModal"></span>" to...</h3>
+                <h3 class="text-lg sm:text-xl font-semibold text-[#3a3a3a]">Add "<span id="songToAddNameModal"></span>" to...</h3>
                 <button id="addToListModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
             <div class="mb-4">
@@ -612,24 +628,22 @@
         </div>
     </div>
 
-    <!-- Document Preview Modal -->
-    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
-        <div class="modal-content bg-white p-6 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
-            <div class="modal-header flex justify-between items-center mb-4 border-b pb-3">
-                <h3 id="modalTitle" class="text-xl font-semibold text-[#3a3a3a]">Document Preview</h3>
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-2 sm:p-4">
+        <div class="modal-content bg-white p-4 sm:p-6 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] sm:max-h-[90vh] flex flex-col">
+            <div class="modal-header flex justify-between items-center mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
+                <h3 id="modalTitle" class="text-lg sm:text-xl font-semibold text-[#3a3a3a]">Document Preview</h3>
                 <button id="modalCloseButton" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
-            <div id="modalBody" class="modal-body flex-grow overflow-y-auto custom-scrollbar">
-                <!-- Iframe or content will be injected here -->
+             <div id="modalBody" class="modal-body flex-grow overflow-y-auto custom-scrollbar">
+                <iframe class="w-full h-full border-none rounded" style="min-height: 70vh;" title="Document Preview"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- Create Playlist Modal -->
     <div id="createPlaylistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3>
+                <h3 class="text-lg sm:text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3>
                 <button id="createPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
             
@@ -648,13 +662,11 @@
                     <div class="relative mb-2">
                         <input type="text" id="modalSongSearchInput" placeholder="Search for songs to add..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
                         <div id="modalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-50">
-                            <!-- Autosuggest items for modal search will appear here -->
-                        </div>
+                            </div>
                     </div>
                     <div id="modalSelectedSongsContainer" class="min-h-[100px] max-h-[200px] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
                         <p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet. Search above to add songs.</p>
-                        <!-- Selected songs will be listed here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
@@ -667,70 +679,65 @@
         </div>
     </div>
 
-    <!-- Add Songs to Setlist Modal -->
     <div id="addSongsToSetlistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 class="text-xl font-semibold text-[#3a3a3a]">Add Songs to Setlist</h3>
+        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[95vh] flex flex-col"> {/* Mobile Friendly Change: Adjusted padding & max-h */}
+            <div class="flex justify-between items-center mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
+                <h3 class="text-lg sm:text-xl font-semibold text-[#3a3a3a]">Add Songs to Setlist</h3>
                 <button id="addSongsToSetlistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
 
             <div class="flex-grow overflow-y-auto custom-scrollbar pr-2">
-                <!-- Search and Filters within Modal -->
                 <div class="mb-4">
-                    <input type="text" id="modalSetlistSongSearchInput" placeholder="Search songs by title, artist, lyrics..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
-                    <div id="modalSetlistAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[60]"></div> <!-- Higher z-index -->
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <input type="text" id="modalSetlistSongSearchInput" placeholder="Search songs by title, artist, lyrics..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-sm sm:text-base">
+                    <div id="modalSetlistAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[60]"></div> </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Theme</label>
-                        <select id="modalSetlistThemeFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Theme</label>
+                        <select id="modalSetlistThemeFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                             <option value="">All Themes</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Key</label>
-                        <select id="modalSetlistKeyFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Key</label>
+                        <select id="modalSetlistKeyFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                             <option value="">All Keys</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Style</label>
-                        <select id="modalSetlistStyleFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Style</label>
+                        <select id="modalSetlistStyleFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                             <option value="">All Styles</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tempo</label>
-                        <select id="modalSetlistTempoFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Tempo</label>
+                        <select id="modalSetlistTempoFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                             <option value="">All Tempos</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Liturgical Season</label>
-                        <select id="modalSetlistLiturgicalSeasonFilter" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Liturgical Season</label>
+                        <select id="modalSetlistLiturgicalSeasonFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                             <option value="">All Seasons</option>
                         </select>
                     </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Scripture</label>
-                        <input type="text" id="modalSetlistScriptureFilter" placeholder="e.g., John 3:16" class="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Scripture</label>
+                        <input type="text" id="modalSetlistScriptureFilter" placeholder="e.g., John 3:16" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                 </div>
-                 <div class="flex space-x-2 mb-4">
-                    <button id="modalSetlistApplyFiltersBtn" class="flex-grow btn-primary text-white px-4 py-2 rounded-md">Search</button>
-                    <button id="modalSetlistClearFiltersBtn" class="btn-clear px-4 py-2 rounded-md text-sm">Clear</button>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
+                    <button id="modalSetlistApplyFiltersBtn" class="flex-grow btn-primary text-white px-4 py-2 rounded-md text-sm sm:text-base">Search</button>
+                    <button id="modalSetlistClearFiltersBtn" class="btn-clear px-4 py-2 rounded-md text-sm sm:text-base">Clear</button>
                 </div>
 
-
-                <!-- Song Results in Modal -->
-                <div id="modalSetlistSongResultsContainer" class="min-h-[200px] max-h-[40vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
+                <div id="modalSetlistSongResultsContainer" class="min-h-[150px] sm:min-h-[200px] max-h-[30vh] sm:max-h-[40vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
                     <p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>
                 </div>
             </div>
 
-            <div class="flex justify-end space-x-3 mt-4 pt-4 border-t">
-                <button id="closeAddSongsToSetlistModalBtn" class="btn-clear px-4 py-2 rounded-md">Done</button>
+            <div class="flex justify-end space-x-3 mt-4 pt-3 sm:pt-4 border-t">
+                <button id="closeAddSongsToSetlistModalBtn" class="btn-clear px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base">Done</button>
             </div>
         </div>
     </div>
@@ -738,7 +745,7 @@
 
     <script>
         // --- START OF SCRIPT ---
-        console.log("LHC Worship Site Script Initializing... (v3.12 - Regex & EscapeHTML Fix)");
+        console.log("LHC Worship Site Script Initializing... (v3.13 - Mobile Friendly)");
 
         // --- Global Variables ---
         let allSongsData = []; 
@@ -759,14 +766,18 @@
             createSongListBtn, mySongListsBtn, currentPlaylistInfo, addToListModal, songToAddNameModalSpan,
             playlistSelectModal, confirmAddToListBtnModal, cancelAddToListBtnModal, addToListModalCloseBtn,
             previewModal, modalTitle, modalBody, modalCloseButton, startSearchingBtnEmptyState, autosuggestDropdownEl,
-            addSongsToCurrentSetlistBtn; // Button on setlist page
+            addSongsToCurrentSetlistBtn;
+
+        // Mobile Friendly Change: Sidebar toggle elements
+        let mobileMenuButton, closeMobileMenuButton, actualPlaylistSidebar;
+
 
         // New Playlist Modal Elements
         let createPlaylistModal, newPlaylistNameInput, newPlaylistSubtitleInput,
             modalSongSearchInput, modalAutosuggestDropdownEl, modalSelectedSongsContainer,
             saveNewPlaylistBtn, cancelNewPlaylistBtn, createPlaylistModalCloseBtn;
         
-        let songsForNewPlaylist = []; // Temp array for songs in the new playlist modal
+        let songsForNewPlaylist = [];
 
         // Add Songs to Setlist Modal Elements
         let addSongsToSetlistModal, addSongsToSetlistModalCloseBtn, closeAddSongsToSetlistModalBtn,
@@ -846,7 +857,6 @@
             cancelNewPlaylistBtn = document.getElementById('cancelNewPlaylistBtn');
             createPlaylistModalCloseBtn = document.getElementById('createPlaylistModalCloseBtn');
 
-            // Add Songs to Setlist Modal elements
             addSongsToSetlistModal = document.getElementById('addSongsToSetlistModal');
             addSongsToSetlistModalCloseBtn = document.getElementById('addSongsToSetlistModalCloseBtn');
             closeAddSongsToSetlistModalBtn = document.getElementById('closeAddSongsToSetlistModalBtn');
@@ -862,9 +872,13 @@
             modalSetlistClearFiltersBtn = document.getElementById('modalSetlistClearFiltersBtn');
             modalSetlistSongResultsContainer = document.getElementById('modalSetlistSongResultsContainer');
 
+            // Mobile Friendly Change: Sidebar toggle elements
+            mobileMenuButton = document.getElementById('mobileMenuButton');
+            closeMobileMenuButton = document.getElementById('closeMobileMenuButton');
+            actualPlaylistSidebar = document.getElementById('playlistSidebar'); // Renamed to avoid conflict if 'playlistSidebar' was used as general reference
 
-            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal) {
-                console.error("CRITICAL DOM INIT ERROR: Essential elements like searchBtn or modals are missing.");
+            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal || !mobileMenuButton) {
+                console.error("CRITICAL DOM INIT ERROR: Essential elements like searchBtn, modals, or mobile menu button are missing.");
             }
             console.log("DOM references assigned.");
         }
@@ -876,11 +890,11 @@
                 return String(unsafe);
             }
             return unsafe
-                .replace(/&/g, "&") 
-                .replace(/</g, "<")
-                .replace(/>/g, ">")
+                .replace(/&/g, "&amp;") 
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;") 
-                /* .replace(/'/g, "&#039;")  // ← comment this out or remove it */
+                .replace(/'/g, "&#039;"); 
         }
 
         function getYouTubeVideoId(url) {
@@ -889,7 +903,7 @@
             const patterns = [
                 /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
                 /(?:https?:\/\/)?googleusercontent\.com\/youtube\.com\/(?:embed|v)\/([a-zA-Z0-9_-]{11})/,
-                /(?:https?:\/\/)?googleusercontent\.com\/youtube\.com\/[0-9]\/([a-zA-Z0-9_-]{11})/ // Adjusted to capture ID after a digit and slash
+                /(?:https?:\/\/)?googleusercontent\.com\/youtube\.com\/[0-9]\/([a-zA-Z0-9_-]{11})/
             ];
 
             for (const pattern of patterns) {
@@ -914,10 +928,11 @@
             if (viewElement) {
                 viewElement.style.display = 'block';
                 console.log(viewIdToShow + " displayed.");
-                if (mainPageContainer) mainPageContainer.scrollTop = 0;
+                if (mainPageContainer) mainPageContainer.scrollTop = 0; // Scroll to top of main content
+                window.scrollTo(0,0); // Also scroll window to top
             } else {
                 console.error("View element not found:", viewIdToShow);
-                if(songFinderView) songFinderView.style.display = 'block';
+                if(songFinderView) songFinderView.style.display = 'block'; // Default to song finder
             }
         }
 
@@ -945,8 +960,8 @@
                     style: escapeHtml(song.category || song.style || 'N/A'),
                     themes: Array.isArray(song.theme) ? song.theme.map(t => escapeHtml(String(t))) : (song.theme ? [escapeHtml(String(song.theme))] : []),
                     scripture: Array.isArray(song.scripture) ? song.scripture.map(s => escapeHtml(String(s))) : (song.scripture && String(song.scripture).trim() !== '' ? [escapeHtml(String(song.scripture))] : []),
-                    keywords: (song.lyrics || '').toLowerCase().split(/\s+/).filter(word => word && word.length > 2).slice(0,20),
-                    lyrics: escapeHtml(song.lyrics || ''),
+                    keywords: (song.lyrics || '').toLowerCase().split(/\s+/).filter(word => word && word.length > 2).slice(0,20), // Keep keywords simple for now
+                    lyrics: escapeHtml(song.lyrics || ''), // Lyrics are escaped here
                     docLinks: Array.isArray(song.docLinks) ? song.docLinks.map(doc => ({...doc, url: escapeHtml(doc.url), name: escapeHtml(doc.name), type: escapeHtml(doc.type) })) : (song.docUrl ? [{url: escapeHtml(song.docUrl), type: escapeHtml(song.docType || 'unknown'), name: 'Document'}] : []),
                     youtubeUrl: escapeHtml(song.youtubeUrl || ''),
                     hasPhysicalCopy: song.hasPhysicalCopy === true || String(song.hasPhysicalCopy).toLowerCase() === 'true',
@@ -956,13 +971,13 @@
                 }));
                 console.log("Songs loaded and mapped:", allSongsData.length);
                 resetToInitialEmptyState(false);
-                populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter); // Populate main filters
-                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter); // Main search autosuggest
+                populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
+                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter);
                 loadPlaylists();
             } catch (error) {
                 console.error("Error in fetchSongDataAndInitialize:", error);
                 if (emptyStateDiv) {
-                    emptyStateDiv.innerHTML = `<p class="text-red-500 font-semibold">Error loading songs!</p><p class="text-gray-600 text-sm">${error.message}</p>`;
+                    emptyStateDiv.innerHTML = `<p class="text-red-500 font-semibold">Error loading songs!</p><p class="text-gray-600 text-sm">${escapeHtml(error.message)}</p>`;
                     emptyStateDiv.classList.remove('hidden');
                 }
             } finally {
@@ -983,7 +998,7 @@
 
             const populateSelect = (selectElement, optionsSet) => {
                 if (!selectElement) return;
-                const firstOption = selectElement.options[0]; // Preserve "All..." option
+                const firstOption = selectElement.options[0]; 
                 selectElement.innerHTML = ""; 
                 if (firstOption) selectElement.appendChild(firstOption); 
                 optionsSet.forEach(optionValue => {
@@ -1015,20 +1030,20 @@
             };
 
             const noFiltersApplied = Object.values(filters).every(val => val === '');
-            if (noFiltersApplied) {
-                generateSongCards(allSongsData);
-                updateResultCounts(allSongsData.length, allSongsData.length);
+            if (noFiltersApplied && !filters.searchTerm) { // Also check for empty search term
+                generateSongCards(allSongsData.slice(0, 20)); // Show a limited number if no filters
+                updateResultCounts(allSongsData.slice(0, 20).length, allSongsData.length); // Adjust count
                 if (songResultsDiv) songResultsDiv.classList.remove('hidden');
                 if (emptyStateDiv) emptyStateDiv.classList.add('hidden');
-                updateActiveFiltersDisplay(filters);
+                 updateActiveFiltersDisplay(filters);
                 return;
             }
 
             const filteredSongs = allSongsData.filter(song => {
                 if (filters.searchTerm) {
                     const term = filters.searchTerm;
-                    const titleMatch = song.title.toLowerCase().startsWith(term);
-                    const artistMatch = song.artist && song.artist.toLowerCase().startsWith(term);
+                    const titleMatch = song.title.toLowerCase().includes(term); // Changed from startsWith to includes
+                    const artistMatch = song.artist && song.artist.toLowerCase().includes(term); // Changed from startsWith to includes
                     const lyricsMatch = song.lyrics && song.lyrics.toLowerCase().includes(term);
                     if (!(titleMatch || artistMatch || lyricsMatch)) return false;
                 }
@@ -1047,15 +1062,16 @@
             if (emptyStateDiv) {
                 emptyStateDiv.classList.toggle('hidden', filteredSongs.length > 0);
                 if (filteredSongs.length === 0) {
-                     emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">No Songs Found</h3><p class="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>`;
+                    emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-16 w-16 sm:h-20 sm:w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-lg sm:text-xl font-semibold mb-2 text-[#4a6da7]">No Songs Found</h3><p class="text-gray-600 mb-6 text-sm sm:text-base">Try adjusting your search criteria or filters.</p>`;
                 }
             }
             updateActiveFiltersDisplay(filters);
         }
 
         function updateResultCounts(showing, total) {
-            if (resultCountSpan) resultCountSpan.textContent = `(${total} songs)`;
-            if (showingCountSpan) showingCountSpan.textContent = total > 0 ? `1-${Math.min(6, total)}` : '0-0'; // Assuming page size 6 for now
+            if (resultCountSpan) resultCountSpan.textContent = `(${total} song${total !== 1 ? 's' : ''})`;
+            // For now, pagination is not fully implemented, so showingCount will be the same as total found.
+            if (showingCountSpan) showingCountSpan.textContent = total > 0 ? `1-${showing}` : '0-0';
             if (totalCountSpan) totalCountSpan.textContent = total;
         }
         
@@ -1063,35 +1079,57 @@
         function generateSongCards(songs) {
             if (!songCardsContainer) return;
             songCardsContainer.innerHTML = '';
-            if (songs.length === 0) return;
+            if (songs.length === 0 && !Object.values(getActiveFilters()).some(f => f)) { // If no songs and no active filters (other than search term)
+                 // Handled by performSearchAndFilter showing emptyStateDiv
+                return;
+            }
+             if (songs.length === 0) { // If truly no songs match active filters
+                // This case is also handled by performSearchAndFilter
+                return;
+            }
+
             songs.forEach((song, index) => {
                 const songCard = document.createElement('div');
-                songCard.className = `song-card p-4 mb-3 bg-gray-50 rounded-md hover:bg-white border border-gray-100 waterfall-animation`;
+                songCard.className = `song-card p-3 sm:p-4 mb-3 bg-gray-50 rounded-md hover:bg-white border border-gray-100 waterfall-animation`;
                 songCard.style.animationDelay = `${0.05 * index}s`;
                 songCard.dataset.songId = song.id;
                 const themesString = Array.isArray(song.themes) ? song.themes.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ') : (song.themes || 'N/A');
+                // Mobile Friendly Change: Adjusted button padding
                 songCard.innerHTML = `
-                    <div class="flex justify-between">
-                        <div>
-                            <h3 class="font-semibold text-lg text-[#3a5d97] cursor-pointer hover:underline song-title-clickable">${song.title}</h3>
-                            <p class="text-gray-600 text-sm">${song.artist}</p>
+                    <div class="flex justify-between items-start">
+                        <div class="flex-grow mr-2">
+                            <h3 class="font-semibold text-md sm:text-lg text-[#3a5d97] cursor-pointer hover:underline song-title-clickable">${song.title}</h3>
+                            <p class="text-gray-600 text-xs sm:text-sm">${song.artist}</p>
                             <div class="flex flex-wrap mt-1 text-xs text-gray-500">
-                                <span class="mr-3 mb-1"><i class="fas fa-music mr-1 text-[#4a6da7]"></i> Key: ${song.key}</span>
-                                <span class="mr-3 mb-1"><i class="fas fa-guitar mr-1 text-[#4a6da7]"></i> ${song.style}</span>
-                                <span class="mb-1"><i class="fas fa-tag mr-1 text-[#4a6da7]"></i> ${themesString}</span>
+                                <span class="mr-2 sm:mr-3 mb-1"><i class="fas fa-music mr-1 text-[#4a6da7]"></i> Key: ${song.key}</span>
+                                <span class="mr-2 sm:mr-3 mb-1"><i class="fas fa-guitar mr-1 text-[#4a6da7]"></i> ${song.style}</span>
+                                <span class="mb-1 truncate max-w-[150px] sm:max-w-xs"><i class="fas fa-tag mr-1 text-[#4a6da7]"></i> ${themesString}</span>
                             </div>
                         </div>
-                        <div class="flex flex-col justify-between items-end">
-                            <button class="p-1 text-gray-500 hover:text-[#4a6da7] view-song-details-btn" title="View Details"><i class="fas fa-info-circle"></i></button>
-                            <button class="text-xs text-white bg-[#6b9ac4] hover:bg-[#5b8ab4] px-2 py-1 rounded add-to-playlist-btn mt-2"><i class="fas fa-plus mr-1"></i> Add to List</button>
+                        <div class="flex flex-col justify-start items-end space-y-1 shrink-0">
+                            <button class="p-1 text-gray-500 hover:text-[#4a6da7] view-song-details-btn" title="View Details"><i class="fas fa-info-circle text-sm sm:text-base"></i></button>
+                            <button class="text-xs text-white bg-[#6b9ac4] hover:bg-[#5b8ab4] px-2 py-1 sm:px-2.5 sm:py-1.5 rounded add-to-playlist-btn"><i class="fas fa-plus mr-1"></i> Add</button>
                         </div>
                     </div>`;
                 songCardsContainer.appendChild(songCard);
                 songCard.querySelector('.song-title-clickable').addEventListener('click', () => displaySongDetailPage(song));
                 songCard.querySelector('.view-song-details-btn').addEventListener('click', () => displaySongDetailPage(song));
-                songCard.querySelector('.add-to-playlist-btn').addEventListener('click', () => { currentSongForPlaylist = song; openAddToListModal(); });
+                songCard.querySelector('.add-to-playlist-btn').addEventListener('click', (e) => { e.stopPropagation(); currentSongForPlaylist = song; openAddToListModal(); });
             });
         }
+        
+        function getActiveFilters() {
+            return {
+                theme: themeSelect ? themeSelect.value : '',
+                key: keySelect ? keySelect.value : '',
+                style: styleSelect ? styleSelect.value : '',
+                searchTerm: searchInput ? searchInput.value.toLowerCase().trim() : '',
+                scripture: biblePassageInput ? biblePassageInput.value.toLowerCase().trim() : '',
+                liturgicalSeason: liturgicalSeasonFilter ? liturgicalSeasonFilter.value : '',
+                tempo: tempoFilter ? tempoFilter.value : ''
+            };
+        }
+
 
         // --- Active Filter Pills Display ---
         function updateActiveFiltersDisplay(filters) {
@@ -1099,19 +1137,19 @@
             activeFiltersContainer.innerHTML = '';
             const createPill = (type, displayValue, filterKey) => {
                 const pill = document.createElement('span');
-                pill.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800';
-                pill.innerHTML = `${type}: ${escapeHtml(displayValue)} <button class="ml-1.5 text-blue-600 hover:text-blue-800 remove-filter-btn" data-filter-key="${filterKey}">×</button>`;
+                pill.className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800'; // Adjusted padding & text size
+                pill.innerHTML = `${type}: ${escapeHtml(displayValue)} <button class="ml-1.5 text-blue-600 hover:text-blue-800 remove-filter-btn" data-filter-key="${filterKey}"><i class="fas fa-times text-xs"></i></button>`;
                 pill.querySelector('.remove-filter-btn').addEventListener('click', function() {
                     const key = this.dataset.filterKey;
                     if (key === 'searchTerm' && searchInput) searchInput.value = '';
                     else if (key === 'scripture' && biblePassageInput) biblePassageInput.value = '';
-                    else if (document.getElementById(key)) document.getElementById(key).value = ''; // For select elements by ID
+                    else if (document.getElementById(key)) document.getElementById(key).value = ''; 
                     else { 
                         if(key === 'theme' && themeSelect) themeSelect.value = '';
                         else if(key === 'key' && keySelect) keySelect.value = '';
                         else if(key === 'style' && styleSelect) styleSelect.value = '';
-                        else if(key === 'liturgicalSeasonFilter' && liturgicalSeasonFilter) liturgicalSeasonFilter.value = ''; // Match ID
-                        else if(key === 'tempoFilter' && tempoFilter) tempoFilter.value = ''; // Match ID
+                        else if(key === 'liturgicalSeasonFilter' && liturgicalSeasonFilter) liturgicalSeasonFilter.value = '';
+                        else if(key === 'tempoFilter' && tempoFilter) tempoFilter.value = '';
                     }
                     performSearchAndFilter();
                 });
@@ -1132,10 +1170,10 @@
             if (!song) return;
             cameFromPlaylistId = fromPlaylistId; 
 
-            songDetailHeaderLHC.innerHTML = `<h1 class="text-3xl md:text-4xl font-bold text-[#3a5d97] mb-1">${song.title}</h1><p class="text-xl text-gray-600">by ${song.artist}</p>`;
+            songDetailHeaderLHC.innerHTML = `<h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3a5d97] mb-1">${song.title}</h1><p class="text-lg sm:text-xl text-gray-600">by ${song.artist}</p>`;
             const themesString = Array.isArray(song.themes) && song.themes.length > 0 ? song.themes.map(t => `<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs mr-1 mb-1 inline-block">${t}</span>`).join('') : 'N/A';
             const scriptureString = Array.isArray(song.scripture) && song.scripture.length > 0 ? song.scripture.map(s => `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs mr-1 mb-1 inline-block">${s}</span>`).join('') : 'N/A';
-            const physicalCopyHTML = song.hasPhysicalCopy ? '<span class="text-green-600 ml-2"><i class="fas fa-check-circle"></i> In Cabinet</span>' : '<span class="text-red-600 ml-2"><i class="fas fa-times-circle"></i> Not In Cabinet</span>';
+            const physicalCopyHTML = song.hasPhysicalCopy ? '<span class="text-green-600 ml-0 sm:ml-2"><i class="fas fa-check-circle"></i> In Cabinet</span>' : '<span class="text-red-600 ml-0 sm:ml-2"><i class="fas fa-times-circle"></i> Not In Cabinet</span>';
 
             songDetailMetaLHC.innerHTML = `
                 <div><strong>Key:</strong> ${song.key}</div>
@@ -1145,11 +1183,11 @@
                 <div class="col-span-full sm:col-span-2 md:col-span-3"><strong>Scripture:</strong> ${scriptureString}</div>
                 <div class="col-span-full sm:col-span-2 md:col-span-3"><strong>Physical Copy:</strong> ${physicalCopyHTML}</div>`;
             
-            songDetailDocsLHC.innerHTML = `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>`;
+            songDetailDocsLHC.innerHTML = `<h4 class="text-md sm:text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Music Sheet / Chords Available:</h4>`;
             const docList = document.createElement('div'); docList.className = "flex flex-wrap gap-2";
             if (song.docLinks && song.docLinks.length > 0) {
                 song.docLinks.forEach(doc => {
-                     if (doc.url) {
+                    if (doc.url) {
                         const docTypeLower = doc.type ? doc.type.toLowerCase() : '';
                         let iconClass = 'fa-file-alt'; let buttonClass = 'open-generic-doc-button'; let buttonText = doc.name || 'Open Document';
                         if (docTypeLower === 'pdf') { iconClass = 'fa-file-pdf'; buttonClass = 'open-pdf-button'; buttonText = doc.name || 'Open PDF'; }
@@ -1166,17 +1204,17 @@
 
             songDetailLyricsLHC.textContent = song.lyrics || 'Lyrics not available.';
             
-            songDetailYouTubeLHC.innerHTML = ''; // Clear previous content
+            songDetailYouTubeLHC.innerHTML = ''; 
             if (song.youtubeUrl) {
                 const videoId = getYouTubeVideoId(song.youtubeUrl);
                 if (videoId) {
                     const titleH4 = document.createElement('h4');
-                    titleH4.className = "text-lg font-semibold text-[#3a3a3a] mb-2 mt-4";
+                    titleH4.className = "text-md sm:text-lg font-semibold text-[#3a3a3a] mb-2 mt-4";
                     titleH4.textContent = "Listen on YouTube:";
                     
                     const iframe = document.createElement('iframe');
                     iframe.className = "w-full aspect-video rounded-md shadow-md";
-                    iframe.src = `https://www.youtube.com/embed/${videoId}`; // CORRECTED YouTube URL
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`; // Standard YouTube embed URL
                     iframe.title = "YouTube video player";
                     iframe.frameBorder = "0";
                     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
@@ -1192,9 +1230,9 @@
             }
             
             if (song.mp3Url && songDetailMp3LHC) {
-                songDetailMp3LHC.innerHTML = `<h4 class="text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen to MP3:</h4><audio controls class="w-full"><source src="${escapeHtml(song.mp3Url)}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
+                songDetailMp3LHC.innerHTML = `<h4 class="text-md sm:text-lg font-semibold text-[#3a3a3a] mb-2 mt-4">Listen to MP3:</h4><audio controls class="w-full"><source src="${escapeHtml(song.mp3Url)}" type="audio/mpeg">Your browser does not support the audio element.</audio>`;
             } else if(songDetailMp3LHC) {
-                 songDetailMp3LHC.innerHTML = '';
+                songDetailMp3LHC.innerHTML = '';
             }
 
             if (backToSongListBtn) {
@@ -1211,15 +1249,31 @@
         function openPreviewModal(url, docType, title) {
             if (!previewModal || !modalTitle || !modalBody) { console.error("Modal elements not found!"); return; }
             modalTitle.textContent = `Preview: ${escapeHtml(title)}`;
-            modalBody.innerHTML = '';
+            modalBody.innerHTML = ''; // Clear previous
             let embedUrl = url;
-            if (url.includes("drive.google.com") && url.includes("/file/d/") && !url.includes("/preview") && !url.includes("/embed")) {
+            // Enhanced Google Drive URL handling for preview
+            if (url.includes("drive.google.com") && url.includes("/file/d/")) {
                 const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-                if (fileIdMatch && fileIdMatch[1]) embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+                if (fileIdMatch && fileIdMatch[1]) {
+                    embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+                }
             } else if (docType && docType.toLowerCase() !== 'pdf' && (url.toLowerCase().match(/\.(doc|docx|ppt|pptx|xls|xlsx)$/))) {
+                // Use Google Docs viewer for Office documents
                 embedUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
             }
-            modalBody.innerHTML = `<iframe class="w-full h-full min-h-[60vh]" src="${embedUrl}" title="Document Preview"></iframe>`;
+            // For PDFs not on Google Drive, direct embed or via Google Viewer if issues
+            else if (docType && docType.toLowerCase() === 'pdf' && !url.includes("drive.google.com")) {
+                 // embedUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`; // Optional: force through gview
+            }
+
+            const iframe = modalBody.querySelector('iframe') || document.createElement('iframe');
+            iframe.className = "w-full h-full border-none rounded";
+            iframe.style.minHeight = modalBody.querySelector('iframe') ? modalBody.querySelector('iframe').style.minHeight : "70vh"; // Keep previous style if exists
+            iframe.src = embedUrl;
+            iframe.title = "Document Preview";
+            if (!modalBody.contains(iframe)) { // only append if it's a new iframe
+                modalBody.appendChild(iframe);
+            }
             previewModal.classList.remove('hidden');
         }
         function openAddToListModal() {
@@ -1250,8 +1304,8 @@
             if (songResultsDiv) songResultsDiv.classList.add('hidden');
             if (emptyStateDiv) {
                 emptyStateDiv.classList.remove('hidden');
-                emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-20 w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above.</p><button id="startSearchingBtnEmptyState" class="btn-primary text-white px-6 py-3 rounded-md flex items-center mx-auto"> <i class="fas fa-search mr-2"></i> Start Searching </button>`;
-                const btn = document.getElementById('startSearchingBtnEmptyState');
+                emptyStateDiv.innerHTML = `<div class="flex justify-center mb-4"><svg class="h-16 w-16 sm:h-20 sm:w-20 text-[#6b9ac4] opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><h3 class="text-lg sm:text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6 text-sm sm:text-base">Use the search and filters above.</p><button id="startSearchingBtnEmptyState" class="btn-primary text-white px-4 py-2 sm:px-6 sm:py-3 rounded-md flex items-center mx-auto text-sm sm:text-base"> <i class="fas fa-search mr-2"></i> Start Searching </button>`;
+                const btn = document.getElementById('startSearchingBtnEmptyState'); // Re-assign if innerHTML changed it
                 if(btn && searchInput) btn.addEventListener('click', () => searchInput.focus());
             }
             if (performFilterAfter) performSearchAndFilter();
@@ -1259,19 +1313,24 @@
         
         // --- Autosuggest & Bible Dropdown Init (Refactored for reusability) ---
         function initBiblePassageDropdown() {
-            const biblePassages = [ "Genesis 1:1", "Psalm 23", "John 3:16", "Romans 8:28", "Philippians 4:13" ];
+            const biblePassages = [ "Genesis 1:1", "Psalm 23", "John 3:16", "Romans 8:28", "Philippians 4:13" ]; // Example passages
             const bibleDropdownContent = document.getElementById('bibleDropdown');
             if (!bibleDropdownContent || !biblePassageInput || !bibleSearchBtn) return;
+            bibleDropdownContent.innerHTML = ''; // Clear any existing
             biblePassages.forEach(passage => {
                 const item = document.createElement('div'); item.className = 'bible-dropdown-item'; item.textContent = passage;
                 item.addEventListener('click', function() { biblePassageInput.value = passage; bibleDropdownContent.classList.remove('show'); performSearchAndFilter(); });
                 bibleDropdownContent.appendChild(item);
             });
-            biblePassageInput.addEventListener('focus', () => bibleDropdownContent.classList.add('show'));
+            biblePassageInput.addEventListener('focus', () => { if (bibleDropdownContent.children.length > 0) bibleDropdownContent.classList.add('show');});
             biblePassageInput.addEventListener('input', function() {
-                const value = this.value.toLowerCase(); const items = bibleDropdownContent.querySelectorAll('.bible-dropdown-item');
-                items.forEach(item => { item.style.display = item.textContent.toLowerCase().includes(value) ? 'block' : 'none'; });
-                bibleDropdownContent.classList.add('show');
+                const value = this.value.toLowerCase(); const items = bibleDropdownContent.querySelectorAll('.bible-dropdown-item'); let hasVisible = false;
+                items.forEach(item => { 
+                    const isVisible = item.textContent.toLowerCase().includes(value);
+                    item.style.display = isVisible ? 'block' : 'none'; 
+                    if(isVisible) hasVisible = true;
+                });
+                bibleDropdownContent.classList.toggle('show', hasVisible);
             });
             document.addEventListener('click', (e) => {
                 if (biblePassageInput && bibleDropdownContent && bibleSearchBtn && !biblePassageInput.contains(e.target) && !bibleDropdownContent.contains(e.target) && !bibleSearchBtn.contains(e.target)) {
@@ -1285,13 +1344,20 @@
             if (!inputElement || !dropdownElement) return;
             dropdownElement.innerHTML = ''; 
             if (allSongsData.length > 0) {
-                const suggestions = [...new Set(allSongsData.flatMap(s => [s.title, s.artist].filter(Boolean)))].sort();
-                suggestions.forEach(text => { 
+                // Create a more comprehensive list of suggestions: titles and artists
+                const suggestions = [];
+                allSongsData.forEach(s => {
+                    if (s.title) suggestions.push(s.title);
+                    if (s.artist) suggestions.push(s.artist);
+                });
+                const uniqueSuggestions = [...new Set(suggestions)].sort();
+
+                uniqueSuggestions.forEach(text => { 
                     const item = document.createElement('div'); item.className = 'autosuggest-item'; item.textContent = text; 
                     item.addEventListener('click', () => { 
                         inputElement.value = text; 
                         dropdownElement.classList.remove('show');
-                        if (onSelectCallback) onSelectCallback(); // Call the provided callback
+                        if (onSelectCallback) onSelectCallback(text); 
                     });
                     dropdownElement.appendChild(item);
                 });
@@ -1302,14 +1368,12 @@
                 if (value.length > 0 && dropdownElement) {
                     const items = dropdownElement.querySelectorAll('.autosuggest-item'); let hasMatches = false;
                     items.forEach(item => {
-                        if (item.textContent.toLowerCase().startsWith(value)) { item.style.display = 'block'; hasMatches = true; } 
+                        if (item.textContent.toLowerCase().includes(value)) { item.style.display = 'block'; hasMatches = true; } 
                         else { item.style.display = 'none'; }
                     });
                     dropdownElement.classList.toggle('show', hasMatches);
                 } else if(dropdownElement) { dropdownElement.classList.remove('show'); }
             });
-            // Global click listener to hide autosuggest should be managed carefully if multiple instances exist
-            // For now, this might affect other autosuggest dropdowns if not handled contextually.
             document.addEventListener('click', (e) => {
                 if (dropdownElement && inputElement && !inputElement.contains(e.target) && !dropdownElement.contains(e.target)) {
                     dropdownElement.classList.remove('show');
@@ -1335,7 +1399,7 @@
                 const div = document.createElement('div');
                 div.className = 'playlist-item p-2 rounded flex items-center justify-between cursor-pointer';
                 div.dataset.playlistId = playlist.id; 
-                div.innerHTML = `<div><p class="font-medium">${escapeHtml(playlist.name)}</p><p class="text-xs text-blue-100">${itemCount} song${itemCount !== 1 ? 's' : ''}${playlist.subtitle ? ' - ' + escapeHtml(playlist.subtitle) : ''}</p></div><button class="text-blue-100 hover:text-white delete-playlist-btn p-1" title="Delete Playlist"><i class="fas fa-trash-alt"></i></button>`;
+                div.innerHTML = `<div><p class="font-medium text-sm">${escapeHtml(playlist.name)}</p><p class="text-xs text-blue-100">${itemCount} song${itemCount !== 1 ? 's' : ''}${playlist.subtitle ? ' - ' + escapeHtml(playlist.subtitle) : ''}</p></div><button class="text-blue-100 hover:text-white delete-playlist-btn p-1.5" title="Delete Playlist"><i class="fas fa-trash-alt"></i></button>`;
                 div.addEventListener('click', (e) => { if (!e.target.closest('.delete-playlist-btn')) displayWorshipSetlistPage(playlist.id); });
                 div.querySelector('.delete-playlist-btn').addEventListener('click', (e) => { e.stopPropagation(); deletePlaylist(playlist.id); });
                 playlistItemsContainer.appendChild(div);
@@ -1345,7 +1409,9 @@
             if (window.confirm("Are you sure you want to delete this playlist? This action cannot be undone.")) {
                 sitePlaylists = sitePlaylists.filter(p => p.id !== playlistId);
                 savePlaylists(); renderPlaylistSidebar();
-                if (worshipSetlistPageView?.dataset.currentPlaylistId === playlistId) showAppView('songFinderView');
+                if (worshipSetlistPageView?.style.display === 'block' && worshipSetlistPageView.dataset.currentPlaylistId === playlistId) {
+                     showAppView('songFinderView'); // Go back to finder if current list is deleted
+                }
             }
         }
         
@@ -1418,7 +1484,7 @@
                 if (playlist.songs?.length > 0) {
                     playlist.songs.forEach((song, index) => {
                         const songItem = document.createElement('div');
-                        songItem.className = 'setlist-song-item p-3 mb-2 bg-gray-100 rounded-md shadow flex justify-between items-center cursor-grab';
+                        songItem.className = 'setlist-song-item p-3 mb-2 bg-gray-100 rounded-md shadow flex flex-col sm:flex-row justify-between items-start sm:items-center cursor-grab';
                         songItem.draggable = true;
                         songItem.dataset.songId = song.id; 
 
@@ -1426,22 +1492,24 @@
                         const pdfDocs = song.docLinks?.filter(doc => doc.type && doc.type.toLowerCase() === 'pdf');
                         if (pdfDocs && pdfDocs.length > 0) {
                             pdfDocs.forEach((pdfDoc, pdfIndex) => {
-                                const buttonText = pdfDoc.name ? escapeHtml(pdfDoc.name) : `Song Chords ${pdfDocs.length > 1 ? pdfIndex + 1 : ''}`;
-                                chordsButtonsHtml += `<button class="text-xs text-red-600 hover:text-red-800 open-chords-pdf-btn flex items-center ml-3 mb-1" data-pdf-url="${escapeHtml(pdfDoc.url)}" data-pdf-name="${escapeHtml(pdfDoc.name || song.title + ' - ' + buttonText)}" title="Open ${buttonText}">
-                                                            <i class="fas fa-file-pdf mr-1"></i> ${buttonText}
-                                                        </button>`;
+                                const buttonText = pdfDoc.name ? escapeHtml(pdfDoc.name) : `Chords ${pdfDocs.length > 1 ? pdfIndex + 1 : ''}`;
+                                // Mobile Friendly Change: Added p-1 for tap target, mb-1 for stacking
+                                chordsButtonsHtml += `<button class="text-xs text-red-600 hover:text-red-800 open-chords-pdf-btn flex items-center ml-0 sm:ml-3 mb-1 sm:mb-0 p-1" data-pdf-url="${escapeHtml(pdfDoc.url)}" data-pdf-name="${escapeHtml(pdfDoc.name || song.title + ' - ' + buttonText)}" title="Open ${buttonText}">
+                                                        <i class="fas fa-file-pdf mr-1"></i> ${buttonText}
+                                                      </button>`;
                             });
                         }
                         
+                        // Mobile Friendly Change: Adjusted layout for buttons, increased tap target for remove
                         songItem.innerHTML = `
-                            <div class="flex-grow">
+                            <div class="flex-grow mb-2 sm:mb-0">
                                 <h4 class="font-semibold text-md text-[#3a5d97] cursor-pointer hover:underline song-title-in-setlist" data-song-id="${song.id}">${index + 1}. ${song.title}</h4>
                                 <p class="text-sm text-gray-500">${song.artist} (Key: ${song.key})</p>
                             </div>
-                            <div class="flex items-center flex-wrap"> 
+                            <div class="flex items-center flex-wrap justify-start sm:justify-end w-full sm:w-auto"> 
                                 ${chordsButtonsHtml}
-                                <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-1 ml-3" data-song-id="${song.id}" title="Remove from this list">
-                                    <i class="fas fa-times-circle"></i>
+                                <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-2 ml-auto sm:ml-3" data-song-id="${song.id}" title="Remove from this list">
+                                    <i class="fas fa-times-circle text-lg"></i>
                                 </button>
                             </div>`;
                         
@@ -1466,7 +1534,7 @@
                     setlistSongsContainer.addEventListener('dragleave', handleDragLeave); 
                     setlistSongsContainer.addEventListener('drop', handleDrop);
 
-                } else { setlistSongsContainer.innerHTML = '<p class="text-gray-500 italic">This playlist is empty.</p>'; }
+                } else { setlistSongsContainer.innerHTML = '<p class="text-gray-500 italic">This playlist is empty. Click "Add Songs" to begin.</p>'; }
             }
             if(worshipSetlistPageView) worshipSetlistPageView.dataset.currentPlaylistId = playlist.id;
             showAppView('worshipSetlistPageView');
@@ -1493,14 +1561,23 @@
             modalSelectedSongsContainer.innerHTML = songsForNewPlaylist.length === 0 ? '<p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet.</p>' : '';
             songsForNewPlaylist.forEach((song, index) => {
                 const div = document.createElement('div'); div.className = 'flex justify-between items-center p-1.5 bg-white border-b text-sm';
-                div.innerHTML = `<span class="truncate" title="${escapeHtml(song.title)} by ${escapeHtml(song.artist)}">${index + 1}. ${escapeHtml(song.title)} (${escapeHtml(song.artist)})</span><button class="text-red-500 hover:text-red-700 remove-song-from-modal-btn" data-song-id="${song.id}" title="Remove"><i class="fas fa-times-circle"></i></button>`;
+                div.innerHTML = `<span class="truncate" title="${escapeHtml(song.title)} by ${escapeHtml(song.artist)}">${index + 1}. ${escapeHtml(song.title)} (${escapeHtml(song.artist)})</span><button class="text-red-500 hover:text-red-700 remove-song-from-modal-btn p-1" data-song-id="${song.id}" title="Remove"><i class="fas fa-times-circle"></i></button>`;
                 div.querySelector('.remove-song-from-modal-btn').addEventListener('click', () => removeSongFromNewPlaylist(song.id));
                 modalSelectedSongsContainer.appendChild(div);
             });
         }
         function addSongToNewPlaylist(song) {
-            if (!song || songsForNewPlaylist.find(s => s.id === song.id)) return;
-            songsForNewPlaylist.push(song); renderModalSelectedSongs();
+            if (!song || songsForNewPlaylist.find(s => s.id === song.id)) return; // Avoid duplicates
+            // Create a minimal representation of the song for the playlist
+            const minimalSong = {
+                id: song.id,
+                title: song.title,
+                artist: song.artist,
+                key: song.key,
+                docLinks: song.docLinks // Include docLinks so they are available in setlist view
+            };
+            songsForNewPlaylist.push(minimalSong); 
+            renderModalSelectedSongs();
         }
         function removeSongFromNewPlaylist(songId) {
             songsForNewPlaylist = songsForNewPlaylist.filter(s => s.id !== songId);
@@ -1513,13 +1590,13 @@
             const newPl = { id: `playlist-${Date.now()}`, name, subtitle: newPlaylistSubtitleInput.value.trim(), songs: [...songsForNewPlaylist] };
             sitePlaylists.push(newPl); savePlaylists(); renderPlaylistSidebar(); 
             closeCreatePlaylistModal(); 
-            alert(`Playlist "${name}" created!`); 
+            // alert(`Playlist "${name}" created!`); 
+            displayWorshipSetlistPage(newPl.id); // Directly open the new playlist
         }
 
         // --- Add Songs to Setlist Modal Functions ---
         function openAddSongsToSetlistModal() {
             if (!addSongsToSetlistModal || !modalSetlistSongSearchInput) return;
-            // Populate filters for this modal
             populateFilterDropdowns(
                 modalSetlistThemeFilter, 
                 modalSetlistKeyFilter, 
@@ -1529,7 +1606,7 @@
             );
             modalSetlistSongSearchInput.value = '';
             if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.value = '';
-            if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = '';
+            if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = ''; // Clear previous suggestions
             if(modalSetlistSongResultsContainer) modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
             
             addSongsToSetlistModal.classList.remove('hidden');
@@ -1553,7 +1630,14 @@
                 tempo: modalSetlistTempoFilter ? modalSetlistTempoFilter.value : ''
             };
             
+            const currentPlaylistId = worshipSetlistPageView.dataset.currentPlaylistId;
+            const currentPlaylist = sitePlaylists.find(p => p.id === currentPlaylistId);
+            const songsAlreadyInSetlist = currentPlaylist ? currentPlaylist.songs.map(s => s.id) : [];
+
             const filteredSongs = allSongsData.filter(song => {
+                // Exclude songs already in the current setlist
+                if (songsAlreadyInSetlist.includes(song.id)) return false;
+
                 if (filters.searchTerm && !(song.title.toLowerCase().includes(filters.searchTerm) || (song.artist && song.artist.toLowerCase().includes(filters.searchTerm)) || (song.lyrics && song.lyrics.toLowerCase().includes(filters.searchTerm)))) return false;
                 if (filters.theme && !(Array.isArray(song.themes) ? song.themes.map(t=>t.toLowerCase()) : [String(song.themes||'').toLowerCase()]).includes(filters.theme)) return false;
                 if (filters.key && !String(song.key||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(k=>k.trim()).includes(filters.key)) return false;
@@ -1570,56 +1654,61 @@
             if (!modalSetlistSongResultsContainer) return;
             modalSetlistSongResultsContainer.innerHTML = '';
             if (songs.length === 0) {
-                modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No songs match your criteria.</p>';
+                modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">No more songs match your criteria or all matching songs are already in the setlist.</p>';
                 return;
             }
-            songs.forEach((song,index) => { // Added index for animation delay
+            songs.forEach((song,index) => {
                 const div = document.createElement('div');
-                // Added animation class
                 div.className = 'modal-song-item-animate flex justify-between items-center p-2 border-b hover:bg-gray-100 text-sm';
-                div.style.animationDelay = `${index * 0.05}s`; // Staggered animation
-                // Increased font size for title
+                div.style.animationDelay = `${index * 0.05}s`; 
                 div.innerHTML = `
                     <div>
-                        <p class="font-medium text-gray-700 text-base">${escapeHtml(song.title)}</p> 
+                        <p class="font-medium text-gray-700 text-sm sm:text-base">${escapeHtml(song.title)}</p> 
                         <p class="text-xs text-gray-500">${escapeHtml(song.artist)}</p>
                     </div>
-                    <button class="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded add-song-from-modal-btn" data-song-id="${song.id}">
+                    <button class="text-xs bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 rounded add-song-from-modal-btn" data-song-id="${song.id}">
                         <i class="fas fa-plus mr-1"></i> Add
                     </button>
                 `;
                 div.querySelector('.add-song-from-modal-btn').addEventListener('click', function() {
                     handleAddSongFromModalToCurrentSetlist(this.dataset.songId);
+                    // After adding, re-filter to remove it from the modal list
+                    performModalSetlistSongSearchAndFilter(); 
                 });
                 modalSetlistSongResultsContainer.appendChild(div);
             });
         }
         
         function handleAddSongFromModalToCurrentSetlist(songIdToAdd) {
-            const songToAdd = allSongsData.find(s => s.id === songIdToAdd);
+            const songToAddDetails = allSongsData.find(s => s.id === songIdToAdd);
+            if (!songToAddDetails) {
+                console.error("Details for song to add not found in allSongsData.");
+                return;
+            }
+            // Create a minimal representation, ensuring docLinks are included
+            const minimalSongToAdd = {
+                id: songToAddDetails.id,
+                title: songToAddDetails.title,
+                artist: songToAddDetails.artist,
+                key: songToAddDetails.key,
+                docLinks: songToAddDetails.docLinks 
+            };
+
             const currentPlaylistId = worshipSetlistPageView.dataset.currentPlaylistId;
-            if (!songToAdd || !currentPlaylistId) {
+            if (!minimalSongToAdd || !currentPlaylistId) {
                 console.error("Song or current playlist not found for adding.");
                 return;
             }
             const playlist = sitePlaylists.find(p => p.id === currentPlaylistId);
             if (playlist) {
-                if (!playlist.songs.find(s => s.id === songToAdd.id)) {
-                    playlist.songs.push(songToAdd);
+                if (!playlist.songs.find(s => s.id === minimalSongToAdd.id)) {
+                    playlist.songs.push(minimalSongToAdd);
                     savePlaylists();
-                    renderPlaylistSidebar(); // Update counts in sidebar
-                    displayWorshipSetlistPage(currentPlaylistId); // Refresh the main setlist view
-                    // Optionally, give feedback in the modal, e.g., disable button or show "Added"
-                    const addButton = modalSetlistSongResultsContainer.querySelector(`.add-song-from-modal-btn[data-song-id="${songIdToAdd}"]`);
-                    if(addButton){
-                        addButton.textContent = 'Added';
-                        addButton.disabled = true;
-                        addButton.classList.remove('bg-green-500', 'hover:bg-green-600');
-                        addButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    }
+                    renderPlaylistSidebar(); 
+                    displayWorshipSetlistPage(currentPlaylistId); 
+                    // Feedback in modal is now handled by re-filtering
                 } else {
-                    console.log(`Song "${songToAdd.title}" is already in the setlist.`);
-                    // Optionally provide feedback that it's already added
+                    console.log(`Song "${minimalSongToAdd.title}" is already in the setlist.`);
                 }
             }
         }
@@ -1632,10 +1721,10 @@
             if (searchBtn) searchBtn.addEventListener('click', performSearchAndFilter);
             if (searchInput) searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(); });
             [themeSelect, keySelect, styleSelect, liturgicalSeasonFilter, tempoFilter].forEach(sel => { if (sel) sel.addEventListener('change', performSearchAndFilter); });
-            if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', performSearchAndFilter);
+            if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', performSearchAndFilter); // Or just toggle dropdown, then user clicks item which calls performSearchAndFilter
             if (biblePassageInput) biblePassageInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(); });
-            if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(true));
-            if (clearResultsBtn) clearResultsBtn.addEventListener('click', () => resetToInitialEmptyState(false));
+            if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(true)); // true to show all songs after clear
+            if (clearResultsBtn) clearResultsBtn.addEventListener('click', () => resetToInitialEmptyState(false)); // false to go to initial empty prompt
             
             // Navigation & Modals
             if (backToSongListBtn) {
@@ -1654,7 +1743,7 @@
                 });
             }
             if (backToSongListFromSetlistBtn) backToSongListFromSetlistBtn.addEventListener('click', () => showAppView('songFinderView'));
-            if (mySongListsBtn) mySongListsBtn.addEventListener('click', () => { if(sitePlaylists.length > 0) displayWorshipSetlistPage(sitePlaylists[0].id); else { if(setlistNameDisplay) setlistNameDisplay.textContent = `Worship Setlists`; if(setlistSongsContainer) setlistSongsContainer.innerHTML = '<p class="text-gray-500">No playlists yet.</p>'; showAppView('worshipSetlistPageView'); } });
+            if (mySongListsBtn) mySongListsBtn.addEventListener('click', () => { if(sitePlaylists.length > 0 && sitePlaylists[0]?.id) {displayWorshipSetlistPage(sitePlaylists[0].id);} else { if(setlistNameDisplay) setlistNameDisplay.textContent = `Worship Setlists`; if(setlistSongsContainer) setlistSongsContainer.innerHTML = '<p class="text-gray-500">No playlists yet. Create one from the sidebar.</p>'; showAppView('worshipSetlistPageView'); } });
             if (playlistItemsContainer) playlistItemsContainer.addEventListener('click', (e) => { const item = e.target.closest('.playlist-item'); if (item && !e.target.closest('.delete-playlist-btn')) displayWorshipSetlistPage(item.dataset.playlistId); });
             
             // Create Playlist Modal
@@ -1663,17 +1752,17 @@
             if (cancelNewPlaylistBtn) cancelNewPlaylistBtn.addEventListener('click', closeCreatePlaylistModal);
             if (saveNewPlaylistBtn) saveNewPlaylistBtn.addEventListener('click', handleSaveNewPlaylist);
             if (createPlaylistModal) createPlaylistModal.addEventListener('click', (e) => { if(e.target === createPlaylistModal) closeCreatePlaylistModal(); });
-            if (modalSongSearchInput && modalAutosuggestDropdownEl) { // Autosuggest for Create Playlist Modal
-                initAutosuggest(modalSongSearchInput, modalAutosuggestDropdownEl, (selectedSongText) => {
-                    const parts = selectedSongText.split(' - ');
-                    const title = parts[0];
-                    const artist = parts.length > 1 ? parts.slice(1).join(' - ') : undefined; 
-                    const songToAdd = allSongsData.find(s => s.title === title && (!artist || s.artist === artist));
+            if (modalSongSearchInput && modalAutosuggestDropdownEl) {
+                initAutosuggest(modalSongSearchInput, modalAutosuggestDropdownEl, (selectedText) => {
+                    // Logic to find song by title or artist if they are combined in selectedText
+                    const songToAdd = allSongsData.find(s => s.title === selectedText || s.artist === selectedText);
                     if (songToAdd) {
                         addSongToNewPlaylist(songToAdd);
                         modalSongSearchInput.value = ''; 
                         modalAutosuggestDropdownEl.classList.remove('show'); 
                         modalSongSearchInput.focus();
+                    } else {
+                        console.warn("Selected song not found from autosuggest:", selectedText);
                     }
                 });
             }
@@ -1684,7 +1773,7 @@
             if(closeAddSongsToSetlistModalBtn) closeAddSongsToSetlistModalBtn.addEventListener('click', closeAddSongsToSetlistModal);
             if(addSongsToSetlistModal) addSongsToSetlistModal.addEventListener('click', (e) => { if(e.target === addSongsToSetlistModal) closeAddSongsToSetlistModal(); });
             if(modalSetlistApplyFiltersBtn) modalSetlistApplyFiltersBtn.addEventListener('click', performModalSetlistSongSearchAndFilter);
-            if(modalSetlistClearFiltersBtn) { // Event listener for the new Clear button in modal
+            if(modalSetlistClearFiltersBtn) { 
                 modalSetlistClearFiltersBtn.addEventListener('click', () => {
                     if(modalSetlistSongSearchInput) modalSetlistSongSearchInput.value = '';
                     if(modalSetlistThemeFilter) modalSetlistThemeFilter.value = '';
@@ -1693,17 +1782,16 @@
                     if(modalSetlistTempoFilter) modalSetlistTempoFilter.value = '';
                     if(modalSetlistLiturgicalSeasonFilter) modalSetlistLiturgicalSeasonFilter.value = '';
                     if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.value = '';
-                    if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = '';
+                    if(modalSetlistAutosuggestDropdown) modalSetlistAutosuggestDropdown.innerHTML = ''; // Clear suggestions
                     if(modalSetlistSongResultsContainer) modalSetlistSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
-                    // Optionally, re-run search to show all songs or default state
-                    // performModalSetlistSongSearchAndFilter(); 
+                    performModalSetlistSongSearchAndFilter(); // Re-run search to show all eligible songs
                 });
             }
             
             if (modalSetlistSongSearchInput && modalSetlistAutosuggestDropdown) {
-                 initAutosuggest(modalSetlistSongSearchInput, modalSetlistAutosuggestDropdown, () => {
+                initAutosuggest(modalSetlistSongSearchInput, modalSetlistAutosuggestDropdown, () => {
                     performModalSetlistSongSearchAndFilter(); 
-                 });
+                });
             }
             if(modalSetlistSongSearchInput) modalSetlistSongSearchInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') performModalSetlistSongSearchAndFilter(); });
             if(modalSetlistScriptureFilter) modalSetlistScriptureFilter.addEventListener('keyup', (e) => { if(e.key === 'Enter') performModalSetlistSongSearchAndFilter(); });
@@ -1716,16 +1804,74 @@
             if (addToListModalCloseBtn) addToListModalCloseBtn.addEventListener('click', () => addToListModal.classList.add('hidden'));
             if (cancelAddToListBtnModal) cancelAddToListBtnModal.addEventListener('click', () => addToListModal.classList.add('hidden'));
             if (confirmAddToListBtnModal) confirmAddToListBtnModal.addEventListener('click', () => {
-                 const playlistId = playlistSelectModal.value; if (!playlistId || !currentSongForPlaylist) { alert("Please select a playlist."); return; } 
-                 const playlist = sitePlaylists.find(p => p.id === playlistId);
-                 if (playlist) { if (!playlist.songs.find(s => s.id === currentSongForPlaylist.id)) { playlist.songs.push(currentSongForPlaylist); savePlaylists(); renderPlaylistSidebar(); if (worshipSetlistPageView.style.display === 'block' && worshipSetlistPageView.dataset.currentPlaylistId === playlist.id) displayWorshipSetlistPage(playlist.id); alert(`Added.`); } else { alert(`Already in list.`);}} 
-                 addToListModal.classList.add('hidden'); currentSongForPlaylist = null;
+                const playlistId = playlistSelectModal.value; if (!playlistId || !currentSongForPlaylist) { alert("Please select a playlist."); return; } 
+                const playlist = sitePlaylists.find(p => p.id === playlistId);
+                if (playlist) { 
+                    if (!playlist.songs.find(s => s.id === currentSongForPlaylist.id)) { 
+                        const minimalSong = { // Add minimal song object to playlist
+                            id: currentSongForPlaylist.id,
+                            title: currentSongForPlaylist.title,
+                            artist: currentSongForPlaylist.artist,
+                            key: currentSongForPlaylist.key,
+                            docLinks: currentSongForPlaylist.docLinks
+                        };
+                        playlist.songs.push(minimalSong); 
+                        savePlaylists(); 
+                        renderPlaylistSidebar(); 
+                        if (worshipSetlistPageView.style.display === 'block' && worshipSetlistPageView.dataset.currentPlaylistId === playlist.id) displayWorshipSetlistPage(playlist.id); 
+                        // alert(`Added "${currentSongForPlaylist.title}" to "${playlist.name}".`); 
+                    } else { 
+                        // alert(`"${currentSongForPlaylist.title}" is already in "${playlist.name}".`);
+                    }
+                } 
+                addToListModal.classList.add('hidden'); currentSongForPlaylist = null;
             });
             if (addToListModal) addToListModal.addEventListener('click', (e) => { if(e.target === addToListModal) addToListModal.classList.add('hidden'); });
 
             // Preview Modal
             if (modalCloseButton) modalCloseButton.addEventListener('click', () => { if (previewModal) previewModal.classList.add('hidden'); if (modalBody) modalBody.innerHTML = ''; });
             if (previewModal) previewModal.addEventListener('click', (e) => { if (e.target === previewModal) { previewModal.classList.add('hidden'); if (modalBody) modalBody.innerHTML = ''; } });
+
+            // Mobile Friendly Change: Sidebar Toggle Logic
+            if (mobileMenuButton && actualPlaylistSidebar && closeMobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    actualPlaylistSidebar.classList.remove('-translate-x-full');
+                    actualPlaylistSidebar.classList.add('translate-x-0');
+                    document.body.classList.add('sidebar-open-mobile'); // For overlay
+                });
+
+                closeMobileMenuButton.addEventListener('click', () => {
+                    actualPlaylistSidebar.classList.add('-translate-x-full');
+                    actualPlaylistSidebar.classList.remove('translate-x-0');
+                     document.body.classList.remove('sidebar-open-mobile');
+                });
+
+                // Close sidebar when a playlist item is clicked or create new list on mobile
+                actualPlaylistSidebar.addEventListener('click', (e) => {
+                    if (window.innerWidth < 1024) { // Tailwind's lg breakpoint
+                        if (e.target.closest('.playlist-item') || e.target.closest('#createSongListBtn') || e.target.closest('.delete-playlist-btn')) {
+                            setTimeout(() => { // Allow click to register first if it navigates
+                                actualPlaylistSidebar.classList.add('-translate-x-full');
+                                actualPlaylistSidebar.classList.remove('translate-x-0');
+                                document.body.classList.remove('sidebar-open-mobile');
+                            }, 100); // Small delay
+                        }
+                    }
+                });
+                // Close sidebar if user clicks on the main content overlay (when sidebar is open)
+                document.body.addEventListener('click', (e) => {
+                    if (window.innerWidth < 1024 && document.body.classList.contains('sidebar-open-mobile')) {
+                        if (e.target === mainPageContainer || mainPageContainer.contains(e.target) && !actualPlaylistSidebar.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                             if (!actualPlaylistSidebar.classList.contains('-translate-x-full')) { // only if open
+                                actualPlaylistSidebar.classList.add('-translate-x-full');
+                                actualPlaylistSidebar.classList.remove('translate-x-0');
+                                document.body.classList.remove('sidebar-open-mobile');
+                            }
+                        }
+                    }
+                });
+            }
+
 
             console.log("Event listeners set up.");
         }
@@ -1741,7 +1887,6 @@
             }
             await fetchSongDataAndInitialize(); 
             initBiblePassageDropdown(); 
-            // initAutosuggest(); // Main autosuggest is now called from fetchSongDataAndInitialize
             setupEventListeners(); 
             showAppView('songFinderView'); 
             console.log("Initial setup complete.");
