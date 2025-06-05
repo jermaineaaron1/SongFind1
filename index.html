@@ -353,6 +353,14 @@
                 display: none;
             }
         }
+        /* Ensure sub-modal (search for new playlist) appears above its parent */
+        #searchSongsForNewPlaylistModal {
+            z-index: 1050; /* Higher than createPlaylistModal (default 40 or 1000 for modal-overlay) */
+        }
+        #searchSongsForNewPlaylistModal .bg-opacity-50 { /* Ensure its overlay is also higher if needed */
+             z-index: 1045;
+        }
+
 
     </style>
 </head>
@@ -641,15 +649,15 @@
         </div>
     </div>
 
-    <!-- Create Playlist Modal (Enhanced) -->
+    <!-- Create Playlist Modal (Structure Updated) -->
     <div id="createPlaylistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] flex flex-col"> {/* Increased max-width */}
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg max-h-[95vh] flex flex-col">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 class="text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3>
                 <button id="createPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
             
-            <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 space-y-4"> {/* Added overflow and space */}
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 space-y-4">
                 <div>
                     <label for="newPlaylistName" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name <span class="text-red-500">*</span></label>
                     <input type="text" id="newPlaylistName" placeholder="E.g., Sunday Morning Worship" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
@@ -660,55 +668,17 @@
                 </div>
 
                 <div class="border-t pt-4">
-                    <h4 class="text-md font-semibold text-gray-700 mb-2">Quick Add Song:</h4>
-                    <div class="relative mb-2">
-                        <input type="text" id="modalSongSearchInput" placeholder="Search by title or artist to add quickly..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
-                        <div id="modalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-50"></div>
-                    </div>
+                     <!-- Updated: Button to open song search modal -->
+                    <h4 class="text-md font-semibold text-gray-700 mb-2">Add Songs to this new list:</h4>
+                    <button id="openSearchForNewPlaylistModalBtn" class="btn-secondary text-white w-full px-4 py-2 rounded-md flex items-center justify-center mb-3">
+                        <i class="fas fa-search mr-2"></i> Search & Add Songs...
+                    </button>
                 </div>
 
                 <div class="border-t pt-4">
                     <h4 class="text-md font-semibold text-gray-700 mb-2">Selected Songs (<span id="modalSelectedSongsCount">0</span>):</h4>
-                    <div id="modalSelectedSongsContainer" class="min-h-[80px] max-h-[150px] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar mb-4">
-                        <p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet.</p>
-                    </div>
-                </div>
-
-                <!-- Enhanced Song Addition with Filters -->
-                <div class="border-t pt-4">
-                    <h4 class="text-md font-semibold text-gray-700 mb-3">Find More Songs (with Filters):</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Theme</label>
-                            <select id="modalCreateThemeFilter" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All</option></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Key</label>
-                            <select id="modalCreateKeyFilter" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All</option></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Style</label>
-                            <select id="modalCreateStyleFilter" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All</option></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Tempo</label>
-                            <select id="modalCreateTempoFilter" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All</option></select>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Liturgical Season</label>
-                            <select id="modalCreateLiturgicalSeasonFilter" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All</option></select>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Scripture</label>
-                            <input type="text" id="modalCreateScriptureFilter" placeholder="e.g. John 3" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-gray-50">
-                        </div>
-                    </div>
-                    <div class="flex space-x-2 mb-3">
-                        <button id="modalCreateApplyFiltersBtn" class="flex-grow btn-primary text-white px-3 py-1.5 text-sm rounded-md">Search Songs in Modal</button>
-                        <button id="modalCreateClearFiltersBtn" class="btn-clear px-3 py-1.5 text-sm rounded-md">Clear Filters</button>
-                    </div>
-                    <div id="modalCreatePlaylistFilterResultsContainer" class="min-h-[100px] max-h-[200px] overflow-y-auto border rounded-md p-1 bg-gray-100 custom-scrollbar">
-                        <p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>
+                    <div id="modalSelectedSongsContainer" class="min-h-[100px] max-h-[250px] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
+                        <p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet. Click "Search & Add Songs..." above.</p>
                     </div>
                 </div>
             </div>
@@ -721,6 +691,72 @@
             </div>
         </div>
     </div>
+
+    <!-- New Modal: Search Songs for New Playlist -->
+    <div id="searchSongsForNewPlaylistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1050] hidden p-4">
+        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[95vh] flex flex-col">
+            <div class="flex justify-between items-center mb-3 sm:mb-4 border-b pb-2 sm:pb-3">
+                <h3 class="text-lg sm:text-xl font-semibold text-[#3a3a3a]">Search & Add Songs for New Playlist</h3>
+                <button id="searchSongsForNewPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-2">
+                <div class="mb-4">
+                    <input type="text" id="newPlaylistModalSongSearchInput" placeholder="Search songs by title or artist..." class="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-sm sm:text-base">
+                    <div id="newPlaylistModalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[1060]"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Theme</label>
+                        <select id="newPlaylistModalThemeFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Themes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Key</label>
+                        <select id="newPlaylistModalKeyFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Keys</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Style</label>
+                        <select id="newPlaylistModalStyleFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Styles</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Tempo</label>
+                        <select id="newPlaylistModalTempoFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Tempos</option>
+                        </select>
+                    </div>
+                     <div class="sm:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Liturgical Season</label>
+                        <select id="newPlaylistModalLiturgicalSeasonFilter" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                            <option value="">All Seasons</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Scripture</label>
+                        <input type="text" id="newPlaylistModalScriptureFilter" placeholder="e.g., John 3:16" class="w-full p-2 text-xs sm:text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
+                    <button id="newPlaylistModalApplyFiltersBtn" class="flex-grow btn-primary text-white px-4 py-2 rounded-md text-sm sm:text-base">Search</button>
+                    <button id="newPlaylistModalClearFiltersBtn" class="btn-clear px-4 py-2 rounded-md text-sm sm:text-base">Clear Filters</button>
+                </div>
+
+                <div id="newPlaylistModalSongResultsContainer" class="min-h-[150px] sm:min-h-[200px] max-h-[30vh] sm:max-h-[40vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar">
+                    <p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-4 pt-3 sm:pt-4 border-t">
+                <button id="doneAddingToNewPlaylistBtn" class="btn-primary px-4 py-2 rounded-md text-sm sm:text-base">Done Adding</button>
+            </div>
+        </div>
+    </div>
+
 
     <div id="addSongsToSetlistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[95vh] flex flex-col">
@@ -789,7 +825,7 @@
 
     <script>
         // --- START OF SCRIPT ---
-        console.log("LHC Worship Site Script Initializing... (v3.15 - Enhanced Create Playlist Modal)");
+        console.log("LHC Worship Site Script Initializing... (v3.16 - Search Sub-Modal for Create Playlist)");
 
         // --- Global Variables ---
         let allSongsData = []; 
@@ -815,17 +851,23 @@
         let mobileMenuButton, closeMobileMenuButton, actualPlaylistSidebar, scrollToSearchBtn;
 
 
-        // Create Playlist Modal (Enhanced) Elements
+        // Create Playlist Modal (Original & New Search Sub-Modal) Elements
         let createPlaylistModal, newPlaylistNameInput, newPlaylistSubtitleInput,
-            modalSongSearchInput, modalAutosuggestDropdownEl, modalSelectedSongsContainer, modalSelectedSongsCount,
-            saveNewPlaylistBtn, cancelNewPlaylistBtn, createPlaylistModalCloseBtn,
-            modalCreateThemeFilter, modalCreateKeyFilter, modalCreateStyleFilter, modalCreateTempoFilter,
-            modalCreateLiturgicalSeasonFilter, modalCreateScriptureFilter,
-            modalCreateApplyFiltersBtn, modalCreateClearFiltersBtn, modalCreatePlaylistFilterResultsContainer;
+            /* modalSongSearchInput, modalAutosuggestDropdownEl, -- These are removed from createPlaylistModal direct use */
+            openSearchForNewPlaylistModalBtn, // New button
+            modalSelectedSongsContainer, modalSelectedSongsCount,
+            saveNewPlaylistBtn, cancelNewPlaylistBtn, createPlaylistModalCloseBtn;
         
+        // New Search Modal elements (for Create Playlist)
+        let searchSongsForNewPlaylistModal, searchSongsForNewPlaylistModalCloseBtn, doneAddingToNewPlaylistBtn,
+            newPlaylistModalSongSearchInput, newPlaylistModalAutosuggestDropdown,
+            newPlaylistModalThemeFilter, newPlaylistModalKeyFilter, newPlaylistModalStyleFilter,
+            newPlaylistModalTempoFilter, newPlaylistModalLiturgicalSeasonFilter, newPlaylistModalScriptureFilter,
+            newPlaylistModalApplyFiltersBtn, newPlaylistModalClearFiltersBtn, newPlaylistModalSongResultsContainer;
+
         let songsForNewPlaylist = [];
 
-        // Add Songs to Setlist Modal Elements
+        // Add Songs to Existing Setlist Modal Elements
         let addSongsToSetlistModal, addSongsToSetlistModalCloseBtn, closeAddSongsToSetlistModalBtn,
             modalSetlistSongSearchInput, modalSetlistAutosuggestDropdown,
             modalSetlistThemeFilter, modalSetlistKeyFilter, modalSetlistStyleFilter,
@@ -893,26 +935,32 @@
             modalCloseButton = document.getElementById('modalCloseButton');
             startSearchingBtnEmptyState = document.getElementById('startSearchingBtnEmptyState');
 
-            // Create Playlist Modal (Enhanced)
+            // Create Playlist Modal
             createPlaylistModal = document.getElementById('createPlaylistModal');
             newPlaylistNameInput = document.getElementById('newPlaylistName');
             newPlaylistSubtitleInput = document.getElementById('newPlaylistSubtitle');
-            modalSongSearchInput = document.getElementById('modalSongSearchInput');
-            modalAutosuggestDropdownEl = document.getElementById('modalAutosuggestDropdown'); 
+            openSearchForNewPlaylistModalBtn = document.getElementById('openSearchForNewPlaylistModalBtn');
             modalSelectedSongsContainer = document.getElementById('modalSelectedSongsContainer');
             modalSelectedSongsCount = document.getElementById('modalSelectedSongsCount');
             saveNewPlaylistBtn = document.getElementById('saveNewPlaylistBtn');
             cancelNewPlaylistBtn = document.getElementById('cancelNewPlaylistBtn');
             createPlaylistModalCloseBtn = document.getElementById('createPlaylistModalCloseBtn');
-            modalCreateThemeFilter = document.getElementById('modalCreateThemeFilter');
-            modalCreateKeyFilter = document.getElementById('modalCreateKeyFilter');
-            modalCreateStyleFilter = document.getElementById('modalCreateStyleFilter');
-            modalCreateTempoFilter = document.getElementById('modalCreateTempoFilter');
-            modalCreateLiturgicalSeasonFilter = document.getElementById('modalCreateLiturgicalSeasonFilter');
-            modalCreateScriptureFilter = document.getElementById('modalCreateScriptureFilter');
-            modalCreateApplyFiltersBtn = document.getElementById('modalCreateApplyFiltersBtn');
-            modalCreateClearFiltersBtn = document.getElementById('modalCreateClearFiltersBtn');
-            modalCreatePlaylistFilterResultsContainer = document.getElementById('modalCreatePlaylistFilterResultsContainer');
+
+            // New Search Modal for Create Playlist
+            searchSongsForNewPlaylistModal = document.getElementById('searchSongsForNewPlaylistModal');
+            searchSongsForNewPlaylistModalCloseBtn = document.getElementById('searchSongsForNewPlaylistModalCloseBtn');
+            doneAddingToNewPlaylistBtn = document.getElementById('doneAddingToNewPlaylistBtn');
+            newPlaylistModalSongSearchInput = document.getElementById('newPlaylistModalSongSearchInput');
+            newPlaylistModalAutosuggestDropdown = document.getElementById('newPlaylistModalAutosuggestDropdown');
+            newPlaylistModalThemeFilter = document.getElementById('newPlaylistModalThemeFilter');
+            newPlaylistModalKeyFilter = document.getElementById('newPlaylistModalKeyFilter');
+            newPlaylistModalStyleFilter = document.getElementById('newPlaylistModalStyleFilter');
+            newPlaylistModalTempoFilter = document.getElementById('newPlaylistModalTempoFilter');
+            newPlaylistModalLiturgicalSeasonFilter = document.getElementById('newPlaylistModalLiturgicalSeasonFilter');
+            newPlaylistModalScriptureFilter = document.getElementById('newPlaylistModalScriptureFilter');
+            newPlaylistModalApplyFiltersBtn = document.getElementById('newPlaylistModalApplyFiltersBtn');
+            newPlaylistModalClearFiltersBtn = document.getElementById('newPlaylistModalClearFiltersBtn');
+            newPlaylistModalSongResultsContainer = document.getElementById('newPlaylistModalSongResultsContainer');
 
 
             addSongsToSetlistModal = document.getElementById('addSongsToSetlistModal');
@@ -936,7 +984,7 @@
             scrollToSearchBtn = document.getElementById('scrollToSearchBtn');
 
 
-            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal || !mobileMenuButton || !scrollToSearchBtn) {
+            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal || !mobileMenuButton || !scrollToSearchBtn || !searchSongsForNewPlaylistModal) {
                 console.error("CRITICAL DOM INIT ERROR: Essential elements are missing.");
             }
             console.log("DOM references assigned.");
@@ -1022,7 +1070,7 @@
                 console.log("Songs loaded and mapped:", allSongsData.length);
                 resetToInitialEmptyState(false);
                 populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
-                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter); // Pass true for main search button
+                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true); // Pass true for main search 
                 loadPlaylists();
             } catch (error) {
                 console.error("Error in fetchSongDataAndInitialize:", error);
@@ -1346,7 +1394,7 @@
             bibleDropdownContent.innerHTML = ''; 
             biblePassages.forEach(passage => {
                 const item = document.createElement('div'); item.className = 'bible-dropdown-item'; item.textContent = passage;
-                item.addEventListener('click', function() { biblePassageInput.value = passage; bibleDropdownContent.classList.remove('show'); performSearchAndFilter(true); }); // Pass true for button click behavior
+                item.addEventListener('click', function() { biblePassageInput.value = passage; bibleDropdownContent.classList.remove('show'); performSearchAndFilter(true); }); 
                 bibleDropdownContent.appendChild(item);
             });
             biblePassageInput.addEventListener('focus', () => { if (bibleDropdownContent.children.length > 0) bibleDropdownContent.classList.add('show');});
@@ -1367,7 +1415,7 @@
             if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', () => { if (bibleDropdownContent) bibleDropdownContent.classList.toggle('show'); });
         }
 
-        function initAutosuggest(inputElement, dropdownElement, onSelectCallback, isMainSearch = false) { // Added isMainSearch
+        function initAutosuggest(inputElement, dropdownElement, onSelectCallback, isForMainSearch = false) {
             if (!inputElement || !dropdownElement) return;
             dropdownElement.innerHTML = ''; 
             if (allSongsData.length > 0) {
@@ -1383,11 +1431,12 @@
                     item.addEventListener('click', () => { 
                         inputElement.value = text; 
                         dropdownElement.classList.remove('show');
-                        // For main search, trigger search on selection. For modals, it's just for input filling.
-                        if (isMainSearch && typeof onSelectCallback === 'function') {
-                             onSelectCallback(true); // Pass true to indicate search should be triggered
-                        } else if (typeof onSelectCallback === 'function') {
-                            onSelectCallback(text); // For modals, pass the selected text
+                        if (typeof onSelectCallback === 'function') {
+                            if(isForMainSearch) {
+                                onSelectCallback(true); // Trigger search for main input
+                            } else {
+                                onSelectCallback(text); // Pass selected text for modal inputs
+                            }
                         }
                     });
                     dropdownElement.appendChild(item);
@@ -1564,29 +1613,25 @@
             }
         }
 
-        // --- Create New Playlist Modal Functions (Enhanced) ---
+        // --- Create New Playlist Modal Functions (Updated for sub-modal) ---
         function openCreatePlaylistModal() {
             if (!createPlaylistModal || !newPlaylistNameInput || !newPlaylistSubtitleInput || !modalSelectedSongsContainer) return;
-            newPlaylistNameInput.value = ''; newPlaylistSubtitleInput.value = ''; modalSongSearchInput.value = '';
+            newPlaylistNameInput.value = ''; newPlaylistSubtitleInput.value = '';
             songsForNewPlaylist = []; 
             renderModalSelectedSongs(); 
-            if (modalAutosuggestDropdownEl) modalAutosuggestDropdownEl.classList.remove('show');
-            
-            // Populate and reset filters for the enhanced search section
-            populateFilterDropdowns(modalCreateThemeFilter, modalCreateKeyFilter, modalCreateStyleFilter, modalCreateTempoFilter, modalCreateLiturgicalSeasonFilter);
-            if(modalCreateScriptureFilter) modalCreateScriptureFilter.value = '';
-            if(modalCreatePlaylistFilterResultsContainer) modalCreatePlaylistFilterResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>';
-
             createPlaylistModal.classList.remove('hidden'); 
             newPlaylistNameInput.focus();
         }
 
-        function closeCreatePlaylistModal() { if (createPlaylistModal) createPlaylistModal.classList.add('hidden'); }
+        function closeCreatePlaylistModal() { 
+            if (createPlaylistModal) createPlaylistModal.classList.add('hidden'); 
+            if (searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.classList.add('hidden'); // Ensure sub-modal is also closed
+        }
         
         function renderModalSelectedSongs() {
             if (!modalSelectedSongsContainer || !modalSelectedSongsCount) return;
             modalSelectedSongsCount.textContent = songsForNewPlaylist.length;
-            modalSelectedSongsContainer.innerHTML = songsForNewPlaylist.length === 0 ? '<p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet.</p>' : '';
+            modalSelectedSongsContainer.innerHTML = songsForNewPlaylist.length === 0 ? '<p class="text-xs text-gray-400 italic modal-empty-placeholder">No songs added yet. Click "Search & Add Songs..." above.</p>' : '';
             songsForNewPlaylist.forEach((song, index) => {
                 const div = document.createElement('div'); div.className = 'flex justify-between items-center p-1.5 bg-white border-b text-sm';
                 div.innerHTML = `<span class="truncate flex-grow mr-2" title="${escapeHtml(song.title)} by ${escapeHtml(song.artist)}">${index + 1}. ${escapeHtml(song.title)} <span class="text-gray-500 text-xs">(${escapeHtml(song.artist)})</span></span><button class="text-red-500 hover:text-red-700 remove-song-from-modal-btn p-1 shrink-0" data-song-id="${song.id}" title="Remove"><i class="fas fa-times-circle"></i></button>`;
@@ -1605,26 +1650,53 @@
         function removeSongFromNewPlaylist(songId) {
             songsForNewPlaylist = songsForNewPlaylist.filter(s => s.id !== songId);
             renderModalSelectedSongs();
-            // If the song was removed from the selected list, it should become available again in the filtered results (if it matches current filters)
-            performModalCreatePlaylistFilterSearch(); 
+            // Refresh the sub-search modal results if it's open, as a song is now available again
+            if (searchSongsForNewPlaylistModal && !searchSongsForNewPlaylistModal.classList.contains('hidden')) {
+                performNewPlaylistModalSearchAndFilter();
+            }
+        }
+        
+        // --- Sub-Modal for Searching/Adding Songs to New Playlist ---
+        function openSearchSongsForNewPlaylistModal() {
+            if (!searchSongsForNewPlaylistModal) return;
+            // Populate filters in this sub-modal
+            populateFilterDropdowns(
+                newPlaylistModalThemeFilter, 
+                newPlaylistModalKeyFilter, 
+                newPlaylistModalStyleFilter, 
+                newPlaylistModalTempoFilter, 
+                newPlaylistModalLiturgicalSeasonFilter
+            );
+            if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.value = '';
+            if(newPlaylistModalScriptureFilter) newPlaylistModalScriptureFilter.value = '';
+            if(newPlaylistModalAutosuggestDropdown) newPlaylistModalAutosuggestDropdown.innerHTML = '';
+            if(newPlaylistModalSongResultsContainer) newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic p-2">Search or filter to find songs.</p>';
+            
+            searchSongsForNewPlaylistModal.classList.remove('hidden');
+            if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.focus();
+            performNewPlaylistModalSearchAndFilter(); // Show initial results if any
         }
 
-        function performModalCreatePlaylistFilterSearch() {
-            if (!allSongsData || !modalCreatePlaylistFilterResultsContainer) return;
+        function closeSearchSongsForNewPlaylistModal() {
+            if (searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.classList.add('hidden');
+        }
+
+        function performNewPlaylistModalSearchAndFilter() {
+            if (!allSongsData || !newPlaylistModalSongResultsContainer) return;
             const filters = {
-                theme: modalCreateThemeFilter ? modalCreateThemeFilter.value : '',
-                key: modalCreateKeyFilter ? modalCreateKeyFilter.value : '',
-                style: modalCreateStyleFilter ? modalCreateStyleFilter.value : '',
-                searchTerm: '', // Not using the main search term here, relying on specific filters
-                scripture: modalCreateScriptureFilter ? modalCreateScriptureFilter.value.toLowerCase().trim() : '',
-                liturgicalSeason: modalCreateLiturgicalSeasonFilter ? modalCreateLiturgicalSeasonFilter.value : '',
-                tempo: modalCreateTempoFilter ? modalCreateTempoFilter.value : ''
+                theme: newPlaylistModalThemeFilter ? newPlaylistModalThemeFilter.value : '',
+                key: newPlaylistModalKeyFilter ? newPlaylistModalKeyFilter.value : '',
+                style: newPlaylistModalStyleFilter ? newPlaylistModalStyleFilter.value : '',
+                searchTerm: newPlaylistModalSongSearchInput ? newPlaylistModalSongSearchInput.value.toLowerCase().trim() : '',
+                scripture: newPlaylistModalScriptureFilter ? newPlaylistModalScriptureFilter.value.toLowerCase().trim() : '',
+                liturgicalSeason: newPlaylistModalLiturgicalSeasonFilter ? newPlaylistModalLiturgicalSeasonFilter.value : '',
+                tempo: newPlaylistModalTempoFilter ? newPlaylistModalTempoFilter.value : ''
             };
 
             const filteredSongs = allSongsData.filter(song => {
-                // Exclude songs already in songsForNewPlaylist
-                if (songsForNewPlaylist.find(s => s.id === song.id)) return false;
+                if (songsForNewPlaylist.find(s => s.id === song.id)) return false; // Exclude already selected
 
+                if (filters.searchTerm && !(song.title.toLowerCase().includes(filters.searchTerm) || (song.artist && song.artist.toLowerCase().includes(filters.searchTerm)))) return false;
                 if (filters.theme && !(Array.isArray(song.themes) ? song.themes.map(t=>t.toLowerCase()) : [String(song.themes||'').toLowerCase()]).includes(filters.theme)) return false;
                 if (filters.key && !String(song.key||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(k=>k.trim()).includes(filters.key)) return false;
                 if (filters.style && !(song.style && song.style.toLowerCase() === filters.style)) return false;
@@ -1633,14 +1705,14 @@
                 if (filters.tempo && !(song.tempo && song.tempo.toLowerCase() === filters.tempo)) return false;
                 return true;
             });
-            renderModalCreatePlaylistFilterResults(filteredSongs);
+            renderNewPlaylistModalSongResults(filteredSongs);
         }
 
-        function renderModalCreatePlaylistFilterResults(songs) {
-            if (!modalCreatePlaylistFilterResultsContainer) return;
-            modalCreatePlaylistFilterResultsContainer.innerHTML = '';
+        function renderNewPlaylistModalSongResults(songs) {
+            if (!newPlaylistModalSongResultsContainer) return;
+            newPlaylistModalSongResultsContainer.innerHTML = '';
             if (songs.length === 0) {
-                modalCreatePlaylistFilterResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">No songs match your criteria or all matching songs are already selected.</p>';
+                newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">No songs match your criteria or all are already selected.</p>';
                 return;
             }
             songs.forEach((song, index) => {
@@ -1652,22 +1724,26 @@
                         <p class="font-medium text-gray-800">${escapeHtml(song.title)}</p>
                         <p class="text-gray-500">${escapeHtml(song.artist)} - Key: ${escapeHtml(song.key)}</p>
                     </div>
-                    <button class="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded add-song-from-modal-create-filter-btn" data-song-id="${song.id}">
+                    <button class="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded add-song-from-new-playlist-search-btn" data-song-id="${song.id}">
                         <i class="fas fa-plus mr-1"></i> Add
                     </button>
                 `;
-                div.querySelector('.add-song-from-modal-create-filter-btn').addEventListener('click', function() {
+                div.querySelector('.add-song-from-new-playlist-search-btn').addEventListener('click', function() {
                     const songToAdd = allSongsData.find(s => s.id === this.dataset.songId);
                     if (songToAdd) addSongToNewPlaylist(songToAdd);
-                    this.textContent = 'Added'; // Provide feedback
+                    // Visually indicate it's added and remove from this search list or disable button
+                    this.textContent = 'Added'; 
                     this.disabled = true;
                     this.classList.remove('bg-green-500', 'hover:bg-green-600');
                     this.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    // Optionally, to remove it from view immediately:
+                    // setTimeout(() => div.remove(), 300); 
                 });
-                modalCreatePlaylistFilterResultsContainer.appendChild(div);
+                newPlaylistModalSongResultsContainer.appendChild(div);
             });
         }
-        
+
+
         function handleSaveNewPlaylist() {
             if (!newPlaylistNameInput || !newPlaylistSubtitleInput) return;
             const name = newPlaylistNameInput.value.trim();
@@ -1763,9 +1839,9 @@
             console.log("Setting up event listeners...");
             if (searchBtn) searchBtn.addEventListener('click', () => performSearchAndFilter(true));
             if (searchInput) searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(true); });
-            [themeSelect, keySelect, styleSelect, liturgicalSeasonFilter, tempoFilter].forEach(sel => { if (sel) sel.addEventListener('change', () => performSearchAndFilter(true)); }); // Pass true on filter changes as well
+            [themeSelect, keySelect, styleSelect, liturgicalSeasonFilter, tempoFilter].forEach(sel => { if (sel) sel.addEventListener('change', () => performSearchAndFilter(true)); });
             if (biblePassageInput) biblePassageInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(true); });
-             if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', () => performSearchAndFilter(true)); // Trigger search on Bible search button
+             if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', () => performSearchAndFilter(true)); 
             if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(true));
             if (clearResultsBtn) clearResultsBtn.addEventListener('click', () => resetToInitialEmptyState(false));
             
@@ -1783,34 +1859,37 @@
             if (mySongListsBtn) mySongListsBtn.addEventListener('click', () => { if(sitePlaylists.length > 0 && sitePlaylists[0]?.id) {displayWorshipSetlistPage(sitePlaylists[0].id);} else { if(setlistNameDisplay) setlistNameDisplay.textContent = `Worship Setlists`; if(setlistSongsContainer) setlistSongsContainer.innerHTML = '<p class="text-gray-500">No playlists yet. Create one from the sidebar.</p>'; showAppView('worshipSetlistPageView'); } });
             if (playlistItemsContainer) playlistItemsContainer.addEventListener('click', (e) => { const item = e.target.closest('.playlist-item'); if (item && !e.target.closest('.delete-playlist-btn')) displayWorshipSetlistPage(item.dataset.playlistId); });
             
-            // Create Playlist Modal (Enhanced)
+            // Create Playlist Modal & its Sub-Search Modal
             if (createSongListBtn) createSongListBtn.addEventListener('click', openCreatePlaylistModal);
             if (createPlaylistModalCloseBtn) createPlaylistModalCloseBtn.addEventListener('click', closeCreatePlaylistModal);
             if (cancelNewPlaylistBtn) cancelNewPlaylistBtn.addEventListener('click', closeCreatePlaylistModal);
             if (saveNewPlaylistBtn) saveNewPlaylistBtn.addEventListener('click', handleSaveNewPlaylist);
             if (createPlaylistModal) createPlaylistModal.addEventListener('click', (e) => { if(e.target === createPlaylistModal) closeCreatePlaylistModal(); });
-            if (modalSongSearchInput && modalAutosuggestDropdownEl) {
-                initAutosuggest(modalSongSearchInput, modalAutosuggestDropdownEl, (selectedText) => { // Callback for quick add
-                    const songToAdd = allSongsData.find(s => s.title.toLowerCase() === selectedText.toLowerCase() || (s.artist && s.artist.toLowerCase() === selectedText.toLowerCase()));
-                    if (songToAdd) {
-                        addSongToNewPlaylist(songToAdd);
-                        modalSongSearchInput.value = ''; 
-                        modalAutosuggestDropdownEl.classList.remove('show'); 
-                        modalSongSearchInput.focus();
-                        performModalCreatePlaylistFilterSearch(); // Refresh filtered results as a song was added
-                    } else console.warn("Selected song not found from autosuggest:", selectedText);
-                });
+            
+            if(openSearchForNewPlaylistModalBtn) openSearchForNewPlaylistModalBtn.addEventListener('click', openSearchSongsForNewPlaylistModal);
+            if(searchSongsForNewPlaylistModalCloseBtn) searchSongsForNewPlaylistModalCloseBtn.addEventListener('click', closeSearchSongsForNewPlaylistModal);
+            if(doneAddingToNewPlaylistBtn) doneAddingToNewPlaylistBtn.addEventListener('click', closeSearchSongsForNewPlaylistModal);
+            if(searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.addEventListener('click', (e) => { if(e.target === searchSongsForNewPlaylistModal) closeSearchSongsForNewPlaylistModal(); });
+
+            if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
+                initAutosuggest(newPlaylistModalSongSearchInput, newPlaylistModalAutosuggestDropdown, performNewPlaylistModalSearchAndFilter);
             }
-            if(modalCreateApplyFiltersBtn) modalCreateApplyFiltersBtn.addEventListener('click', performModalCreatePlaylistFilterSearch);
-            if(modalCreateClearFiltersBtn) modalCreateClearFiltersBtn.addEventListener('click', () => {
-                if(modalCreateThemeFilter) modalCreateThemeFilter.value = '';
-                if(modalCreateKeyFilter) modalCreateKeyFilter.value = '';
-                if(modalCreateStyleFilter) modalCreateStyleFilter.value = '';
-                if(modalCreateTempoFilter) modalCreateTempoFilter.value = '';
-                if(modalCreateLiturgicalSeasonFilter) modalCreateLiturgicalSeasonFilter.value = '';
-                if(modalCreateScriptureFilter) modalCreateScriptureFilter.value = '';
-                if(modalCreatePlaylistFilterResultsContainer) modalCreatePlaylistFilterResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>';
+            if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
+            if(newPlaylistModalClearFiltersBtn) newPlaylistModalClearFiltersBtn.addEventListener('click', () => {
+                if(newPlaylistModalThemeFilter) newPlaylistModalThemeFilter.value = '';
+                if(newPlaylistModalKeyFilter) newPlaylistModalKeyFilter.value = '';
+                if(newPlaylistModalStyleFilter) newPlaylistModalStyleFilter.value = '';
+                if(newPlaylistModalTempoFilter) newPlaylistModalTempoFilter.value = '';
+                if(newPlaylistModalLiturgicalSeasonFilter) newPlaylistModalLiturgicalSeasonFilter.value = '';
+                if(newPlaylistModalScriptureFilter) newPlaylistModalScriptureFilter.value = '';
+                if(newPlaylistModalSongResultsContainer) newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>';
+                performNewPlaylistModalSearchAndFilter(); // Re-run search to show all eligible songs
             });
+            [newPlaylistModalThemeFilter, newPlaylistModalKeyFilter, newPlaylistModalStyleFilter, newPlaylistModalTempoFilter, newPlaylistModalLiturgicalSeasonFilter].forEach(sel => {
+                if(sel) sel.addEventListener('change', performNewPlaylistModalSearchAndFilter);
+            });
+            if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') performNewPlaylistModalSearchAndFilter(); });
+            if(newPlaylistModalScriptureFilter) newPlaylistModalScriptureFilter.addEventListener('keyup', (e) => { if(e.key === 'Enter') performNewPlaylistModalSearchAndFilter(); });
 
 
             if(addSongsToCurrentSetlistBtn) addSongsToCurrentSetlistBtn.addEventListener('click', openAddSongsToSetlistModal);
