@@ -410,7 +410,7 @@
             </div>
             
             <div id="mainPageContainer" class="flex-1 lg:ml-64 transition-all duration-300 ease-in-out"> 
-                <header class="bg-white shadow-sm sticky top-0 z-20"> 
+                <header id="mainHeader" class="bg-white shadow-sm sticky top-0 z-20">  {/* Added ID to header for scroll calculation */}
                     <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                         <div class="flex flex-col md:flex-row justify-between items-center">
                             <div class="flex items-center mb-3 md:mb-0">
@@ -504,7 +504,7 @@
                         
                         <div id="songResults" class="bg-white rounded-lg shadow-md p-4 sm:p-6 water-effect hidden">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 waterfall-animation waterfall-delay-1">
-                                <h2 class="text-lg sm:text-xl font-semibold text-[#3a3a3a] flex items-center mb-2 sm:mb-0">
+                                <h2 id="songResultsHeading" class="text-lg sm:text-xl font-semibold text-[#3a3a3a] flex items-center mb-2 sm:mb-0"> {/* Added ID to heading for scroll calculation */}
                                     <i class="fas fa-music mr-2 text-[#4a6da7] glow-icon"></i> Song Results 
                                     <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500">(0 songs)</span>
                                 </h2>
@@ -668,7 +668,6 @@
                 </div>
 
                 <div class="border-t pt-4">
-                     <!-- Updated: Button to open song search modal -->
                     <h4 class="text-md font-semibold text-gray-700 mb-2">Add Songs to this new list:</h4>
                     <button id="openSearchForNewPlaylistModalBtn" class="btn-secondary text-white w-full px-4 py-2 rounded-md flex items-center justify-center mb-3">
                         <i class="fas fa-search mr-2"></i> Search & Add Songs...
@@ -825,7 +824,7 @@
 
     <script>
         // --- START OF SCRIPT ---
-        console.log("LHC Worship Site Script Initializing... (v3.16 - Search Sub-Modal for Create Playlist)");
+        console.log("LHC Worship Site Script Initializing... (v3.17 - AutoScroll & Strict Autosuggest)");
 
         // --- Global Variables ---
         let allSongsData = []; 
@@ -836,9 +835,9 @@
         let cameFromPlaylistId = null;
 
         // --- DOM Element Variables ---
-        let loadingIndicator, mainPageContainer, songFinderView, songDetailPageView, worshipSetlistPageView,
+        let loadingIndicator, mainPageContainer, mainHeader, songFinderView, songDetailPageView, worshipSetlistPageView,
             searchBtn, clearBtn, clearResultsBtn, themeSelect, keySelect, styleSelect, searchInput, 
-            biblePassageInput, bibleSearchBtn, songResultsDiv, emptyStateDiv, 
+            biblePassageInput, bibleSearchBtn, songResultsDiv, songResultsHeading, emptyStateDiv, 
             songCardsContainer, resultCountSpan, showingCountSpan, totalCountSpan, activeFiltersContainer, 
             sortBySelect, liturgicalSeasonFilter, tempoFilter, songDetailHeaderLHC, songDetailMetaLHC, 
             songDetailDocsLHC, songDetailLyricsLHC, songDetailYouTubeLHC, songDetailMp3LHC, backToSongListBtn,
@@ -853,8 +852,7 @@
 
         // Create Playlist Modal (Original & New Search Sub-Modal) Elements
         let createPlaylistModal, newPlaylistNameInput, newPlaylistSubtitleInput,
-            /* modalSongSearchInput, modalAutosuggestDropdownEl, -- These are removed from createPlaylistModal direct use */
-            openSearchForNewPlaylistModalBtn, // New button
+            openSearchForNewPlaylistModalBtn, 
             modalSelectedSongsContainer, modalSelectedSongsCount,
             saveNewPlaylistBtn, cancelNewPlaylistBtn, createPlaylistModalCloseBtn;
         
@@ -879,6 +877,7 @@
             console.log("Assigning DOM references...");
             loadingIndicator = document.getElementById('loadingIndicator');
             mainPageContainer = document.getElementById('mainPageContainer'); 
+            mainHeader = document.getElementById('mainHeader'); // For scroll calculation
             songFinderView = document.getElementById('songFinderView');
             songDetailPageView = document.getElementById('songDetailPageView');
             worshipSetlistPageView = document.getElementById('worshipSetlistPageView');
@@ -893,6 +892,7 @@
             biblePassageInput = document.getElementById('biblePassage');
             bibleSearchBtn = document.getElementById('bibleSearchBtn');
             songResultsDiv = document.getElementById('songResults');
+            songResultsHeading = document.getElementById('songResultsHeading'); // For scroll calculation
             emptyStateDiv = document.getElementById('emptyState');
             songCardsContainer = document.getElementById('songCardsContainer');
             resultCountSpan = document.getElementById('resultCount');
@@ -984,7 +984,7 @@
             scrollToSearchBtn = document.getElementById('scrollToSearchBtn');
 
 
-            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal || !mobileMenuButton || !scrollToSearchBtn || !searchSongsForNewPlaylistModal) {
+            if (!searchBtn || !createPlaylistModal || !addSongsToSetlistModal || !mobileMenuButton || !scrollToSearchBtn || !searchSongsForNewPlaylistModal || !mainHeader || !songResultsHeading) {
                 console.error("CRITICAL DOM INIT ERROR: Essential elements are missing.");
             }
             console.log("DOM references assigned.");
@@ -1155,8 +1155,19 @@
             }
             updateActiveFiltersDisplay(filters);
 
-            if (isTriggeredByMainSearchButton && window.innerWidth < 768 && songResultsDiv && !songResultsDiv.classList.contains('hidden')) {
-                songResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Amendment 2: Scroll to results on main page after search
+            if (isTriggeredByMainSearchButton && songResultsDiv && !songResultsDiv.classList.contains('hidden') && mainHeader && songResultsHeading) {
+                const headerHeight = mainHeader.offsetHeight;
+                const resultsTop = songResultsDiv.offsetTop; // Get top of the whole results container
+                const desiredOffset = 20; // Small gap below the header
+                
+                // Check if the current view is the songFinderView before scrolling
+                if(songFinderView && songFinderView.style.display !== 'none') {
+                    window.scrollTo({
+                        top: resultsTop - headerHeight - desiredOffset,
+                        behavior: 'smooth'
+                    });
+                }
             }
         }
 
@@ -1435,7 +1446,8 @@
                             if(isForMainSearch) {
                                 onSelectCallback(true); // Trigger search for main input
                             } else {
-                                onSelectCallback(text); // Pass selected text for modal inputs
+                                // For modal inputs, the onSelectCallback might be the search/filter function for that modal
+                                onSelectCallback(); // Call it without arguments, it will pick up the input value
                             }
                         }
                     });
@@ -1460,7 +1472,7 @@
                 if (value.length > 0 && dropdownElement) {
                     const items = dropdownElement.querySelectorAll('.autosuggest-item'); let hasMatches = false;
                     items.forEach(item => {
-                        if (item.textContent.toLowerCase().startsWith(value)) { // Correctly uses startsWith
+                        if (item.textContent.toLowerCase().startsWith(value)) { 
                             item.style.display = 'block'; hasMatches = true; 
                         } else { item.style.display = 'none'; }
                     });
@@ -1625,7 +1637,7 @@
 
         function closeCreatePlaylistModal() { 
             if (createPlaylistModal) createPlaylistModal.classList.add('hidden'); 
-            if (searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.classList.add('hidden'); // Ensure sub-modal is also closed
+            if (searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.classList.add('hidden');
         }
         
         function renderModalSelectedSongs() {
@@ -1650,7 +1662,6 @@
         function removeSongFromNewPlaylist(songId) {
             songsForNewPlaylist = songsForNewPlaylist.filter(s => s.id !== songId);
             renderModalSelectedSongs();
-            // Refresh the sub-search modal results if it's open, as a song is now available again
             if (searchSongsForNewPlaylistModal && !searchSongsForNewPlaylistModal.classList.contains('hidden')) {
                 performNewPlaylistModalSearchAndFilter();
             }
@@ -1659,7 +1670,6 @@
         // --- Sub-Modal for Searching/Adding Songs to New Playlist ---
         function openSearchSongsForNewPlaylistModal() {
             if (!searchSongsForNewPlaylistModal) return;
-            // Populate filters in this sub-modal
             populateFilterDropdowns(
                 newPlaylistModalThemeFilter, 
                 newPlaylistModalKeyFilter, 
@@ -1674,7 +1684,7 @@
             
             searchSongsForNewPlaylistModal.classList.remove('hidden');
             if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.focus();
-            performNewPlaylistModalSearchAndFilter(); // Show initial results if any
+            performNewPlaylistModalSearchAndFilter(); 
         }
 
         function closeSearchSongsForNewPlaylistModal() {
@@ -1694,9 +1704,10 @@
             };
 
             const filteredSongs = allSongsData.filter(song => {
-                if (songsForNewPlaylist.find(s => s.id === song.id)) return false; // Exclude already selected
+                if (songsForNewPlaylist.find(s => s.id === song.id)) return false; 
 
                 if (filters.searchTerm && !(song.title.toLowerCase().includes(filters.searchTerm) || (song.artist && song.artist.toLowerCase().includes(filters.searchTerm)))) return false;
+                
                 if (filters.theme && !(Array.isArray(song.themes) ? song.themes.map(t=>t.toLowerCase()) : [String(song.themes||'').toLowerCase()]).includes(filters.theme)) return false;
                 if (filters.key && !String(song.key||'').toLowerCase().split(/\s*(?:,|\band\b)\s*/i).map(k=>k.trim()).includes(filters.key)) return false;
                 if (filters.style && !(song.style && song.style.toLowerCase() === filters.style)) return false;
@@ -1731,13 +1742,10 @@
                 div.querySelector('.add-song-from-new-playlist-search-btn').addEventListener('click', function() {
                     const songToAdd = allSongsData.find(s => s.id === this.dataset.songId);
                     if (songToAdd) addSongToNewPlaylist(songToAdd);
-                    // Visually indicate it's added and remove from this search list or disable button
                     this.textContent = 'Added'; 
                     this.disabled = true;
                     this.classList.remove('bg-green-500', 'hover:bg-green-600');
                     this.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    // Optionally, to remove it from view immediately:
-                    // setTimeout(() => div.remove(), 300); 
                 });
                 newPlaylistModalSongResultsContainer.appendChild(div);
             });
@@ -1871,6 +1879,7 @@
             if(doneAddingToNewPlaylistBtn) doneAddingToNewPlaylistBtn.addEventListener('click', closeSearchSongsForNewPlaylistModal);
             if(searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.addEventListener('click', (e) => { if(e.target === searchSongsForNewPlaylistModal) closeSearchSongsForNewPlaylistModal(); });
 
+            // Autosuggest for the NEW search input within the "Search Songs for New Playlist" modal
             if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
                 initAutosuggest(newPlaylistModalSongSearchInput, newPlaylistModalAutosuggestDropdown, performNewPlaylistModalSearchAndFilter);
             }
@@ -1882,8 +1891,10 @@
                 if(newPlaylistModalTempoFilter) newPlaylistModalTempoFilter.value = '';
                 if(newPlaylistModalLiturgicalSeasonFilter) newPlaylistModalLiturgicalSeasonFilter.value = '';
                 if(newPlaylistModalScriptureFilter) newPlaylistModalScriptureFilter.value = '';
+                if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.value = ''; // Clear search input too
+                if(newPlaylistModalAutosuggestDropdown) newPlaylistModalAutosuggestDropdown.classList.remove('show'); // Hide autosuggest
                 if(newPlaylistModalSongResultsContainer) newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>';
-                performNewPlaylistModalSearchAndFilter(); // Re-run search to show all eligible songs
+                performNewPlaylistModalSearchAndFilter(); 
             });
             [newPlaylistModalThemeFilter, newPlaylistModalKeyFilter, newPlaylistModalStyleFilter, newPlaylistModalTempoFilter, newPlaylistModalLiturgicalSeasonFilter].forEach(sel => {
                 if(sel) sel.addEventListener('change', performNewPlaylistModalSearchAndFilter);
