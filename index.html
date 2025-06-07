@@ -1099,17 +1099,18 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
     newPlaylistModalSongSearchInput,
     newPlaylistModalAutosuggestDropdown,
     () => {
-      // When the user clicks a suggestion, add that song to the new‐playlist
+    () => {
+      // When the user clicks a suggestion, add that song to the new-playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
-      const foundSong = allSongsData.find(s => s.title === selectedText);
+      const foundSong   = allSongsData.find(s => s.title === selectedText);
       if (foundSong) {
         addSongToNewPlaylist(foundSong);
         newPlaylistModalSongSearchInput.value = '';
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
-    }   // ← this closes the () => { … }
-  );    // ← this closes initAutosuggest(…)
-}      // ← this closes the if
+    }  // ← closes the () => { … }
+  );   // ← closes the initAutosuggest( … ) call
+}      // ← closes the if block
         
         function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
             const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
