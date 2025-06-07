@@ -1071,16 +1071,26 @@
                 resetToInitialEmptyState(false);
                 populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
                 initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true); 
-                
-               // ── Initialize the “New Playlist” autosuggest (runs only after allSongsData exists) ──
+            }
+            // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-  initAutosuggest(
-    newPlaylistModalSongSearchInput,
-    newPlaylistModalAutosuggestDropdown,
-    () => {
-      // When a user clicks an item, add that song to the new‐playlist array:
+    initAutosuggest(
+        newPlaylistModalSongSearchInput,
+        newPlaylistModalAutosuggestDropdown,
+        performNewPlaylistModalSearchAndFilter
+    );
+}
+               // ── Initialize autosuggest for the “Search & Add Songs…” field in the Create-Playlist modal ──
+            if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
+          initAutosuggest(
+        newPlaylistModalSongSearchInput,
+        newPlaylistModalAutosuggestDropdown,
+        () => { /* … */ }
+      );
+    }
+      // When the user clicks a suggestion, add that song to the new‐playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
-      const foundSong = allSongsData.find(song => song.title === selectedText);
+      const foundSong = allSongsData.find(s => s.title === selectedText);
       if (foundSong) {
         addSongToNewPlaylist(foundSong);
         newPlaylistModalSongSearchInput.value = '';
@@ -1854,7 +1864,7 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
             [themeSelect, keySelect, styleSelect, liturgicalSeasonFilter, tempoFilter].forEach(sel => { if (sel) sel.addEventListener('change', () => performSearchAndFilter(true)); });
             if (biblePassageInput) biblePassageInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performSearchAndFilter(true); });
              if (bibleSearchBtn) bibleSearchBtn.addEventListener('click', () => performSearchAndFilter(true)); 
-            if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(true));
+            if (clearBtn) clearBtn.addEventListener('click', () => resetToInitialEmptyState(false));
             if (clearResultsBtn) clearResultsBtn.addEventListener('click', () => resetToInitialEmptyState(false));
             
             if (backToSongListBtn) {
@@ -1884,8 +1894,13 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
             if(searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.addEventListener('click', (e) => { if(e.target === searchSongsForNewPlaylistModal) closeSearchSongsForNewPlaylistModal(); });
 
             if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-                initAutosuggest(newPlaylistModalSongSearchInput, newPlaylistModalAutosuggestDropdown, performNewPlaylistModalSearchAndFilter);
-            }
+                initAutosuggest(
+              newPlaylistModalSongSearchInput,
+              newPlaylistModalAutosuggestDropdown,
+              () => { … }
+            );
+        +   }   // <-- Add this to close fetchSongDataAndInitialize
+            
             if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
             if(newPlaylistModalClearFiltersBtn) newPlaylistModalClearFiltersBtn.addEventListener('click', () => {
                 if(newPlaylistModalThemeFilter) newPlaylistModalThemeFilter.value = '';
@@ -1897,7 +1912,6 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
                 if(newPlaylistModalSongSearchInput) newPlaylistModalSongSearchInput.value = ''; 
                 if(newPlaylistModalAutosuggestDropdown) newPlaylistModalAutosuggestDropdown.classList.remove('show'); 
                 if(newPlaylistModalSongResultsContainer) newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-500 italic p-2">Use filters above to find songs.</p>';
-                performNewPlaylistModalSearchAndFilter(); 
             });
             [newPlaylistModalThemeFilter, newPlaylistModalKeyFilter, newPlaylistModalStyleFilter, newPlaylistModalTempoFilter, newPlaylistModalLiturgicalSeasonFilter].forEach(sel => {
                 if(sel) sel.addEventListener('change', performNewPlaylistModalSearchAndFilter);
