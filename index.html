@@ -1071,7 +1071,11 @@
                 resetToInitialEmptyState(false);
                 populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
                 initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true); 
-            
+            } catch (error) {
+    console.error("Error in fetchSongDataAndInitialize:", error);
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+  }
+}
             // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
      initAutosuggest(
