@@ -2048,20 +2048,21 @@ function populateFilterDropdowns(
             console.log("Event listeners set up.");
         }
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log("DOM fully loaded. Initializing script...");
-            assignDOMReferences(); 
-            if (!searchBtn) { 
-                console.error("CRITICAL: searchBtn not found. App cannot initialize properly.");
-                if (loadingIndicator) loadingIndicator.style.display = 'none';
-                return; 
-            }
-            await fetchSongDataAndInitialize(); 
-            initBiblePassageDropdown(); 
-            setupEventListeners(); 
-            showAppView('songFinderView'); 
-            console.log("Initial setup complete.");
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log("DOM fully loaded. Initializing script...");
+  assignDOMReferences();
+  if (!searchBtn) {
+    console.error("CRITICAL: searchBtn not found. App cannot initialize properly.");
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    return;
+  }
+  await fetchSongDataAndInitialize();
+  initBiblePassageDropdown();
+  setupEventListeners();
+  showAppView('songFinderView');
+  console.log("Initial setup complete.");
+});  // ← only one closing brace + parenthesis here
+
+</script>
 </body>
 </html>
