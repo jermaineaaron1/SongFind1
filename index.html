@@ -1093,24 +1093,23 @@ async function fetchSongDataAndInitialize() {
     }
 }
 
-            // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
+// ── Autosuggest for “Search & Add Songs” in Create-Playlist modal ──
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
   initAutosuggest(
     newPlaylistModalSongSearchInput,
     newPlaylistModalAutosuggestDropdown,
     () => {
-    () => {
       // When the user clicks a suggestion, add that song to the new-playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
-      const foundSong   = allSongsData.find(s => s.title === selectedText);
+      const foundSong    = allSongsData.find(s => s.title === selectedText);
       if (foundSong) {
         addSongToNewPlaylist(foundSong);
         newPlaylistModalSongSearchInput.value = '';
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
-    }  // ← closes the () => { … }
-  );   // ← closes the initAutosuggest( … ) call
-}      // ← closes the if block
+    }  // ← closes the callback
+  );   // ← closes initAutosuggest(
+}      // ← closes the if
         
         function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
             const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
