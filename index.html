@@ -1095,14 +1095,22 @@ async function fetchSongDataAndInitialize() {
 
             // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-     initAutosuggest(
-      newPlaylistModalSongSearchInput,
-      newPlaylistModalAutosuggestDropdown,
+  initAutosuggest(
+    newPlaylistModalSongSearchInput,
+    newPlaylistModalAutosuggestDropdown,
     () => {
-      // …
+      // When the user clicks a suggestion, add that song to the new‐playlist
+      const selectedText = newPlaylistModalSongSearchInput.value.trim();
+      const foundSong = allSongsData.find(s => s.title === selectedText);
+      if (foundSong) {
+        addSongToNewPlaylist(foundSong);
+        newPlaylistModalSongSearchInput.value = '';
+        newPlaylistModalAutosuggestDropdown.classList.remove('show');
+      }
     }
   );
 }
+        
                // ── Initialize autosuggest for the “Search & Add Songs…” field in the Create-Playlist modal ──
             if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
           initAutosuggest(
