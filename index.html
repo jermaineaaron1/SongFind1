@@ -1074,12 +1074,14 @@
             }
             // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-    initAutosuggest(
-        newPlaylistModalSongSearchInput,
-        newPlaylistModalAutosuggestDropdown,
-        performNewPlaylistModalSearchAndFilter
+     initAutosuggest(
+      newPlaylistModalSongSearchInput,
+      newPlaylistModalAutosuggestDropdown,
+      () => {
+        // …
+      }
     );
-}
+    
                // ── Initialize autosuggest for the “Search & Add Songs…” field in the Create-Playlist modal ──
             if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
           initAutosuggest(
