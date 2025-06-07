@@ -1036,46 +1036,63 @@
             }
         }
 
-        async function fetchSongDataAndInitialize() {
-            if (loadingIndicator) loadingIndicator.style.display = 'flex';
-            console.log("Fetching songs from:", songsJsonUrl);
-            try {
-                const response = await fetch(songsJsonUrl);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! Status: ${response.status}. Details: ${errorText}`);
-                }
-                const data = await response.json();
-                if (!Array.isArray(data)) throw new Error("Fetched data is not an array.");
-                
-                allSongsData = data.map((song, index) => ({
-                    id: escapeHtml(song.title || 'N/A').replace(/\s+/g, '-').toLowerCase() + '-' + 
-                        escapeHtml(song.artist || 'Unknown').replace(/\s+/g, '-').toLowerCase() + '-' + 
-                        index,
-                    title: escapeHtml(song.title || 'Untitled Song'),
-                    artist: escapeHtml(song.artist || 'Unknown Artist'),
-                    key: escapeHtml(song.key || 'N/A'),
-                    style: escapeHtml(song.category || song.style || 'N/A'),
-                    themes: Array.isArray(song.theme) ? song.theme.map(t => escapeHtml(String(t))) : (song.theme ? [escapeHtml(String(song.theme))] : []),
-                    scripture: Array.isArray(song.scripture) ? song.scripture.map(s => escapeHtml(String(s))) : (song.scripture && String(song.scripture).trim() !== '' ? [escapeHtml(String(song.scripture))] : []),
-                    keywords: (song.lyrics || '').toLowerCase().split(/\s+/).filter(word => word && word.length > 2).slice(0,20),
-                    lyrics: escapeHtml(song.lyrics || ''),
-                    docLinks: Array.isArray(song.docLinks) ? song.docLinks.map(doc => ({...doc, url: escapeHtml(doc.url), name: escapeHtml(doc.name), type: escapeHtml(doc.type) })) : (song.docUrl ? [{url: escapeHtml(song.docUrl), type: escapeHtml(song.docType || 'unknown'), name: 'Document'}] : []),
-                    youtubeUrl: escapeHtml(song.youtubeUrl || ''),
-                    hasPhysicalCopy: song.hasPhysicalCopy === true || String(song.hasPhysicalCopy).toLowerCase() === 'true',
-                    mp3Url: escapeHtml(song.mp3Url || ''),
-                    tempo: escapeHtml(song.tempo || 'N/A'),
-                    liturgicalSeason: escapeHtml(song.liturgicalSeason || 'N/A')
-                }));
-                console.log("Songs loaded and mapped:", allSongsData.length);
-                resetToInitialEmptyState(false);
-                populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
-                initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true); 
-            } catch (error) {
-    console.error("Error in fetchSongDataAndInitialize:", error);
-    if (loadingIndicator) loadingIndicator.style.display = 'none';
-  }
+async function fetchSongDataAndInitialize() {
+    if (loadingIndicator) loadingIndicator.style.display = 'flex';
+    console.log("Fetching songs from:", songsJsonUrl);
+    try {
+        const response = await fetch(songsJsonUrl);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! Status: ${response.status}. Details: ${errorText}`);
+        }
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error("Fetched data is not an array.");
+        
+        allSongsData = data.map((song, index) => ({
+            id: escapeHtml(song.title || 'N/A')
+                    .replace(/\s+/g, '-').toLowerCase() + '-' +
+                escapeHtml(song.artist || 'Unknown').replace(/\s+/g, '-').toLowerCase() + '-' +
+                index,
+            title: escapeHtml(song.title || 'Untitled Song'),
+            artist: escapeHtml(song.artist || 'Unknown Artist'),
+            key: escapeHtml(song.key || 'N/A'),
+            style: escapeHtml(song.category || song.style || 'N/A'),
+            themes: Array.isArray(song.theme) ? song.theme.map(t => escapeHtml(String(t))) :
+                    (song.theme ? [escapeHtml(String(song.theme))] : []),
+            scripture: Array.isArray(song.scripture) ? song.scripture.map(s => escapeHtml(String(s))) :
+                       (song.scripture && String(song.scripture).trim() !== '' ?
+                        [escapeHtml(String(song.scripture))] : []),
+            keywords: (song.lyrics || '').toLowerCase()
+                              .split(/\s+/).filter(w => w.length > 2).slice(0,20),
+            lyrics: escapeHtml(song.lyrics || ''),
+            docLinks: Array.isArray(song.docLinks) ?
+                      song.docLinks.map(doc => ({
+                          url: escapeHtml(doc.url),
+                          name: escapeHtml(doc.name),
+                          type: escapeHtml(doc.type)
+                      })) :
+                      (song.docUrl ?
+                       [{ url: escapeHtml(song.docUrl),
+                          type: escapeHtml(song.docType || 'unknown'),
+                          name: 'Document' }] : []),
+            youtubeUrl: escapeHtml(song.youtubeUrl || ''),
+            hasPhysicalCopy: song.hasPhysicalCopy === true ||
+                             String(song.hasPhysicalCopy).toLowerCase() === 'true',
+            mp3Url: escapeHtml(song.mp3Url || ''),
+            tempo: escapeHtml(song.tempo || 'N/A'),
+            liturgicalSeason: escapeHtml(song.liturgicalSeason || 'N/A')
+        }));
+        
+        console.log("Songs loaded and mapped:", allSongsData.length);
+        resetToInitialEmptyState(false);
+        populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
+        initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true);
+    } catch (error) {
+        console.error("Error in fetchSongDataAndInitialize:", error);
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+    }
 }
+
             // ── Autosuggest for “Search & Add Songs” in Create-Playlist modal
 if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
      initAutosuggest(
