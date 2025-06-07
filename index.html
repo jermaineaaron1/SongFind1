@@ -1108,6 +1108,7 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
     }
+  );
 }
         
         function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
@@ -1907,10 +1908,9 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
                 initAutosuggest(
               newPlaylistModalSongSearchInput,
               newPlaylistModalAutosuggestDropdown,
-      }
-    }
-  );
-}
+              () => {}
+            );
+
             
             if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
             if(newPlaylistModalClearFiltersBtn) newPlaylistModalClearFiltersBtn.addEventListener('click', () => {
