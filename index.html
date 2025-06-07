@@ -1907,9 +1907,10 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
                 initAutosuggest(
               newPlaylistModalSongSearchInput,
               newPlaylistModalAutosuggestDropdown,
-              () => {} 
-            );
-        +   }   // <-- Add this to close fetchSongDataAndInitialize
+      }
+    }
+  );
+}
             
             if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
             if(newPlaylistModalClearFiltersBtn) newPlaylistModalClearFiltersBtn.addEventListener('click', () => {
