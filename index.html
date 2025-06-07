@@ -1111,26 +1111,6 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
   );
 }
         
-               // ── Initialize autosuggest for the “Search & Add Songs…” field in the Create-Playlist modal ──
-            if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-          initAutosuggest(
-        newPlaylistModalSongSearchInput,
-        newPlaylistModalAutosuggestDropdown,
-        () => { /* … */ }
-      );
-    }
-      // When the user clicks a suggestion, add that song to the new‐playlist
-      const selectedText = newPlaylistModalSongSearchInput.value.trim();
-      const foundSong = allSongsData.find(s => s.title === selectedText);
-      if (foundSong) {
-        addSongToNewPlaylist(foundSong);
-        newPlaylistModalSongSearchInput.value = '';
-        newPlaylistModalAutosuggestDropdown.classList.remove('show');
-      }
-    }
-  );
-}
-
         function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
             const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
                 const value = song[key];
