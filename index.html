@@ -1107,6 +1107,9 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
         newPlaylistModalSongSearchInput.value = '';
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
+    }   // ← this closes the () => { … }
+  );    // ← this closes initAutosuggest(…)
+}      // ← this closes the if
         
         function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
             const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
