@@ -1111,35 +1111,53 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
   );   // ← closes initAutosuggest(
 }      // ← closes the if
         
-        function populateFilterDropdowns(targetThemeSelect, targetKeySelect, targetStyleSelect, targetTempoFilter, targetLiturgicalSeasonFilter) {
-            const uniqueValues = (key) => [...new Set(allSongsData.flatMap(song => {
-                const value = song[key];
-                if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(v => v && v !== "N/A");
-                if (value && String(value).trim() !== "" && String(value).trim() !== "N/A") {
-                    return String(value).split(/\s*(?:,|\band\b)\s*/i).map(v => v.trim()).filter(v => v);
-                }
-                return [];
-            }))].sort((a,b) => a.localeCompare(b));
-
-            const populateSelect = (selectElement, optionsSet) => {
-                if (!selectElement) return;
-                const firstOption = selectElement.options[0]; 
-                selectElement.innerHTML = ""; 
-                if (firstOption) selectElement.appendChild(firstOption); 
-                optionsSet.forEach(optionValue => {
-                    const opt = document.createElement("option");
-                    opt.value = optionValue.toLowerCase(); 
-                    opt.textContent = optionValue;
-                    selectElement.appendChild(opt);
-                });
-            };
-            populateSelect(targetThemeSelect, uniqueValues('themes'));
-            populateSelect(targetKeySelect, uniqueValues('key'));
-            populateSelect(targetStyleSelect, uniqueValues('style'));
-            populateSelect(targetTempoFilter, uniqueValues('tempo'));
-            populateSelect(targetLiturgicalSeasonFilter, uniqueValues('liturgicalSeason'));
-            console.log("Filter dropdowns populated for target elements.");
+function populateFilterDropdowns(
+  targetThemeSelect,
+  targetKeySelect,
+  targetStyleSelect,
+  targetTempoFilter,
+  targetLiturgicalSeasonFilter
+) {
+  const uniqueValues = key =>
+    [...new Set(
+      allSongsData.flatMap(song => {
+        const value = song[key];
+        if (Array.isArray(value)) {
+          return value
+            .map(v => String(v).trim())
+            .filter(v => v && v !== 'N/A');
         }
+        if (value && String(value).trim() !== '' && String(value).trim() !== 'N/A') {
+          return String(value)
+            .split(/\s*(?:,|\band\b)\s*/i)
+            .map(v => v.trim())
+            .filter(v => v);
+        }
+        return [];
+      })
+    )].sort((a, b) => a.localeCompare(b));
+
+  const populateSelect = (selectElement, optionsSet) => {
+    if (!selectElement) return;
+    const firstOption = selectElement.options[0];
+    selectElement.innerHTML = '';
+    if (firstOption) selectElement.appendChild(firstOption);
+    optionsSet.forEach(optionValue => {
+      const opt = document.createElement('option');
+      opt.value = optionValue.toLowerCase();
+      opt.textContent = optionValue;
+      selectElement.appendChild(opt);
+    });
+  };
+
+  populateSelect(targetThemeSelect, uniqueValues('themes'));
+  populateSelect(targetKeySelect, uniqueValues('key'));
+  populateSelect(targetStyleSelect, uniqueValues('style'));
+  populateSelect(targetTempoFilter, uniqueValues('tempo'));
+  populateSelect(targetLiturgicalSeasonFilter, uniqueValues('liturgicalSeason'));
+
+  console.log("Filter dropdowns populated for target elements.");
+}
 
         function performSearchAndFilter(isTriggeredByMainSearchButton = false) { 
             if (!allSongsData) return;
