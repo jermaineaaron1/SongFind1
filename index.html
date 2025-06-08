@@ -1909,18 +1909,16 @@ function populateFilterDropdowns(
     newPlaylistModalSongSearchInput,
     newPlaylistModalAutosuggestDropdown,
     () => {
-      // User clicked a suggestion: add that song to the new playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
       const foundSong = allSongsData.find(s => s.title === selectedText);
       if (foundSong) {
         addSongToNewPlaylist(foundSong);
-        // clear input and hide dropdown
         newPlaylistModalSongSearchInput.value = '';
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
     }
   );
-}
+}     //
 
             
             if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
