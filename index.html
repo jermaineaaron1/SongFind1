@@ -1093,24 +1093,7 @@ async function fetchSongDataAndInitialize() {
     }
 }
 
-// ── Autosuggest for “Search & Add Songs” in Create-Playlist modal ──
-if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-  initAutosuggest(
-    newPlaylistModalSongSearchInput,
-    newPlaylistModalAutosuggestDropdown,
-       () => { /* … */ }
-     );
-        
-      // When the user clicks a suggestion, add that song to the new-playlist
-      const selectedText = newPlaylistModalSongSearchInput.value.trim();
-      const foundSong    = allSongsData.find(s => s.title === selectedText);
-      if (foundSong) {
-        addSongToNewPlaylist(foundSong);
-        newPlaylistModalSongSearchInput.value = '';
-        newPlaylistModalAutosuggestDropdown.classList.remove('show');
-      }
-    //
-}
+
 function populateFilterDropdowns(
   targetThemeSelect,
   targetKeySelect,
@@ -1922,12 +1905,22 @@ function populateFilterDropdowns(
             if(doneAddingToNewPlaylistBtn) doneAddingToNewPlaylistBtn.addEventListener('click', closeSearchSongsForNewPlaylistModal);
             if(searchSongsForNewPlaylistModal) searchSongsForNewPlaylistModal.addEventListener('click', (e) => { if(e.target === searchSongsForNewPlaylistModal) closeSearchSongsForNewPlaylistModal(); });
 
-            if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
-                initAutosuggest(
-              newPlaylistModalSongSearchInput,
-              newPlaylistModalAutosuggestDropdown,
-              () => {}
-            );
+  initAutosuggest(
+    newPlaylistModalSongSearchInput,
+    newPlaylistModalAutosuggestDropdown,
+    () => {
+      // User clicked a suggestion: add that song to the new playlist
+      const selectedText = newPlaylistModalSongSearchInput.value.trim();
+      const foundSong = allSongsData.find(s => s.title === selectedText);
+      if (foundSong) {
+        addSongToNewPlaylist(foundSong);
+        // clear input and hide dropdown
+        newPlaylistModalSongSearchInput.value = '';
+        newPlaylistModalAutosuggestDropdown.classList.remove('show');
+      }
+    }
+  );
+}
 
             
             if(newPlaylistModalApplyFiltersBtn) newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearchAndFilter);
