@@ -2035,10 +2035,9 @@ function populateFilterDropdowns(
                 scrollToSearchBtn.addEventListener('click', () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
-            }
-            console.log("Event listeners set up.");
-        }
-
+    }
+    console.log("Event listeners set up.");
+}    // closes setupEventListeners()
 document.addEventListener('DOMContentLoaded', async function() {
   console.log("DOM fully loaded. Initializing script...");
   assignDOMReferences();
