@@ -1087,6 +1087,13 @@ async function fetchSongDataAndInitialize() {
         resetToInitialEmptyState(false);
         populateFilterDropdowns(themeSelect, keySelect, styleSelect, tempoFilter, liturgicalSeasonFilter);
         initAutosuggest(searchInput, autosuggestDropdownEl, performSearchAndFilter, true);
+        
+    // ← INSERT the hide‐spinner call right here:
+    if (loadingIndicator) {
+      loadingIndicator.style.display = 'none';
+      console.log("Loading complete, hiding spinner.");
+    }
+        
     } catch (error) {
         console.error("Error in fetchSongDataAndInitialize:", error);
         if (loadingIndicator) loadingIndicator.style.display = 'none';
