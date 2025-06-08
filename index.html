@@ -1100,7 +1100,6 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
     newPlaylistModalAutosuggestDropdown,
        () => { /* … */ }
      );
-+}  // ← close the initAutosuggest “if” block here
         
       // When the user clicks a suggestion, add that song to the new-playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
@@ -1110,8 +1109,7 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
         newPlaylistModalSongSearchInput.value = '';
         newPlaylistModalAutosuggestDropdown.classList.remove('show');
       }
-  );   
-        // ← closes initAutosuggest(
+    //
 }
 function populateFilterDropdowns(
   targetThemeSelect,
