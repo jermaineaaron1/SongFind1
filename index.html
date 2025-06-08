@@ -2035,9 +2035,10 @@ function populateFilterDropdowns(
                 scrollToSearchBtn.addEventListener('click', () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
-    }
+    
     console.log("Event listeners set up.");
-}    // closes setupEventListeners()
+}
+        
 document.addEventListener('DOMContentLoaded', async function() {
   console.log("DOM fully loaded. Initializing script...");
   assignDOMReferences();
@@ -2052,7 +2053,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   showAppView('songFinderView');
   showAppView('songFinderView');
   console.log("Initial setup complete.");
-});  // ← closes async function AND addEventListener
+}); 
 
 </script>
 </body>
