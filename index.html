@@ -1098,10 +1098,10 @@ if (newPlaylistModalSongSearchInput && newPlaylistModalAutosuggestDropdown) {
   initAutosuggest(
     newPlaylistModalSongSearchInput,
     newPlaylistModalAutosuggestDropdown,
-    () => {}
-    );
-
-} 
+       () => { /* … */ }
+     );
++}  // ← close the initAutosuggest “if” block here
+        
       // When the user clicks a suggestion, add that song to the new-playlist
       const selectedText = newPlaylistModalSongSearchInput.value.trim();
       const foundSong    = allSongsData.find(s => s.title === selectedText);
