@@ -233,22 +233,32 @@ function populateAllDropdowns() {
             const filters = { themes: new Set(), keys: new Set(), styles: new Set(), tempos: new Set(), seasons: new Set() };
             
             allSongsData.forEach(song => {
-                // Handle themes (can be array or comma-separated string)
-                const songThemes = Array.isArray(song.themes) ? song.themes : (song.themes || '').split(',').map(t => t.trim()).filter(Boolean);
-                songThemes.forEach(t => filters.themes.add(t));
+                // CORRECTED: Look for song.theme (which is an array from your script)
+                if (song.theme && Array.isArray(song.theme)) {
+                    song.theme.forEach(t => filters.themes.add(t));
+                }
 
-                // Handle liturgicalSeasons (can be array or comma-separated string)
-                const songSeasons = Array.isArray(song.liturgicalSeasons) ? song.liturgicalSeasons : (song.liturgicalSeasons || '').split(',').map(s => s.trim()).filter(Boolean);
-                songSeasons.forEach(s => filters.seasons.add(s));
+                // CORRECTED: Look for song.liturgicalSeason (which is a string)
+                if (song.liturgicalSeason) {
+                    filters.seasons.add(song.liturgicalSeason);
+                }
 
-                // Handle single-value fields
+                // CORRECTED: Look for song.category for the Style dropdown
+                if (song.category) {
+                    filters.styles.add(song.category);
+                }
+
+                // These were already correct
                 if (song.key) filters.keys.add(song.key);
-                if (song.style) filters.styles.add(song.style);
                 if (song.tempo) filters.tempos.add(song.tempo);
             });
 
             const populate = (select, items) => { 
                 if (!select) return; 
+                // Clear existing options except the first "All..." option
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
                 const sorted = Array.from(items).sort(); 
                 sorted.forEach(item => select.add(new Option(item, item))); 
             };
@@ -310,14 +320,25 @@ function populateAllDropdowns() {
         function getFilteredSongs(filters, songsToExcludeIds = []) {
             let songs = allSongsData.filter(song => {
                 if (songsToExcludeIds.includes(song.id)) return false;
-                const termMatch = !filters.term || song.title.toLowerCase().includes(filters.term) || (song.lyrics || '').toLowerCase().includes(filters.term);
-                const themeMatch = !filters.theme || (song.themes || []).includes(filters.theme);
+
+                const termMatch = !filters.term || (song.title && song.title.toLowerCase().includes(filters.term)) || (song.lyrics && song.lyrics.toLowerCase().includes(filters.term));
+                
+                // CORRECTED: Check if the song.theme array includes the selected theme
+                const themeMatch = !filters.theme || (song.theme && song.theme.includes(filters.theme));
+                
+                // CORRECTED: Compare the filter's 'style' value with song.category
+                const styleMatch = !filters.style || (song.category === filters.style);
+                
+                // CORRECTED: Compare the filter's 'season' value with song.liturgicalSeason
+                const seasonMatch = !filters.season || (song.liturgicalSeason === filters.season);
+
+                // These were already correct
                 const keyMatch = !filters.key || song.key === filters.key;
-                const styleMatch = !filters.style || song.style === filters.style;
                 const tempoMatch = !filters.tempo || song.tempo === filters.tempo;
-                const seasonMatch = !filters.season || (song.liturgicalSeasons || []).includes(filters.season);
+
                 return termMatch && themeMatch && keyMatch && styleMatch && tempoMatch && seasonMatch;
             });
+
             if (DOMElements.sortBy && DOMElements.sortBy.value === 'title') {
                 songs.sort((a,b) => a.title.localeCompare(b.title));
             }
