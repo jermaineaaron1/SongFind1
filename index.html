@@ -229,14 +229,38 @@
             }
         }
         
-        function populateAllDropdowns() {
+function populateAllDropdowns() {
             const filters = { themes: new Set(), keys: new Set(), styles: new Set(), tempos: new Set(), seasons: new Set() };
+            
             allSongsData.forEach(song => {
-                (song.themes || []).forEach(t => filters.themes.add(t));
-                if (song.key) filters.keys.add(song.key); if (song.style) filters.styles.add(song.style); if (song.tempo) filters.tempos.add(song.tempo); (song.liturgicalSeasons || []).forEach(s => filters.seasons.add(s));
+                // Handle themes (can be array or comma-separated string)
+                const songThemes = Array.isArray(song.themes) ? song.themes : (song.themes || '').split(',').map(t => t.trim()).filter(Boolean);
+                songThemes.forEach(t => filters.themes.add(t));
+
+                // Handle liturgicalSeasons (can be array or comma-separated string)
+                const songSeasons = Array.isArray(song.liturgicalSeasons) ? song.liturgicalSeasons : (song.liturgicalSeasons || '').split(',').map(s => s.trim()).filter(Boolean);
+                songSeasons.forEach(s => filters.seasons.add(s));
+
+                // Handle single-value fields
+                if (song.key) filters.keys.add(song.key);
+                if (song.style) filters.styles.add(song.style);
+                if (song.tempo) filters.tempos.add(song.tempo);
             });
-            const populate = (select, items) => { if (!select) return; const sorted = Array.from(items).sort(); sorted.forEach(item => select.add(new Option(item, item))); };
-            populate(DOMElements.theme, filters.themes); populate(DOMElements.key, filters.keys); populate(DOMElements.style, filters.styles); populate(DOMElements.tempoFilter, filters.tempos); populate(DOMElements.liturgicalSeasonFilter, filters.seasons); populate(DOMElements.newPlaylistModalThemeFilter, filters.themes); populate(DOMElements.newPlaylistModalKeyFilter, filters.keys); populate(DOMElements.newPlaylistModalStyleFilter, filters.styles);
+
+            const populate = (select, items) => { 
+                if (!select) return; 
+                const sorted = Array.from(items).sort(); 
+                sorted.forEach(item => select.add(new Option(item, item))); 
+            };
+            
+            populate(DOMElements.theme, filters.themes); 
+            populate(DOMElements.key, filters.keys); 
+            populate(DOMElements.style, filters.styles); 
+            populate(DOMElements.tempoFilter, filters.tempos); 
+            populate(DOMElements.liturgicalSeasonFilter, filters.seasons); 
+            populate(DOMElements.newPlaylistModalThemeFilter, filters.themes); 
+            populate(DOMElements.newPlaylistModalKeyFilter, filters.keys); 
+            populate(DOMElements.newPlaylistModalStyleFilter, filters.styles);
         }
 
         // --- FIRESTORE DATABASE LOGIC ---
