@@ -314,6 +314,22 @@ function populateAllDropdowns() {
         function showOfflineStatus(msg) { if(DOMElements.authStatus) DOMElements.authStatus.textContent = msg; if(DOMElements.playlistItemsContainer) DOMElements.playlistItemsContainer.innerHTML = `<p class="italic text-yellow-300 px-2 text-xs">Playlists unavailable.</p>`; }
         function escapeHtml(str) { const p = document.createElement("p"); p.textContent = str || ''; return p.innerHTML; }
 
+        function resetToEmptyState() {
+    // Clear all filter input fields
+    [DOMElements.search, DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => {
+        if (el) el.value = '';
+    });
+
+    // Hide the song results container
+    if (DOMElements.songResults) DOMElements.songResults.classList.add('hidden');
+
+    // Show the initial "Find the Perfect Worship Songs" message
+    if (DOMElements.emptyState) DOMElements.emptyState.classList.remove('hidden');
+
+    // Clear any "active filter" pills that are showing
+    if (DOMElements.activeFilters) DOMElements.activeFilters.innerHTML = '';
+}
+
         // --- SEARCH & FILTER LOGIC ---
         function getFiltersFromUI(prefix = '') {
             const getEl = id => document.getElementById(prefix + id);
@@ -322,9 +338,16 @@ function populateAllDropdowns() {
             const keyInput = prefix ? 'newPlaylistModalKeyFilter' : 'key';
             const styleInput = prefix ? 'newPlaylistModalStyleFilter' : 'style';
 
-            return { term: (getEl(searchInput) || {}).value || '', theme: (getEl(themeInput) || {}).value || '', key: (getEl(keyInput) || {}).value || '', style: (getEl(styleInput) || {}).value || '', tempo: !prefix && DOMElements.tempoFilter ? DOMElements.tempoFilter.value : '', season: !prefix && DOMElements.liturgicalSeasonFilter ? DOMElements.liturgicalSeasonFilter.value : '' };
+                       // The .toLowerCase().trim() is added to the search term here
+            return { 
+                term: (getEl(searchInput) || {}).value.toLowerCase().trim() || '', 
+                theme: (getEl(themeInput) || {}).value || '', 
+                key: (getEl(keyInput) || {}).value || '', 
+                style: (getEl(styleInput) || {}).value || '', 
+                tempo: !prefix && DOMElements.tempoFilter ? DOMElements.tempoFilter.value : '', 
+                season: !prefix && DOMElements.liturgicalSeasonFilter ? DOMElements.liturgicalSeasonFilter.value : '' 
+            };
         }
-
         function getFilteredSongs(filters, songsToExcludeIds = []) {
             let songs = allSongsData.filter(song => {
                 if (songsToExcludeIds.includes(song.id)) return false;
@@ -566,9 +589,7 @@ function populateAllDropdowns() {
             initAutosuggest(DOMElements.search, DOMElements.autosuggestDropdown);
 
             // Listeners for searching and filtering
-            DOMElements.searchBtn.addEventListener('click', performSearchAndFilter);
-            DOMElements.clearBtn.addEventListener('click', () => { [DOMElements.search, DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter].forEach(el => { if(el) el.value = ''; }); performSearchAndFilter(); });
-            [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', performSearchAndFilter); });
+            DOMElements.clearBtn.addEventListener('click', resetToEmptyState);
             
             // Listener for clicks inside the song results area
             DOMElements.songCardsContainer.addEventListener('click', (e) => {
