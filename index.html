@@ -514,13 +514,63 @@ function populateAllDropdowns() {
             
             showAppView('worshipSetlistPageView');
         }
+        
+// --- AUTOSUGGEST FUNCTION ---
+        function initAutosuggest(inputElement, dropdownElement) {
+            inputElement.addEventListener('input', () => {
+                const query = inputElement.value.trim().toLowerCase();
+                dropdownElement.innerHTML = ''; // Clear previous suggestions
 
+                if (query.length === 0) {
+                    dropdownElement.classList.remove('show');
+                    return;
+                }
+
+                // Filter songs where the title starts with the typed query
+                const suggestions = allSongsData
+                    .filter(song => song.title.toLowerCase().startsWith(query))
+                    .slice(0, 7); // We'll show a maximum of 7 suggestions
+
+                if (suggestions.length > 0) {
+                    suggestions.forEach(song => {
+                        const item = document.createElement('div');
+                        item.className = 'autosuggest-item';
+                        item.textContent = song.title;
+                        
+                        // Add a click event to each suggestion
+                        item.addEventListener('click', () => {
+                            inputElement.value = song.title; // Fill the search bar with the clicked song
+                            dropdownElement.classList.remove('show'); // Hide the dropdown
+                            DOMElements.searchBtn.click(); // Automatically perform the search
+                        });
+                        dropdownElement.appendChild(item);
+                    });
+                    dropdownElement.classList.add('show'); // Show the dropdown
+                } else {
+                    dropdownElement.classList.remove('show'); // Hide if no suggestions
+                }
+            });
+
+            // Add a listener to the whole document to hide the dropdown when you click elsewhere
+            document.addEventListener('click', (e) => {
+                if (e.target !== inputElement) {
+                    dropdownElement.classList.remove('show');
+                }
+            });
+        }
+        
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
+
+            // Activate the autosuggest feature on the main search bar
+            initAutosuggest(DOMElements.search, DOMElements.autosuggestDropdown);
+
+            // Listeners for searching and filtering
             DOMElements.searchBtn.addEventListener('click', performSearchAndFilter);
             DOMElements.clearBtn.addEventListener('click', () => { [DOMElements.search, DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter].forEach(el => { if(el) el.value = ''; }); performSearchAndFilter(); });
             [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', performSearchAndFilter); });
             
+            // Listener for clicks inside the song results area
             DOMElements.songCardsContainer.addEventListener('click', (e) => {
                 const songId = e.target.closest('[data-song-id]')?.dataset.songId;
                 if (!songId) return;
@@ -537,6 +587,7 @@ function populateAllDropdowns() {
                 }
             });
             
+            // Listeners for the "Add to List" modal
             DOMElements.confirmAddToListBtnModal.addEventListener('click', () => {
                 const playlistId = DOMElements.playlistSelectModal.value;
                 if (!playlistId || !currentSongForPlaylist) return;
@@ -554,7 +605,7 @@ function populateAllDropdowns() {
                 DOMElements.addToListModal.classList.add('hidden');
             });
 
-            // Modals and Sidebar
+            // Listeners for closing modals and sidebar navigation
             [DOMElements.addToListModalCloseBtn, DOMElements.cancelAddToListBtnModal].forEach(btn => btn.addEventListener('click', () => DOMElements.addToListModal.classList.add('hidden')));
             DOMElements.mobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.remove('-translate-x-full'));
             DOMElements.closeMobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.add('-translate-x-full'));
@@ -568,7 +619,7 @@ function populateAllDropdowns() {
             });
             DOMElements.backToFinderBtn.addEventListener('click', () => showAppView('songFinderView'));
 
-            // Create Playlist Modal
+            // Listeners for the "Create Playlist" modal workflow
             DOMElements.createSongListBtn.addEventListener('click', () => {
                 songsForNewPlaylist = [];
                 DOMElements.newPlaylistName.value = '';
@@ -611,13 +662,13 @@ function populateAllDropdowns() {
                     const songId = e.target.closest('.remove-from-modal-btn').dataset.songId;
                     songsForNewPlaylist = songsForNewPlaylist.filter(s => s.id !== songId);
                     renderModalSelectedSongs();
-                    performNewPlaylistModalSearch(); // Refresh search to make the song available again
+                    performNewPlaylistModalSearch();
                 }
             });
             
             DOMElements.addSongsToCurrentSetlistBtn.addEventListener('click', () => showAppView('songFinderView'));
 
-            // Drag and Drop
+            // Initialize Drag and Drop functionality
             setupDragAndDrop();
         }
 
