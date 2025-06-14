@@ -231,31 +231,39 @@
         
 function populateAllDropdowns() {
             const filters = { themes: new Set(), keys: new Set(), styles: new Set(), tempos: new Set(), seasons: new Set() };
-            
+
+            // This helper function takes a string, splits it by commas, and adds each individual item to a Set.
+            const addValuesToSet = (value, targetSet) => {
+                // Return early if the value isn't a non-empty string
+                if (typeof value !== 'string' || !value.trim()) return; 
+
+                // Split the string by commas
+                value.split(',').forEach(item => {
+                    const trimmedItem = item.trim(); // Remove any extra spaces
+                    if (trimmedItem) {
+                        targetSet.add(trimmedItem); // Add the clean item to the Set
+                    }
+                });
+            };
+
             allSongsData.forEach(song => {
-                // CORRECTED: Look for song.theme (which is an array from your script)
+                // Your 'theme' property is already an array from the Apps Script, which is great.
                 if (song.theme && Array.isArray(song.theme)) {
-                    song.theme.forEach(t => filters.themes.add(t));
+                    song.theme.forEach(t => {
+                        if (t) filters.themes.add(t.trim());
+                    });
                 }
 
-                // CORRECTED: Look for song.liturgicalSeason (which is a string)
-                if (song.liturgicalSeason) {
-                    filters.seasons.add(song.liturgicalSeason);
-                }
-
-                // CORRECTED: Look for song.category for the Style dropdown
-                if (song.category) {
-                    filters.styles.add(song.category);
-                }
-
-                // These were already correct
-                if (song.key) filters.keys.add(song.key);
-                if (song.tempo) filters.tempos.add(song.tempo);
+                // Use the helper function for fields that might be comma-separated strings
+                addValuesToSet(song.liturgicalSeason, filters.seasons);
+                addValuesToSet(song.key, filters.keys);
+                addValuesToSet(song.tempo, filters.tempos);
+                addValuesToSet(song.category, filters.styles); // 'category' is used for the "Song Style" dropdown
             });
 
+            // This part of the function does not need to change. It correctly populates the dropdowns from the Sets.
             const populate = (select, items) => { 
                 if (!select) return; 
-                // Clear existing options except the first "All..." option
                 while (select.options.length > 1) {
                     select.remove(1);
                 }
