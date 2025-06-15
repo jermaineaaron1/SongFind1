@@ -146,7 +146,7 @@
                 </div>
                 <div id="worshipSetlistPageView" class="hidden container mx-auto px-6 py-8">
                      <div class="flex justify-between items-center mb-6"><button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button><button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i> Add More Songs</button></div>
-                    <div class="bg-white rounded-lg shadow-md p-6"><h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2><div id="setlistSongsContainer" class="custom-scrollbar"></div><div id="playlistActionsContainer" class="mt-8 flex justify-end"></div></div>
+                    <div class="bg-white rounded-lg shadow-md p-6"><h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2><div id="setlistSongsContainer" class="custom-scrollbar"></div><div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-4"></div></div>
                 </div>
             </div> 
         </div> 
@@ -158,7 +158,7 @@
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg max-h-[95vh] flex flex-col"><div class="flex justify-between items-center mb-4 border-b pb-3"><h3 class="text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3><button id="createPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button></div><div class="flex-grow overflow-y-auto custom-scrollbar pr-1 space-y-4"><div><label for="newPlaylistName" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name <span class="text-red-500">*</span></label><input type="text" id="newPlaylistName" placeholder="E.g., Sunday Morning Worship" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50"></div><div><label for="newPlaylistSubtitle" class="block text-sm font-medium text-gray-700 mb-1">Subtitle / Date</label><input type="text" id="newPlaylistSubtitle" placeholder="E.g., June 13, 2025" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50"></div><div class="border-t pt-4"><h4 class="text-md font-semibold text-gray-700 mb-2">Add Songs:</h4><button id="openSearchForNewPlaylistModalBtn" class="btn-secondary text-white w-full px-4 py-2 rounded-md flex items-center justify-center mb-3"><i class="fas fa-search mr-2"></i> Search & Add Songs...</button></div><div class="border-t pt-4"><h4 class="text-md font-semibold text-gray-700 mb-2">Selected Songs (<span id="modalSelectedSongsCount">0</span>):</h4><div id="modalSelectedSongsContainer" class="min-h-[100px] max-h-[250px] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar"><p class="text-xs text-gray-400 italic">No songs added yet.</p></div></div></div><div class="flex justify-end space-x-3 mt-6 pt-4 border-t"><button id="saveNewPlaylistBtn" class="btn-primary text-white px-4 py-2 rounded-md"><i class="fas fa-save mr-2"></i>Save Playlist</button><button id="cancelNewPlaylistBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancel</button></div></div>
     </div>
     <div id="searchSongsForNewPlaylistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[1050] hidden p-4">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col"><div class="flex justify-between items-center mb-4 border-b pb-3"><h3 class="text-xl font-semibold text-[#3a3a3a]">Search & Add Songs</h3><button id="searchSongsForNewPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button></div><div class="flex-grow overflow-y-auto custom-scrollbar pr-2"><div class="mb-4"><div class="flex items-center"><div class="relative flex-grow"><input type="text" id="newPlaylistModalSongSearchInput" placeholder="Keywords, title, etc." class="w-full p-3 rounded-l-md bg-gray-50"><div id="newPlaylistModalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[1060]"></div></div><button id="newPlaylistModalApplyFiltersBtn" class="btn-primary text-white px-6 py-3 rounded-none flex items-center"><i class="fas fa-search mr-2"></i> Search</button><button id="newPlaylistModalClearFiltersBtn" class="bg-gray-200 text-gray-600 px-6 py-3 rounded-r-md flex items-center ml-2"><i class="fas fa-times mr-2"></i> Clear</button></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">Theme</label><select id="newPlaylistModalThemeFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Themes</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Key</label><select id="newPlaylistModalKeyFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Keys</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Style</label><select id="newPlaylistModalStyleFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Styles</option></select></div></div><div id="newPlaylistModalSongResultsContainer" class="min-h-[300px] max-h-[50vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar"></div></div><div class="flex justify-end space-x-3 mt-6 pt-4 border-t"><button id="doneAddingToNewPlaylistBtn" class="btn-primary text-white px-4 py-2 rounded-md">Done Adding</button></div></div>
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col"><div class="flex justify-between items-center mb-4 border-b pb-3"><h3 id="searchSongsModalTitle" class="text-xl font-semibold text-[#3a3a3a]">Search & Add Songs</h3><button id="searchSongsForNewPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button></div><div class="flex-grow overflow-y-auto custom-scrollbar pr-2"><div class="mb-4"><div class="flex items-center"><div class="relative flex-grow"><input type="text" id="newPlaylistModalSongSearchInput" placeholder="Keywords, title, etc." class="w-full p-3 rounded-l-md bg-gray-50"><div id="newPlaylistModalAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar z-[1060]"></div></div><button id="newPlaylistModalApplyFiltersBtn" class="btn-primary text-white px-6 py-3 rounded-none flex items-center"><i class="fas fa-search mr-2"></i> Search</button><button id="newPlaylistModalClearFiltersBtn" class="bg-gray-200 text-gray-600 px-6 py-3 rounded-r-md flex items-center ml-2"><i class="fas fa-times mr-2"></i> Clear</button></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">Theme</label><select id="newPlaylistModalThemeFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Themes</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Key</label><select id="newPlaylistModalKeyFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Keys</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Style</label><select id="newPlaylistModalStyleFilter" class="w-full p-1 text-xs border border-gray-300 rounded-md bg-gray-50"><option value="">All Styles</option></select></div></div><div id="newPlaylistModalSongResultsContainer" class="min-h-[300px] max-h-[50vh] overflow-y-auto border rounded-md p-2 bg-gray-50 custom-scrollbar"></div></div><div class="flex justify-end space-x-3 mt-6 pt-4 border-t"><button id="doneAddingToNewPlaylistBtn" class="btn-primary text-white px-4 py-2 rounded-md">Done Adding</button></div></div>
     </div>
     <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100] hidden p-4">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm"><h3 id="confirmationModalTitle" class="text-lg font-semibold text-[#3a3a3a] mb-4">Are you sure?</h3><p id="confirmationModalMessage" class="text-gray-600 mb-6"></p><div class="flex justify-end space-x-3"><button id="confirmActionBtn" class="btn-primary bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Confirm</button><button id="cancelActionBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancel</button></div></div>
@@ -174,19 +174,18 @@
             </div>
         </div>
     </div>
-    <div id="chordPlayerModal" class="modal-overlay fixed inset-0 bg-black/80 flex flex-col p-4">
-        <div class="flex-shrink-0 flex justify-between items-center text-white pb-4">
-            <h3 id="chordPlayerTitle" class="text-xl font-semibold"></h3>
-            <button id="chordPlayerCloseBtn" class="text-white text-3xl">&times;</button>
+    <div id="chordPlayerModal" class="modal-overlay fixed inset-0 bg-black/90 flex flex-col p-4">
+        <div class="flex-shrink-0 flex flex-col items-center text-white pb-4">
+            <h3 id="chordPlayerTitle" class="text-2xl font-semibold"></h3>
+            <button id="chordPlayerCloseBtn" class="mt-2 bg-gray-700 hover:bg-gray-600 px-4 py-1 text-sm rounded-full">Close</button>
         </div>
-        <div class="flex-grow flex items-center justify-center relative">
-             <iframe id="chordPlayerIframe" class="w-full h-full max-w-4xl bg-gray-500" src="about:blank"></iframe>
+        <div class="flex-grow flex items-center justify-center relative w-full h-full">
+             <iframe id="chordPlayerIframe" class="w-full h-full max-w-5xl" src="about:blank"></iframe>
         </div>
         <div id="chordPlayerNav" class="flex-shrink-0 flex justify-center items-center p-4 space-x-4 rounded-lg mt-4">
-            <button id="chordPlayerPrevBtn" class="text-white text-3xl disabled:opacity-50"><i class="fas fa-arrow-circle-left"></i></button>
-            <div id="chordPlayerCounter" class="text-white font-semibold"></div>
-            <button id="chordPlayerNextBtn" class="text-white text-3xl disabled:opacity-50"><i class="fas fa-arrow-circle-right"></i></button>
-            <button id="chordPlayerShareBtn" class="absolute right-4 bottom-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full flex items-center"><i class="fab fa-whatsapp mr-2"></i> Share</button>
+            <button id="chordPlayerPrevBtn" class="text-white text-4xl disabled:opacity-50"><i class="fas fa-arrow-circle-left"></i></button>
+            <div id="chordPlayerCounter" class="text-white font-semibold text-lg"></div>
+            <button id="chordPlayerNextBtn" class="text-white text-4xl disabled:opacity-50"><i class="fas fa-arrow-circle-right"></i></button>
         </div>
     </div>
     <div id="toast-notification">Link copied to clipboard!</div>
@@ -203,13 +202,13 @@
         
         let allSongsData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
-        let isAppInitialized = false, onConfirmCallback = null;
+        let isAppInitialized = false, onConfirmCallback = null, isEditingPlaylist = false;
         let currentPage = 1, songsPerPage = 20, currentChordIndex = 0;
         let currentSongForPlaylist = null, cameFromPlaylistId = null, lastViewedPlaylistId = null;
         let draggedSongElement = null;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "chordPlayerShareBtn", "toast-notification" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "chordPlayerShareBtn", "toast-notification" ];
         
         // --- BOOTSTRAPPING ---
         document.addEventListener("DOMContentLoaded", main);
@@ -652,6 +651,32 @@
                  playAllBtn.innerHTML = `<i class="fas fa-play mr-2"></i> Play All Chords`;
                  playAllBtn.addEventListener('click', () => openChordPlayer(playlist));
                  actionsContainer.appendChild(playAllBtn);
+
+                if (playlist.songs.length > 0) {
+                    const shareBtn = document.createElement('button');
+                    shareBtn.className = "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full flex items-center";
+                    shareBtn.innerHTML = `<i class="fab fa-whatsapp mr-2"></i> Share`;
+                    shareBtn.addEventListener('click', () => {
+                        const baseUrl = window.location.href.split('?')[0];
+                        const shareUrl = `${baseUrl}?playlist=${playlist.id}`;
+                        try {
+                            const textArea = document.createElement("textarea");
+                            textArea.value = shareUrl;
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+
+                            const toast = DOMElements.toastNotification;
+                            toast.classList.add('show');
+                            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                        } catch (err) {
+                             console.error('Failed to copy link: ', err);
+                        }
+                    });
+                    actionsContainer.appendChild(shareBtn);
+                }
             }
             
             showAppView('worshipSetlistPageView');
@@ -747,6 +772,8 @@
             });
 
             DOMElements.createSongListBtn.addEventListener('click', () => {
+                isEditingPlaylist = false;
+                DOMElements.searchSongsModalTitle.textContent = "Create New Song List";
                 songsForNewPlaylist = [];
                 DOMElements.newPlaylistName.value = '';
                 DOMElements.newPlaylistSubtitle.value = '';
@@ -762,20 +789,28 @@
                 DOMElements.createPlaylistModal.classList.add('hidden');
             });
             DOMElements.openSearchForNewPlaylistModalBtn.addEventListener('click', () => {
+                isEditingPlaylist = false;
+                DOMElements.searchSongsModalTitle.textContent = "Search & Add Songs";
                 DOMElements.newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
                 DOMElements.searchSongsForNewPlaylistModal.classList.remove('hidden');
             });
+            
+            DOMElements.addSongsToCurrentSetlistBtn.addEventListener('click', () => {
+                isEditingPlaylist = true;
+                const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                const playlist = sitePlaylists.find(p => p.id === playlistId);
+                DOMElements.searchSongsModalTitle.textContent = `Add to: ${playlist.name}`;
+                DOMElements.newPlaylistModalSongResultsContainer.innerHTML = '<p class="text-xs text-gray-400 italic">Search or filter to find songs.</p>';
+                DOMElements.searchSongsForNewPlaylistModal.classList.remove('hidden');
+            });
+
             [DOMElements.searchSongsForNewPlaylistModalCloseBtn, DOMElements.doneAddingToNewPlaylistBtn].forEach(btn => btn.addEventListener('click', () => DOMElements.searchSongsForNewPlaylistModal.classList.add('hidden')));
             
-            if (DOMElements.newPlaylistModalApplyFiltersBtn) {
-                DOMElements.newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearch);
-            }
-            if (DOMElements.newPlaylistModalClearFiltersBtn) {
-                DOMElements.newPlaylistModalClearFiltersBtn.addEventListener('click', () => { 
-                    [DOMElements.newPlaylistModalSongSearchInput, DOMElements.newPlaylistModalThemeFilter, DOMElements.newPlaylistModalKeyFilter, DOMElements.newPlaylistModalStyleFilter].forEach(el => { if(el) el.value = ''; }); 
-                    performNewPlaylistModalSearch(); 
-                });
-            }
+            DOMElements.newPlaylistModalApplyFiltersBtn.addEventListener('click', performNewPlaylistModalSearch);
+            DOMElements.newPlaylistModalClearFiltersBtn.addEventListener('click', () => { 
+                [DOMElements.newPlaylistModalSongSearchInput, DOMElements.newPlaylistModalThemeFilter, DOMElements.newPlaylistModalKeyFilter, DOMElements.newPlaylistModalStyleFilter].forEach(el => { if(el) el.value = ''; }); 
+                performNewPlaylistModalSearch(); 
+            });
             [DOMElements.newPlaylistModalThemeFilter, DOMElements.newPlaylistModalKeyFilter, DOMElements.newPlaylistModalStyleFilter].forEach(el => {
                 if(el) el.addEventListener('change', performNewPlaylistModalSearch);
             });
@@ -790,11 +825,25 @@
                     const btn = e.target.closest('.add-song-to-new-list-btn');
                     const song = allSongsData.find(s => s.id === btn.dataset.songId);
                     if (song) {
-                        songsForNewPlaylist.push(song);
+                        if (isEditingPlaylist) {
+                            const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                            const newPlaylists = sitePlaylists.map(p => {
+                                if (p.id === playlistId) {
+                                    const songs = p.songs || [];
+                                    if (!songs.includes(song.id)) {
+                                        return { ...p, songs: [...songs, song.id] };
+                                    }
+                                }
+                                return p;
+                            });
+                            updateFirestorePlaylists(newPlaylists);
+                        } else {
+                            songsForNewPlaylist.push(song);
+                            renderModalSelectedSongs();
+                        }
                         btn.disabled = true;
                         btn.textContent = 'Added';
                         btn.classList.replace('bg-green-500', 'bg-gray-400');
-                        renderModalSelectedSongs();
                     }
                 }
             });
@@ -808,10 +857,20 @@
                 }
             });
             
-            DOMElements.addSongsToCurrentSetlistBtn.addEventListener('click', () => {
-                lastViewedPlaylistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
-                showAppView('songFinderView');
+            DOMElements.chordPlayerCloseBtn.addEventListener('click', closeChordPlayer);
+            DOMElements.chordPlayerNextBtn.addEventListener('click', () => {
+                if(currentChordIndex < currentChordDocs.length - 1) {
+                    currentChordIndex++;
+                    renderChordPlayerPage();
+                }
             });
+            DOMElements.chordPlayerPrevBtn.addEventListener('click', () => {
+                if(currentChordIndex > 0) {
+                    currentChordIndex--;
+                    renderChordPlayerPage();
+                }
+            });
+
             setupDragAndDrop();
         }
 
@@ -826,7 +885,15 @@
 
         function performNewPlaylistModalSearch() {
             const filters = getFiltersFromUI('newPlaylistModal');
-            const songsToExclude = songsForNewPlaylist.map(s => s.id);
+            let songsToExclude = [];
+            if(isEditingPlaylist) {
+                const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                const playlist = sitePlaylists.find(p => p.id === playlistId);
+                if (playlist) songsToExclude = playlist.songs || [];
+            } else {
+                songsToExclude = songsForNewPlaylist.map(s => s.id);
+            }
+
             const filtered = getFilteredSongs(filters, songsToExclude);
             const container = DOMElements.newPlaylistModalSongResultsContainer;
             container.innerHTML = '';
@@ -898,6 +965,7 @@
             
             currentChordIndex = 0;
             DOMElements.chordPlayerModal.classList.add('active');
+            DOMElements.chordPlayerTitle.textContent = playlist.name;
             renderChordPlayerPage();
             
             document.addEventListener('keydown', handleChordPlayerKeys);
@@ -910,7 +978,7 @@
         }
 
         function renderChordPlayerPage() {
-            const { chordPlayerIframe, chordPlayerPrevBtn, chordPlayerNextBtn, chordPlayerCounter, chordPlayerTitle } = DOMElements;
+            const { chordPlayerIframe, chordPlayerPrevBtn, chordPlayerNextBtn, chordPlayerCounter } = DOMElements;
             const doc = currentChordDocs[currentChordIndex];
             
             let embedUrl = doc.url;
@@ -922,7 +990,6 @@
             }
             chordPlayerIframe.src = embedUrl;
             
-            chordPlayerTitle.textContent = doc.name || `Song ${currentChordIndex + 1}`;
             chordPlayerCounter.textContent = `${currentChordIndex + 1} / ${currentChordDocs.length}`;
             chordPlayerPrevBtn.disabled = currentChordIndex === 0;
             chordPlayerNextBtn.disabled = currentChordIndex === currentChordDocs.length - 1;
@@ -940,44 +1007,6 @@
             }
         }
         
-        DOMElements.chordPlayerCloseBtn.addEventListener('click', closeChordPlayer);
-        DOMElements.chordPlayerNextBtn.addEventListener('click', () => {
-            if(currentChordIndex < currentChordDocs.length - 1) {
-                currentChordIndex++;
-                renderChordPlayerPage();
-            }
-        });
-        DOMElements.chordPlayerPrevBtn.addEventListener('click', () => {
-            if(currentChordIndex > 0) {
-                currentChordIndex--;
-                renderChordPlayerPage();
-            }
-        });
-        DOMElements.chordPlayerShareBtn.addEventListener('click', () => {
-            const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
-            const playlist = sitePlaylists.find(p => p.id === playlistId);
-            if (!playlist) return;
-
-            const baseUrl = window.location.href.split('?')[0];
-            const shareUrl = `${baseUrl}?playlist=${playlistId}`;
-            
-            try {
-                const textArea = document.createElement("textarea");
-                textArea.value = shareUrl;
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-
-                const toast = DOMElements.toastNotification;
-                toast.classList.add('show');
-                setTimeout(() => { toast.classList.remove('show'); }, 3000);
-            } catch (err) {
-                 console.error('Failed to copy link: ', err);
-            }
-        });
-
         function checkUrlForPlaylist() {
             const params = new URLSearchParams(window.location.search);
             const playlistId = params.get('playlist');
