@@ -1,26 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Worship Song Library</title>
-  <!-- Tailwind for quick styling (optional) -->
+  <!-- Tailwind CSS for utility classes -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
 
-  <h1 class="text-3xl font-bold mb-4">The Perfect Worship Songs</h1>
-  <p class="mb-6">Use the search and filters above to begin.</p>
+  <h1 class="text-3xl font-bold mb-6">Worship Song Library</h1>
 
-  <!-- Here we’ll inject song cards -->
-  <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <!-- Search & Filters -->
+  <div class="flex flex-wrap gap-4 mb-6">
+    <input id="search-text" 
+           type="text" 
+           placeholder="Search by title or lyrics…" 
+           class="flex-grow p-2 border rounded" />
 
-  <!-- Firebase v9 modular SDKs -->
+    <button id="btn-clear" 
+            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+      Clear
+    </button>
+
+    <select id="filter-key" class="p-2 border rounded">
+      <option value="">All Keys</option>
+      <option>A</option><option>B♭</option><option>B</option>
+      <option>C</option><option>D♭</option><option>D</option>
+      <option>E♭</option><option>E</option><option>F</option>
+      <option>F♯</option><option>G</option><option>A♭</option>
+    </select>
+
+    <select id="filter-style" class="p-2 border rounded">
+      <option value="">All Styles</option>
+      <option>Pop</option>
+      <option>Rock</option>
+      <option>Gospel</option>
+      <option>Traditional</option>
+      <option>Contemporary</option>
+    </select>
+
+    <select id="filter-season" class="p-2 border rounded">
+      <option value="">All Seasons</option>
+      <option>Advent</option>
+      <option>Christmas</option>
+      <option>Lent</option>
+      <option>Easter</option>
+      <option>Ordinary Time</option>
+    </select>
+  </div>
+
+  <!-- Container for song cards -->
+  <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- song cards go here -->
+  </div>
+
+  <!-- Firebase & Firestore SDKs -->
   <script type="module">
-    // 1) Import and configure Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { initializeApp }       from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } 
+      from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
+    // ── 1) Your Firebase config: REPLACE with your values ─────────────────────
     const firebaseConfig = {
       apiKey:       "AIza…REPLACE_WITH_YOURS…",
       authDomain:   "your-project.firebaseapp.com",
@@ -30,39 +71,102 @@
       appId:        "1:…:web:…"
     };
 
+    // initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // 2) Fetch and render songs
-    async function loadSongs() {
-      const listEl = document.getElementById('song-list');
-      listEl.innerHTML = `<p>Loading…</p>`;
+    // ── 2) Grab DOM elements ───────────────────────────────────────────────────
+    const txtSearch   = document.getElementById('search-text');
+    const btnClear    = document.getElementById('btn-clear');
+    const selKey      = document.getElementById('filter-key');
+    const selStyle    = document.getElementById('filter-style');
+    const selSeason   = document.getElementById('filter-season');
+    const songListEl  = document.getElementById('song-list');
+
+    let allSongs = [];   // will hold the full array from Firestore
+
+    // ── 3) Fetch all songs from Firestore ─────────────────────────────────────
+    async function fetchAllSongs() {
+      songListEl.innerHTML = `<p>Loading songs…</p>`;
       try {
         const snap = await getDocs(collection(db, 'songs'));
-        if (snap.empty) {
-          listEl.innerHTML = `<p>No songs found.</p>`;
-          return;
-        }
-        listEl.innerHTML = ''; // clear loading
-        snap.forEach(doc => {
-          const data = doc.data();
-          const card = document.createElement('div');
-          card.className = 'bg-white p-4 rounded shadow';
-          card.innerHTML = `
-            <h2 class="font-semibold text-xl">${data.title || 'Untitled'}</h2>
-            <p class="text-sm text-gray-600">Key: ${data.key || '—'}</p>
-            <pre class="mt-2 bg-gray-100 p-2 text-sm overflow-auto">${data.chords || ''}</pre>
-          `;
-          listEl.appendChild(card);
-        });
-      } catch (e) {
-        listEl.innerHTML = `<p class="text-red-600">Error loading songs: ${e.message}</p>`;
-        console.error(e);
+        allSongs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        applyFilters();
+      } catch (err) {
+        songListEl.innerHTML = `<p class="text-red-600">Error: ${err.message}</p>`;
+        console.error(err);
       }
     }
 
-    // 3) Kick it off
-    loadSongs();
+    // ── 4) Apply current filters & render results ─────────────────────────────
+    function applyFilters() {
+      const text    = txtSearch.value.trim().toLowerCase();
+      const key     = selKey.value;
+      const style   = selStyle.value;
+      const season  = selSeason.value;
+
+      const filtered = allSongs.filter(song => {
+        // text match in title or lyrics
+        const matchesText =
+          !text ||
+          (song.title  && song.title.toLowerCase().includes(text)) ||
+          (song.lyrics && song.lyrics.toLowerCase().includes(text));
+
+        const matchesKey    = !key    || (song.key    === key);
+        const matchesStyle  = !style  || (song.style  === style);
+        const matchesSeason = !season || (song.season === season);
+
+        return matchesText && matchesKey && matchesStyle && matchesSeason;
+      });
+
+      renderSongs(filtered);
+    }
+
+    // ── 5) Render a set of songs into the grid ────────────────────────────────
+    function renderSongs(songs) {
+      if (!songs.length) {
+        songListEl.innerHTML = `<p>No songs match your criteria.</p>`;
+        return;
+      }
+
+      songListEl.innerHTML = '';
+      songs.forEach(song => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg shadow hover:shadow-md transition';
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">${song.title || 'Untitled'}</h2>
+          <p class="text-sm text-gray-600 mb-2">
+            Key: ${song.key || '—'} &nbsp;|&nbsp;
+            Style: ${song.style || '—'} &nbsp;|&nbsp;
+            Season: ${song.season || '—'}
+          </p>
+          <pre class="bg-gray-100 p-2 rounded text-sm overflow-auto mb-2">
+${song.chords || ''}
+          </pre>
+          <details class="text-sm">
+            <summary class="cursor-pointer text-blue-600">Show lyrics excerpt</summary>
+            <p class="mt-2 whitespace-pre-wrap">${song.lyrics?.slice(0, 300) || ''}${song.lyrics && song.lyrics.length > 300 ? '…' : ''}</p>
+          </details>
+        `;
+        songListEl.appendChild(card);
+      });
+    }
+
+    // ── 6) Wire up UI events ───────────────────────────────────────────────────
+    txtSearch .addEventListener('input', applyFilters);
+    selKey     .addEventListener('change',applyFilters);
+    selStyle   .addEventListener('change',applyFilters);
+    selSeason  .addEventListener('change',applyFilters);
+    btnClear   .addEventListener('click', () => {
+      txtSearch.value = '';
+      selKey.value    = '';
+      selStyle.value  = '';
+      selSeason.value = '';
+      applyFilters();
+    });
+
+    // ── Bootstrap ──────────────────────────────────────────────────────────────
+    fetchAllSongs();
   </script>
 </body>
 </html>
