@@ -1,112 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worship Song Selection | Luther House Chapel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- (Your existing styles here) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Worship Song Selection | Luther House Chapel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- (Your existing <style>…</style> block goes here) -->
 </head>
 <body>
-    <!-- (Your existing HTML structure here) -->
+  <!-- (All your existing HTML containers: header, sidebar, main content, modals, etc.) -->
 
-    <!-- Begin updated script -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-      import {
-        getAuth,
-        onAuthStateChanged,
-        signInAnonymously
-      } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-      import {
-        getFirestore,
-        collection,
-        getDocs,
-        doc,
-        onSnapshot,
-        updateDoc,
-        setDoc,
-        arrayUnion,
-        arrayRemove
-      } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  <!-- FULL SCRIPT BLOCK -->
+  <script type="module">
+    // ── 1) Firebase & Firestore SDK imports ──────────────────────────────────
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import {
+      getFirestore, collection, getDocs,
+      doc, onSnapshot, setDoc, arrayUnion, arrayRemove
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM",
-        authDomain: "worship-song-finder.firebaseapp.com",
-        projectId: "worship-song-finder",
-        storageBucket: "worship-song-finder.appspot.com",
-        messagingSenderId: "34741956145",
-        appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10"
-      };
+    // ── 2) External URLs & Config ────────────────────────────────────────────
+    const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwoHlz98GgsMUdtgUxx01BjzD1C3NIEs3ojFC-4p2qMV0CTc46XxGd8ZxZxJ8C6MpaC1U/exec";
 
-      // Globals
-      let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [];
-      let app, auth, db, userId, unsubscribePlaylists = null;
-      let isAppInitialized = false;
+    const firebaseConfig = {
+      apiKey:       "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM",
+      authDomain:   "worship-song-finder.firebaseapp.com",
+      projectId:    "worship-song-finder",
+      storageBucket:"worship-song-finder.appspot.com",
+      messagingSenderId:"34741956145",
+      appId:        "1:34741956145:web:b721c5f2532f9ea3fe2f10"
+    };
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        initializeApp(firebaseConfig);
-        auth = getAuth();
-        db   = getFirestore();
-        onAuthStateChanged(auth, user => {
-          if (user) {
-            userId = user.uid;
-            startApp();
-            loadPlaylistsFromFirestore();
-          } else {
-            signInAnonymously(auth).catch(console.error);
-          }
-        });
+    // ── 3) Global State & DOM References ──────────────────────────────────────
+    let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [];
+    let app, auth, db, userId, unsubscribePlaylists = null;
+    let isAppInitialized = false, currentPage = 1, songsPerPage = 20, currentChordIndex = 0;
+    let currentSongForPlaylist = null, cameFromPlaylistId = null, lastViewedPlaylistId = null;
+    let draggedSongElement = null;
+
+    const DOM = {};
+    const ids = [
+      /* list all your element IDs exactly as you had them */
+      "loadingIndicator","mobileMenuButton","closeMobileMenuButton","playlistSidebar",
+      "mainPageContainer","songFinderView","worshipRosterView","songDetailPageView",
+      "worshipSetlistPageView","searchBtn","clearBtn","theme","key","style","search",
+      "songResults","emptyState","songCardsContainer","resultCount","showingCount",
+      "totalCount","activeFilters","sortBy","liturgicalSeasonFilter","tempoFilter",
+      "autosuggestDropdown","pagination","backToSongListBtn","setlistNameDisplay",
+      "setlistSongsContainer","backToFinderBtn","playlistItemsContainer","createSongListBtn",
+      "authStatus","addToListModal","songToAddNameModal","playlistSelectModal",
+      "confirmAddToListBtnModal","cancelAddToListBtnModal","addToListModalCloseBtn",
+      "addSongsToCurrentSetlistBtn","createPlaylistModal","newPlaylistName",
+      "newPlaylistSubtitle","openSearchForNewPlaylistModalBtn","modalSelectedSongsContainer",
+      "modalSelectedSongsCount","saveNewPlaylistBtn","cancelNewPlaylistBtn",
+      "createPlaylistModalCloseBtn","searchSongsForNewPlaylistModal",
+      "searchSongsModalTitle","searchSongsForNewPlaylistModalCloseBtn",
+      "doneAddingToNewPlaylistBtn","newPlaylistModalSongSearchInput",
+      "newPlaylistModalAutosuggestDropdown","newPlaylistModalThemeFilter",
+      "newPlaylistModalKeyFilter","newPlaylistModalStyleFilter",
+      "newPlaylistModalApplyFiltersBtn","newPlaylistModalClearFiltersBtn",
+      "newPlaylistModalSongResultsContainer","confirmationModal",
+      "confirmationModalTitle","confirmationModalMessage","confirmActionBtn",
+      "cancelActionBtn","songDetailHeaderLHC","songDetailMetaLHC",
+      "songDetailDocsLHC","songDetailLyricsLHC","youtubeContainer","previewModal",
+      "previewModalTitle","previewModalCloseBtn","previewModalIframe",
+      "playlistActionsContainer","chordPlayerModal","chordPlayerTitle",
+      "chordPlayerCloseBtn","chordPlayerIframe","chordPlayerPrevBtn",
+      "chordPlayerNextBtn","chordPlayerCounter","toast-notification",
+      "searchClearBtn","modalSearchClearBtn","worshipRosterBtn","rosterTableBody",
+      "backToFinderFromRosterBtn"
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Cache DOM refs
+      ids.forEach(id => DOM[id] = document.getElementById(id));
+
+      // Initialize Firebase
+      app  = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db   = getFirestore(app);
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          userId = user.uid;
+          DOM.authStatus.innerHTML = `<i class="fas fa-check-circle text-green-300 mr-1"></i> Synced`;
+          startApp();
+          loadPlaylistsFromFirestore();
+        } else {
+          signInAnonymously(auth).catch(console.error);
+        }
       });
+    });
 
-      async function startApp() {
-        if (isAppInitialized) return;
-        isAppInitialized = true;
-        await Promise.all([fetchSongDataAndInitialize(), fetchRosterData()]);
-        setupEventListeners();
-        // hide loader
-        document.getElementById('loadingIndicator').style.display = 'none';
+    // ── 4) Boot & Data Fetch ───────────────────────────────────────────────────
+    async function startApp() {
+      if (isAppInitialized) return;
+      isAppInitialized = true;
+      await Promise.all([
+        fetchSongDataAndInitialize(),
+        fetchRosterData()
+      ]);
+      setupEventListeners();
+      checkUrlForPlaylist();
+      DOM.loadingIndicator.style.display = 'none';
+    }
+
+    async function fetchSongDataAndInitialize() {
+      try {
+        const res = await fetch(SONGS_JSON_URL);
+        if (!res.ok) throw new Error(`Songs fetch failed: ${res.status}`);
+        const raw = await res.json();
+        allSongsData = raw.map((s,i) => ({ id:`song-${i}`, ...s }));
+        populateAllDropdowns();
+        resetToEmptyState();
+      } catch (err) {
+        console.error("Song fetch error:", err);
+        DOM.emptyState.innerHTML = `<h3 class="text-red-500">Error loading songs</h3>`;
       }
+    }
 
-      // Fetch songs from your Google Apps Script URL
-      async function fetchSongDataAndInitialize() {
-        try {
-          const resp = await fetch(SONGS_JSON_URL);
-          const raw  = await resp.json();
-          allSongsData = raw.map((s,i) => ({ id:`song-${i}`, ...s }));
-          populateAllDropdowns();
-        } catch (err) {
-          console.error('Song fetch error:', err);
+    // ── 5) NEW: Firestore-based roster ────────────────────────────────────────
+    async function fetchRosterData() {
+      try {
+        const snap = await getDocs(collection(db, 'roster'));
+        allRosterData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch (err) {
+        console.error("Roster fetch error:", err);
+      }
+    }
+
+    // ── 6) Firestore playlists ───────────────────────────────────────────────
+    function loadPlaylistsFromFirestore() {
+      if (!userId) return;
+      const userDoc = doc(db, 'users', userId);
+      unsubscribePlaylists = onSnapshot(userDoc, docSnap => {
+        sitePlaylists = docSnap.exists() ? docSnap.data().playlists||[] : [];
+        renderPlaylistSidebar();
+        const cur = DOM.worshipSetlistPageView.dataset.currentPlaylistId;
+        if (cur && DOM.worshipSetlistPageView.style.display==='block') {
+          displayWorshipSetlistPage(cur);
         }
-      }
+      }, console.error);
+    }
+    async function updateFirestorePlaylists(newPL) {
+      await setDoc(doc(db,'users',userId), { playlists: newPL });
+    }
 
-      // NEW: Fetch roster from Firestore
-      async function fetchRosterData() {
-        try {
-          const snap = await getDocs(collection(db, 'roster'));
-          allRosterData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        } catch (err) {
-          console.error('Roster fetch error:', err);
-        }
-      }
+    // ── 7) ALL YOUR EXISTING FUNCTIONS BELOW ──────────────────────────────────
+    // (setupEventListeners, populateAllDropdowns, renderSongCards, performSearchAndFilter,
+    //  renderRosterTable, displaySongDetailsPage, displayWorshipSetlistPage,
+    //  initAutosuggest, renderPagination, updateActiveFiltersDisplay,
+    //  showConfirmationModal, performNewPlaylistModalSearch, renderModalSelectedSongs,
+    //  setupDragAndDrop, openChordPlayer, closeChordPlayer, handleChordPlayerKeys,
+    //  checkUrlForPlaylist, escapeHtml, resetToEmptyState, etc.)
 
-      function loadPlaylistsFromFirestore() {
-        if (!userId) return;
-        const userDoc = doc(db, 'users', userId);
-        unsubscribePlaylists = onSnapshot(userDoc, docSnap => {
-          sitePlaylists = docSnap.data().playlists || [];
-          renderPlaylistSidebar();
-        }, console.error);
-      }
+  </script>
+  <!-- END SCRIPT BLOCK -->
 
-      async function updateFirestorePlaylists(newPL) {
-        await setDoc(doc(db,'users',userId), { playlists: newPL });
-      }
-
-      // (Include your existing functions for UI, search, filter, render, modals, etc.)
-
-    </script>
-    <!-- End updated script -->
 </body>
 </html>
