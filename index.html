@@ -220,14 +220,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, arrayUnion, arrayRemove, collection, query, where, getDocs, orderBy, limit, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwoHlz98GgsMUdtgUxx01BjzD1C3NIEs3ojFC-4p2qMV0CTc46XxGd8ZxJ8C6MpaC1U/exec";
         const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbyMBBaL53ShU0ss8LYBlIO-2Kg3-DgS_tokwPJcdnaLBR6NHM24sUOsgGBcnq0Rp-AG/exec";
         
-        let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
+        let allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
         let isAppInitialized = false, onConfirmCallback = null, isEditingPlaylist = false;
         let currentPage = 1, songsPerPage = 20, currentChordIndex = 0;
@@ -283,10 +282,12 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await Promise.allSettled([fetchSongDataAndInitialize(), fetchRosterData()]);
-            } catch (error) {
-                console.error("Failed during initial data fetch:", error);
-            }
+                // Notice fetchSongDataAndInitialize() is gone.
+                // It has been replaced by our new function to populate the dropdowns.
+                await Promise.allSettled([populateDropdownsFromFirestore(), fetchRosterData()]);
+        } catch (error) {
+            console.error("Failed during initial data fetch:", error);
+    }
             setupEventListeners();
             checkUrlForPlaylist();
             if(DOMElements.loadingIndicator) {
@@ -295,75 +296,80 @@
             }
         }
 
-        async function fetchSongDataAndInitialize() {
-            try {
-                const response = await fetch(SONGS_JSON_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const rawData = await response.json();
-                allSongsData = rawData.map((song, index) => ({
-                    ...song,
-                    id: `${(song.title || 'untitled').replace(/\s/g, '-')}-${index}`
-                }));
-                populateAllDropdowns();
-                resetToEmptyState();
-            } catch (error) {
-                console.error("Could not fetch song data:", error);
-                if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library.</p>`;
+        // --- NEW: Populates dropdowns from the 'metadata/filters' document ---
+    async function populateDropdownsFromFirestore() {
+        try {
+            const filtersDocRef = doc(db, "metadata", "filters");
+            const docSnap = await getDoc(filtersDocRef);
+
+            if (docSnap.exists()) {
+                const filters = docSnap.data();
+                const populate = (select, items, defaultText) => {
+                    if (!select || !items) return;
+                    select.innerHTML = `<option value="">${defaultText}</option>`;
+                    items.sort().forEach(item => select.add(new Option(item, item)));
+                };
+
+                populate(DOMElements.theme, filters.themes, "No Theme");
+                populate(DOMElements.key, filters.keys, "No Key");
+                populate(DOMElements.style, filters.styles, "No Style");
+                populate(DOMElements.tempoFilter, filters.tempos, "No Tempo");
+                populate(DOMElements.liturgicalSeasonFilter, filters.seasons, "No Season");
+                populate(DOMElements.newPlaylistModalThemeFilter, filters.themes, "All Themes");
+                populate(DOMElements.newPlaylistModalKeyFilter, filters.keys, "All Keys");
+                populate(DOMElements.newPlaylistModalStyleFilter, filters.styles, "All Styles");
+            } else {
+                console.error("Metadata/filters document not found!");
             }
+        } catch (error) {
+            console.error("Could not populate dropdowns:", error);
+        }
+    }
+
+    // --- NEW: Performs the actual Firestore query based on UI filters ---
+    async function getFilteredSongsFromFirestore(filters) {
+        const songsRef = collection(db, "songs");
+        let q = query(songsRef);
+
+        // Build the query dynamically
+        if (filters.term) {
+             // Firestore does not support partial text search well. 
+             // We search our pre-made keywords array instead.
+            q = query(q, where("searchableKeywords", "array-contains", filters.term.toLowerCase()));
+        }
+        if (filters.theme) {
+            q = query(q, where("themes", "array-contains", filters.theme));
+        }
+        if (filters.key) {
+            q = query(q, where("key", "==", filters.key));
+        }
+        if (filters.style) {
+            q = query(q, where("category", "==", filters.style));
+        }
+        if (filters.tempo) {
+            q = query(q, where("tempo", "==", filters.tempo));
+        }
+        if (filters.season) {
+            q = query(q, where("liturgicalSeason", "==", filters.season));
+        }
+
+        // Add sorting
+        if (DOMElements.sortBy && DOMElements.sortBy.value === 'title') {
+            q = query(q, orderBy("title"));
         }
         
-        async function fetchRosterData() {
-             if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_ROSTER_APPS_SCRIPT_URL") {
-                console.warn("Roster URL is a placeholder. Roster feature will be disabled.");
-                return;
-             };
-             try {
-                const response = await fetch(ROSTER_JSON_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                allRosterData = await response.json();
-             } catch (error) {
-                console.error("Could not fetch roster data:", error);
-                 if (DOMElements.rosterTableBody) DOMElements.rosterTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-red-500">Could not load roster data. Please check the ROSTER_JSON_URL and your Apps Script deployment.</td></tr>';
-             }
+        // We fetch all results from the query to get the total count
+        const querySnapshot = await getDocs(q);
+        
+        // We manually sort by title AFTER fetching if the sort is by relevance but a search term was used.
+        // This is a client-side sort for better relevance matching.
+        const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (DOMElements.sortBy && DOMElements.sortBy.value === 'relevance' && filters.term) {
+            results.sort((a, b) => a.title.localeCompare(b.title));
         }
-
-        function populateAllDropdowns() {
-            const filters = { themes: new Set(), keys: new Set(), styles: new Set(), tempos: new Set(), seasons: new Set() };
-
-            const addValuesToSet = (value, targetSet) => {
-                if (typeof value !== 'string' || !value.trim()) return; 
-                value.split(',').forEach(item => {
-                    const trimmedItem = item.trim();
-                    if (trimmedItem) targetSet.add(trimmedItem);
-                });
-            };
-
-            allSongsData.forEach(song => {
-                if (song.theme && Array.isArray(song.theme)) {
-                    song.theme.forEach(t => { if (t) filters.themes.add(t.trim()); });
-                }
-                addValuesToSet(song.liturgicalSeason, filters.seasons);
-                addValuesToSet(song.key, filters.keys);
-                addValuesToSet(song.tempo, filters.tempos);
-                addValuesToSet(song.category, filters.styles);
-            });
-
-            const populate = (select, items, defaultText) => { 
-                if (!select) return; 
-                select.innerHTML = `<option value="">${defaultText}</option>`;
-                const sorted = Array.from(items).sort(); 
-                sorted.forEach(item => select.add(new Option(item, item))); 
-            };
-            
-            populate(DOMElements.theme, filters.themes, "No Theme"); 
-            populate(DOMElements.key, filters.keys, "No Key"); 
-            populate(DOMElements.style, filters.styles, "No Style"); 
-            populate(DOMElements.tempoFilter, filters.tempos, "No Tempo"); 
-            populate(DOMElements.liturgicalSeasonFilter, filters.seasons, "No Season"); 
-            populate(DOMElements.newPlaylistModalThemeFilter, filters.themes, "All Themes"); 
-            populate(DOMElements.newPlaylistModalKeyFilter, filters.keys, "All Keys"); 
-            populate(DOMElements.newPlaylistModalStyleFilter, filters.styles, "All Styles");
-        }
+        
+        return results;
+    }
 
         // --- FIRESTORE DATABASE LOGIC ---
         function loadPlaylistsFromFirestore() {
@@ -456,21 +462,27 @@
             });
         }
 
-        function performSearchAndFilter() {
-            currentPage = 1;
-            const filters = getFiltersFromUI();
-            const noFiltersApplied = Object.values(filters).every(val => val === '');
-            if (noFiltersApplied) {
-                resetToEmptyState();
-                return;
-            }
-            const filteredSongs = getFilteredSongs(filters);
-            if (DOMElements.sortBy && DOMElements.sortBy.value === 'title') {
-                filteredSongs.sort((a, b) => a.title.localeCompare(b.title));
-            }
-            renderSongCards(filteredSongs);
-            updateActiveFiltersDisplay(filters);
+        async function performSearchAndFilter() {
+        currentPage = 1;
+        const filters = getFiltersFromUI();
+        const noFiltersApplied = Object.values(filters).every(val => val === '');
+        if (noFiltersApplied) {
+            resetToEmptyState();
+            return;
         }
+
+        // Show a temporary loading state
+        if (DOMElements.songCardsContainer) DOMElements.songCardsContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Searching...</p>';
+        if (DOMElements.emptyState) DOMElements.emptyState.classList.add('hidden');
+        if (DOMElements.songResults) DOMElements.songResults.classList.remove('hidden');
+
+        // Call the new Firestore function
+        const filteredSongs = await getFilteredSongsFromFirestore(filters);
+        
+        // The rest of the logic to display the cards remains the same
+        renderSongCards(filteredSongs);
+        updateActiveFiltersDisplay(filters);
+    }
 
         // --- AUTOSUGGEST FUNCTION ---
         function initAutosuggest(inputElement, dropdownElement) {
