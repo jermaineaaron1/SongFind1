@@ -150,22 +150,9 @@
                          <h2 class="text-3xl font-semibold text-[#3a3a3a]">Worship Roster</h2>
                          <button id="backToFinderFromRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button>
                      </div>
-                     <div class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
-                         <table class="w-full text-sm text-left text-gray-500">
-                             <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                                 <tr>
-                                     <th scope="col" class="px-6 py-3">Date</th>
-                                     <th scope="col" class="px-6 py-3">Service</th>
-                                     <th scope="col" class="px-6 py-3">Speaker</th>
-                                     <th scope="col" class="px-6 py-3">Worship Leader</th>
-                                     <th scope="col" class="px-6 py-3">Musicians</th>
-                                     <th scope="col" class="px-6 py-3">Liturgist</th>
-                                 </tr>
-                             </thead>
-                             <tbody id="rosterTableBody">
-                                 <!-- Roster data will be inserted here -->
-                             </tbody>
-                         </table>
+                     <div id="rosterGridContainer" class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
+                        <!-- The roster grid will be dynamically generated here -->
+                        <p class="text-center text-gray-500 py-8">Loading Roster...</p>
                      </div>
                 </div>
                 <div id="songDetailPageView" class="hidden container mx-auto px-6 py-8">
@@ -227,7 +214,7 @@
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
         const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
-        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbyMBBaL53ShU0ss8LYBlIO-2Kg3-DgS_tokwPJcdnaLBR6NHM24sUOsgGBcnq0Rp-AG/exec";
+        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbxkvzBbKmFdqjEa1L-fMXzx2Ygh3yw1kgjEQofZ6CYmkfk3DbtkpfSoDof5AGhPgZYl/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -238,7 +225,7 @@
         let fuse; // This will hold our fuzzy search instance
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "rosterTableBody", "backToFinderFromRosterBtn" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "backToFinderFromRosterBtn", "rosterGridContainer" ];
         
         // --- BOOTSTRAPPING ---
         document.addEventListener("DOMContentLoaded", main);
@@ -286,8 +273,7 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await fetchSongDataWithJSONP();
-                await fetchRosterData();
+                await Promise.all([fetchSongDataWithJSONP(), fetchRosterData()]);
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
                 if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library. Please check the Google Sheet link and deployment.</p>`;
@@ -351,17 +337,19 @@
         }
 
         async function fetchRosterData() {
-            if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_ROSTER_APPS_SCRIPT_URL") {
+            if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_NEW_ROSTER_URL") {
                 console.warn("Roster URL is a placeholder. Roster feature will be disabled.");
+                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-gray-500">Roster feature not configured.</p>';
                 return;
             };
             try {
                 const response = await fetch(ROSTER_JSON_URL);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 allRosterData = await response.json();
+                renderRosterGrid(allRosterData);
             } catch (error) {
                 console.error("Could not fetch roster data:", error);
-                if (DOMElements.rosterTableBody) DOMElements.rosterTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-red-500">Could not load roster data.</td></tr>';
+                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-red-500">Could not load roster data. Please check the ROSTER_JSON_URL and your Apps Script deployment.</p>';
             }
         }
 
@@ -401,7 +389,6 @@
             populate(DOMElements.newPlaylistModalStyleFilter, filters.styles, "All Styles");
         }
 
-        // --- FIRESTORE DATABASE LOGIC (FOR PLAYLISTS ONLY) ---
         function loadPlaylistsFromFirestore() {
             if (!userId) return;
             if (unsubscribePlaylists) unsubscribePlaylists();
@@ -428,7 +415,6 @@
             }
         }
         
-        // --- UI & VIEW MANAGEMENT ---
         function showAppView(viewId) { ['songFinderView', 'worshipRosterView', 'songDetailPageView', 'worshipSetlistPageView'].forEach(id => { const el = DOMElements[id]; if (el) el.style.display = (id === viewId) ? 'block' : 'none'; }); window.scrollTo(0,0); }
         function showOfflineStatus(msg) { if(DOMElements.authStatus) DOMElements.authStatus.textContent = msg; if(DOMElements.playlistItemsContainer) DOMElements.playlistItemsContainer.innerHTML = `<p class="italic text-yellow-300 px-2 text-xs">Playlists unavailable.</p>`; }
         function escapeHtml(str) { const p = document.createElement("p"); p.textContent = str || ''; return p.innerHTML; }
@@ -443,7 +429,6 @@
             if (DOMElements.activeFilters) DOMElements.activeFilters.innerHTML = '';
         }
 
-        // --- SEARCH & FILTER LOGIC (USING FUSE.JS) ---
         function performSearchAndFilter() {
             currentPage = 1;
             const filters = getFiltersFromUI();
@@ -455,14 +440,12 @@
             }
             
             let results = [];
-            // If there's a search term, use Fuse.js first
             if (filters.term) {
                 results = fuse.search(filters.term).map(result => result.item);
             } else {
-                results = [...allSongsData]; // Otherwise, start with all songs
+                results = [...allSongsData];
             }
 
-            // Apply dropdown filters on the results
             const filteredSongs = results.filter(song => {
                 const themeMatch = !filters.theme || (song.theme && song.theme.includes(filters.theme));
                 const styleMatch = !filters.style || (song.category === filters.style);
@@ -472,7 +455,6 @@
                 return themeMatch && styleMatch && seasonMatch && keyMatch && tempoMatch;
             });
 
-            // Sort the final results
             if (DOMElements.sortBy.value === 'title') {
                 filteredSongs.sort((a, b) => a.title.localeCompare(b.title));
             }
@@ -481,7 +463,6 @@
             updateActiveFiltersDisplay(filters);
         }
 
-        // --- AUTOSUGGEST FUNCTION (USING FUSE.JS) ---
         function initAutosuggest(inputElement, dropdownElement) {
             if (!inputElement || !dropdownElement || !fuse) return;
 
@@ -518,31 +499,6 @@
                     dropdownElement.classList.remove('show');
                 }
             });
-        }
-
-        // --- All other functions (rendering, modals, etc.) remain largely the same ---
-        // They will now operate on the `allSongsData` array which is loaded once.
-
-        function getFiltersFromUI(prefix = '') {
-            const getElVal = (el) => (el ? el.value : '');
-
-            if (prefix === 'newPlaylistModal') {
-                 return { 
-                     term: getElVal(DOMElements.newPlaylistModalSongSearchInput).toLowerCase().trim(), 
-                     theme: getElVal(DOMElements.newPlaylistModalThemeFilter), 
-                     key: getElVal(DOMElements.newPlaylistModalKeyFilter), 
-                     style: getElVal(DOMElements.newPlaylistModalStyleFilter), 
-                 };
-            } else {
-                 return { 
-                     term: getElVal(DOMElements.search).toLowerCase().trim(), 
-                     theme: getElVal(DOMElements.theme), 
-                     key: getElVal(DOMElements.key), 
-                     style: getElVal(DOMElements.style), 
-                     tempo: getElVal(DOMElements.tempoFilter), 
-                     season: getElVal(DOMElements.liturgicalSeasonFilter), 
-                 };
-            }
         }
 
         function renderSongCards(songs) {
@@ -599,7 +555,6 @@
                 button.className = `px-3 py-1 mx-1 rounded ${currentPage === i ? 'bg-blue-600 text-white' : 'bg-gray-200'}`;
                 button.addEventListener('click', () => { 
                     currentPage = i; 
-                    // Re-run the search to re-apply pagination, not all filters
                     performSearchAndFilter(); 
                 });
                 DOMElements.pagination.appendChild(button);
@@ -781,52 +736,56 @@
             showAppView('worshipSetlistPageView');
         }
 
-        function renderRosterTable() {
-            if (!DOMElements.rosterTableBody) return;
-            const tbody = DOMElements.rosterTableBody;
-            tbody.innerHTML = '';
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+        function renderRosterGrid(rosterData) {
+            const container = DOMElements.rosterGridContainer;
+            if (!container || !rosterData) {
+                container.innerHTML = '<p class="text-center p-4 text-red-500">Could not render roster data.</p>';
+                return;
+            }
 
-            let foundCurrent = false;
-
-            allRosterData.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.className = 'bg-white border-b';
-                
-                let dateCell;
-                if (row.Date && (row.Date instanceof Date || typeof row.Date === 'string')) {
-                    const dateStr = row.Date.toString();
-                    if (dateStr.includes('/')) {
-                        const parts = dateStr.split(' ')[0].split('/');
-                        dateCell = new Date(parts[2], parts[0] - 1, parts[1]);
-                    } else {
-                        dateCell = new Date(dateStr);
-                    }
-                } else {
-                    dateCell = new Date(NaN);
-                }
-
-                if (isNaN(dateCell.getTime())) {
-                     tr.innerHTML = `<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-red-500">Invalid Date</td><td colspan="5"></td>`;
-                } else {
-                    dateCell.setHours(0,0,0,0);
-                    if (dateCell >= today && !foundCurrent) {
-                        tr.classList.add('bg-yellow-100');
-                        foundCurrent = true;
-                    }
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric'}).format(dateCell)}</td>
-                        <td class="px-6 py-4">${row.Service || ''}</td>
-                        <td class="px-6 py-4">${row.Speaker || ''}</td>
-                        <td class="px-6 py-4">${row['Worship Leader'] || ''}</td>
-                        <td class="px-6 py-4">${row.Musicians || ''}</td>
-                        <td class="px-6 py-4">${row.Liturgist || ''}</td>
-                    `;
-                }
-                tbody.appendChild(tr);
+            // Get all unique role names in order
+            const allRoles = new Set();
+            rosterData.sundays.forEach(sunday => {
+                sunday.roles.forEach(role => allRoles.add(role.name));
             });
+            const rolesInOrder = Array.from(allRoles);
+
+            let tableHTML = `
+                <div class="text-center mb-6">
+                    <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
+                    <p class="text-lg text-green-700 font-semibold">${rosterData.season}</p>
+                </div>
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border border-gray-400 p-2 text-left w-1/5"></th>
+            `;
+
+            rosterData.sundays.forEach(sunday => {
+                tableHTML += `<th class="border border-gray-400 p-2 text-center">
+                                <div class="font-semibold">${sunday.title}</div>
+                                <div class="font-bold text-lg">${sunday.date}</div>
+                              </th>`;
+            });
+
+            tableHTML += `</tr></thead><tbody>`;
+
+            rolesInOrder.forEach(roleName => {
+                tableHTML += `<tr class="border-t border-gray-300">
+                                <td class="border border-gray-400 p-2 font-bold text-right">${roleName}</td>`;
+                
+                rosterData.sundays.forEach(sunday => {
+                    const role = sunday.roles.find(r => r.name === roleName);
+                    const people = role ? role.people.join('<br>') : '';
+                    const cellClass = !people ? 'bg-gray-600' : '';
+                    tableHTML += `<td class="border border-gray-400 p-2 text-center align-top ${cellClass}">${people}</td>`;
+                });
+                
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            container.innerHTML = tableHTML;
         }
 
         function openPreviewModal(url, title) {
@@ -919,7 +878,9 @@
             });
             DOMElements.backToFinderBtn.addEventListener('click', () => showAppView('songFinderView'));
             DOMElements.backToFinderFromRosterBtn.addEventListener('click', () => showAppView('songFinderView'));
-            DOMElements.worshipRosterBtn.addEventListener('click', () => { renderRosterTable(); showAppView('worshipRosterView'); });
+            DOMElements.worshipRosterBtn.addEventListener('click', () => { 
+                showAppView('worshipRosterView'); 
+            });
             
             DOMElements.previewModalCloseBtn.addEventListener('click', () => DOMElements.previewModal.classList.remove('active'));
             DOMElements.previewModal.addEventListener('click', (e) => {
