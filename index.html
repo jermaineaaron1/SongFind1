@@ -226,7 +226,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbz-jR-yw7tKUEvi06HGQvqqrgZTtXZfisjr6vf83BTnrmHTSg0BG-2BUSWQZaHZ2HbD/exec";
+        const SONGS_JSON_URL = "PASTE_YOUR_NEW_APPS_SCRIPT_URL_HERE";
         const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbyMBBaL53ShU0ss8LYBlIO-2Kg3-DgS_tokwPJcdnaLBR6NHM24sUOsgGBcnq0Rp-AG/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
@@ -286,9 +286,11 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await Promise.allSettled([fetchSongDataAndInitialize(), fetchRosterData()]);
+                await fetchSongDataWithJSONP();
+                await fetchRosterData();
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
+                if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library. Please check the Google Sheet link and deployment.</p>`;
             }
             setupEventListeners();
             checkUrlForPlaylist();
@@ -298,36 +300,54 @@
             }
         }
 
-        async function fetchSongDataAndInitialize() {
-            try {
-                const response = await fetch(SONGS_JSON_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const rawData = await response.json();
-                allSongsData = rawData.map((song, index) => ({
-                    ...song,
-                    id: `${(song.title || 'untitled').replace(/\s/g, '-')}-${index}`
-                }));
+        function fetchSongDataWithJSONP() {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'handleSongData';
                 
-                // Initialize Fuse.js
-                const fuseOptions = {
-                    includeScore: true,
-                    threshold: 0.4, // How fuzzy the search is (0.0 = exact match, 1.0 = match anything)
-                    keys: [
-                        { name: 'title', weight: 0.4 },
-                        { name: 'artist', weight: 0.2 },
-                        { name: 'theme', weight: 0.2 },
-                        { name: 'lyrics', weight: 0.1 },
-                        { name: 'scripture', weight: 0.1 }
-                    ]
+                window[callbackName] = (data) => {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    if (data.error) {
+                        reject(new Error(data.details || data.error));
+                        return;
+                    }
+                    processSongData(data);
+                    resolve();
                 };
-                fuse = new Fuse(allSongsData, fuseOptions);
 
-                populateAllDropdowns();
-                resetToEmptyState();
-            } catch (error) {
-                console.error("Could not fetch song data:", error);
-                if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library.</p>`;
-            }
+                const script = document.createElement('script');
+                script.src = `${SONGS_JSON_URL}?callback=${callbackName}`;
+                script.onerror = () => {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    reject(new Error('Failed to load song data script. Check the Apps Script URL and deployment.'));
+                };
+
+                document.body.appendChild(script);
+            });
+        }
+
+        function processSongData(rawData) {
+            allSongsData = rawData.map((song, index) => ({
+                ...song,
+                id: `${(song.title || 'untitled').replace(/\s/g, '-')}-${index}`
+            }));
+            
+            const fuseOptions = {
+                includeScore: true,
+                threshold: 0.4,
+                keys: [
+                    { name: 'title', weight: 0.4 },
+                    { name: 'artist', weight: 0.2 },
+                    { name: 'theme', weight: 0.2 },
+                    { name: 'lyrics', weight: 0.1 },
+                    { name: 'scripture', weight: 0.1 }
+                ]
+            };
+            fuse = new Fuse(allSongsData, fuseOptions);
+
+            populateAllDropdowns();
+            resetToEmptyState();
         }
 
         async function fetchRosterData() {
@@ -341,7 +361,7 @@
                 allRosterData = await response.json();
             } catch (error) {
                 console.error("Could not fetch roster data:", error);
-                if (DOMElements.rosterTableBody) DOMElements.rosterTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-red-500">Could not load roster data. Please check the ROSTER_JSON_URL and your Apps Script deployment.</td></tr>';
+                if (DOMElements.rosterTableBody) DOMElements.rosterTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-red-500">Could not load roster data.</td></tr>';
             }
         }
 
