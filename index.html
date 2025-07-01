@@ -138,7 +138,7 @@
                             <div class="flex flex-wrap justify-between items-center mb-6 gap-4"><h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center"><i class="fas fa-music mr-2 text-[#4a6da7]"></i> Song Results <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500"></span></h2><div class="flex items-center"><label class="text-sm text-gray-600 mr-2">Sort by:</label><select id="sortBy" class="p-1 text-sm rounded border-gray-200"><option value="relevance">Relevance</option><option value="title">Title (A-Z)</option></select></div></div>
                             <div id="activeFilters" class="mb-4 flex flex-wrap gap-2"></div>
                             <div id="songCardsContainer" class="min-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-                            <div class="mt-6 flex justify-between items-center"><div><span class="text-sm text-gray-600">Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs</span></div><div id="pagination" class="flex items-center"></div></div>
+                            <div class="mt-6 flex justify-between items-center"><div><span id="showingCount" class="text-sm text-gray-600"></span></div><div id="pagination" class="flex items-center space-x-2"></div></div>
                         </div>
                         <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center"><i class="fas fa-music text-5xl text-[#6b9ac4] opacity-70 mb-4"></i><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above to begin.</p></div>
                     </main>
@@ -220,7 +220,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, arrayUnion, arrayRemove, collection, query, where, getDocs, orderBy, limit, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, arrayUnion, arrayRemove, collection, query, where, getDocs, orderBy, limit, getDoc, startAfter, endBefore, limitToLast } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
@@ -232,9 +232,15 @@
         let currentPage = 1, songsPerPage = 20, currentChordIndex = 0;
         let currentSongForPlaylist = null, cameFromPlaylistId = null, lastViewedPlaylistId = null;
         let draggedSongElement = null;
+
+        // State for server-side pagination
+        let lastVisibleDoc = null;
+        let firstVisibleDoc = null;
+        let pageHistory = []; // To store the first doc of each page for "previous" functionality
+        let currentQuery = null; // To store the last used query
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "rosterTableBody", "backToFinderFromRosterBtn" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "rosterTableBody", "backToFinderFromRosterBtn" ];
         
         // --- BOOTSTRAPPING ---
         document.addEventListener("DOMContentLoaded", main);
@@ -309,7 +315,6 @@
             }
         }
 
-        // --- NEW: Populates dropdowns from the 'metadata/filters' document ---
         async function populateDropdownsFromFirestore() {
             try {
                 const filtersDocRef = doc(db, "metadata", "filters");
@@ -327,7 +332,8 @@
                     populate(DOMElements.key, filters.keys, "No Key");
                     populate(DOMElements.style, filters.styles, "No Style");
                     populate(DOMElements.tempoFilter, filters.tempos, "No Tempo");
-                    populate(DOMElements.liturgicalSeasonFilter, filters.seasons, "No Season");
+                    // FIX: Changed 'filters.seasons' to match the database field name 'Liturgical Seasons'
+                    populate(DOMElements.liturgicalSeasonFilter, filters["Liturgical Seasons"], "No Season");
                     populate(DOMElements.newPlaylistModalThemeFilter, filters.themes, "All Themes");
                     populate(DOMElements.newPlaylistModalKeyFilter, filters.keys, "All Keys");
                     populate(DOMElements.newPlaylistModalStyleFilter, filters.styles, "All Styles");
@@ -339,42 +345,28 @@
             }
         }
 
-        // --- NEW: Performs the actual Firestore query based on UI filters ---
-        async function getFilteredSongsFromFirestore(filters) {
-            const songsRef = collection(db, "songs");
-            let q = query(songsRef);
+        async function getPaginatedSongs(baseQuery, direction) {
+            let paginatedQuery = baseQuery;
+            if (direction === 'next' && lastVisibleDoc) {
+                paginatedQuery = query(paginatedQuery, startAfter(lastVisibleDoc), limit(songsPerPage));
+            } else if (direction === 'prev' && pageHistory.length > 1) {
+                pageHistory.pop(); // Remove current page
+                const prevPageStartDoc = pageHistory[pageHistory.length - 1];
+                paginatedQuery = query(paginatedQuery, startAfter(prevPageStartDoc), limit(songsPerPage));
+            } else {
+                paginatedQuery = query(paginatedQuery, limit(songsPerPage));
+            }
+            
+            const documentSnapshots = await getDocs(paginatedQuery);
+            
+            firstVisibleDoc = documentSnapshots.docs[0] || null;
+            lastVisibleDoc = documentSnapshots.docs[documentSnapshots.docs.length - 1] || null;
 
-            if (filters.term) {
-                q = query(q, where("searchableKeywords", "array-contains", filters.term.toLowerCase()));
-            }
-            if (filters.theme) {
-                q = query(q, where("themes", "array-contains", filters.theme));
-            }
-            if (filters.key) {
-                q = query(q, where("key", "==", filters.key));
-            }
-            if (filters.style) {
-                q = query(q, where("category", "==", filters.style));
-            }
-            if (filters.tempo) {
-                q = query(q, where("tempo", "==", filters.tempo));
-            }
-            if (filters.season) {
-                q = query(q, where("liturgicalSeason", "==", filters.season));
+            if (direction !== 'prev') {
+                 pageHistory.push(firstVisibleDoc);
             }
 
-            if (DOMElements.sortBy && DOMElements.sortBy.value === 'title') {
-                q = query(q, orderBy("title"));
-            }
-            
-            const querySnapshot = await getDocs(q);
-            
-            const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if (DOMElements.sortBy && DOMElements.sortBy.value === 'relevance' && filters.term) {
-                results.sort((a, b) => a.title.localeCompare(b.title));
-            }
-            
-            return results;
+            return documentSnapshots.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
 
         // --- FIRESTORE DATABASE LOGIC ---
@@ -417,6 +409,10 @@
             if (DOMElements.songResults) DOMElements.songResults.classList.add('hidden');
             if (DOMElements.emptyState) DOMElements.emptyState.classList.remove('hidden');
             if (DOMElements.activeFilters) DOMElements.activeFilters.innerHTML = '';
+            pageHistory = [];
+            lastVisibleDoc = null;
+            firstVisibleDoc = null;
+            currentQuery = null;
         }
 
         // --- SEARCH & FILTER LOGIC ---
@@ -429,8 +425,6 @@
                      theme: getElVal(DOMElements.newPlaylistModalThemeFilter), 
                      key: getElVal(DOMElements.newPlaylistModalKeyFilter), 
                      style: getElVal(DOMElements.newPlaylistModalStyleFilter), 
-                     tempo: '', 
-                     season: '' 
                  };
             } else {
                  return { 
@@ -444,23 +438,76 @@
             }
         }
 
-        async function performSearchAndFilter() {
-            currentPage = 1;
+        function buildBaseQuery() {
             const filters = getFiltersFromUI();
-            const noFiltersApplied = Object.values(filters).every(val => val === '');
+            const songsRef = collection(db, "songs");
+            let q = query(songsRef);
+
+            const searchTerms = filters.term.split(' ').filter(t => t.length > 0);
+
+            if (searchTerms.length > 0) {
+                // Use the first search term for the main Firestore query.
+                q = query(q, where("searchableKeywords", "array-contains", searchTerms[0]));
+            }
+            if (filters.theme) {
+                q = query(q, where("themes", "array-contains", filters.theme));
+            }
+            if (filters.key) {
+                q = query(q, where("key", "==", filters.key));
+            }
+            if (filters.style) {
+                q = query(q, where("category", "==", filters.style));
+            }
+            if (filters.tempo) {
+                q = query(q, where("tempo", "==", filters.tempo));
+            }
+            if (filters.season) {
+                q = query(q, where("liturgicalSeason", "==", filters.season));
+            }
+
+            if (DOMElements.sortBy && DOMElements.sortBy.value === 'title') {
+                q = query(q, orderBy("title"));
+            } else {
+                // A default sort is required for pagination to work consistently.
+                q = query(q, orderBy("title"));
+            }
+            return q;
+        }
+
+        async function executeSearch(direction = 'first') {
+            const noFiltersApplied = Object.values(getFiltersFromUI()).every(val => val === '');
             if (noFiltersApplied) {
                 resetToEmptyState();
                 return;
+            }
+
+            if (direction === 'first') {
+                currentPage = 1;
+                pageHistory = [null]; // Start with null for the very first page
+                currentQuery = buildBaseQuery();
             }
 
             if (DOMElements.songCardsContainer) DOMElements.songCardsContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Searching...</p>';
             if (DOMElements.emptyState) DOMElements.emptyState.classList.add('hidden');
             if (DOMElements.songResults) DOMElements.songResults.classList.remove('hidden');
 
-            const filteredSongs = await getFilteredSongsFromFirestore(filters);
+            const documentSnapshots = await getDocs(
+                direction === 'next' ? query(currentQuery, startAfter(lastVisibleDoc), limit(songsPerPage)) :
+                direction === 'prev' ? query(currentQuery, endBefore(firstVisibleDoc), limitToLast(songsPerPage)) :
+                query(currentQuery, limit(songsPerPage))
+            );
+
+            const songs = documentSnapshots.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            renderSongCards(filteredSongs);
-            updateActiveFiltersDisplay(filters);
+            firstVisibleDoc = documentSnapshots.docs[0] || null;
+            lastVisibleDoc = documentSnapshots.docs[documentSnapshots.docs.length - 1] || null;
+
+            if (direction === 'next') currentPage++;
+            if (direction === 'prev' && currentPage > 1) currentPage--;
+
+            renderSongCards(songs, documentSnapshots.empty);
+            updateActiveFiltersDisplay(getFiltersFromUI());
+            renderPagination(currentPage, documentSnapshots.empty);
         }
 
         // --- AUTOSUGGEST FUNCTION ---
@@ -479,6 +526,7 @@
                 const q = query(
                     collection(db, 'songs'),
                     where('searchableKeywords', 'array-contains', queryText),
+                    orderBy('title'),
                     limit(7)
                 );
                 const querySnapshot = await getDocs(q);
@@ -511,24 +559,24 @@
         }
 
         // --- RENDERING FUNCTIONS ---
-        function renderSongCards(songs) {
-            const { songCardsContainer, emptyState, songResults, resultCount, totalCount, showingCount } = DOMElements;
+        function renderSongCards(songs, isEmpty) {
+            const { songCardsContainer, emptyState, songResults, resultCount, showingCount } = DOMElements;
             songCardsContainer.innerHTML = '';
-            if (songs.length === 0) {
-                if (DOMElements.search.value) { 
-                    emptyState.classList.remove('hidden'); 
-                    songResults.classList.add('hidden');
-                }
+
+            if (isEmpty && currentPage === 1) {
+                emptyState.classList.remove('hidden');
+                songResults.classList.add('hidden');
+                resultCount.textContent = '(0 songs)';
+                showingCount.textContent = '';
                 return;
             }
-            emptyState.classList.add('hidden'); songResults.classList.remove('hidden');
-            resultCount.textContent = `(${songs.length} songs)`;
-            
-            const paginatedSongs = songs.slice((currentPage - 1) * songsPerPage, currentPage * songsPerPage);
-            totalCount.textContent = songs.length;
-            showingCount.textContent = `${(currentPage - 1) * songsPerPage + 1}-${Math.min(currentPage * songsPerPage, songs.length)}`;
 
-            paginatedSongs.forEach((song, i) => {
+            emptyState.classList.add('hidden');
+            songResults.classList.remove('hidden');
+            resultCount.textContent = ''; // Total count is unknown with server-side pagination
+            showingCount.textContent = `Page ${currentPage}`;
+
+            songs.forEach((song, i) => {
                 const card = document.createElement('div');
                 card.className = 'song-card bg-white p-4 rounded-lg shadow-sm flex items-center justify-between';
                 card.style.animationDelay = `${i * 0.03}s`;
@@ -551,20 +599,26 @@
                     </div>`;
                 songCardsContainer.appendChild(card);
             });
-            renderPagination(songs.length);
         }
         
-        function renderPagination(totalItems) {
-            DOMElements.pagination.innerHTML = '';
-            const pageCount = Math.ceil(totalItems / songsPerPage);
-            if (pageCount <= 1) return;
-            for (let i = 1; i <= pageCount; i++) {
-                const button = document.createElement('button');
-                button.textContent = i;
-                button.className = `px-3 py-1 mx-1 rounded ${currentPage === i ? 'bg-blue-600 text-white' : 'bg-gray-200'}`;
-                button.addEventListener('click', () => { currentPage = i; performSearchAndFilter(); });
-                DOMElements.pagination.appendChild(button);
-            }
+        function renderPagination(page, isLastPage) {
+            const { pagination } = DOMElements;
+            pagination.innerHTML = '';
+            
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = `<i class="fas fa-arrow-left mr-2"></i> Prev`;
+            prevButton.className = 'btn-secondary text-white px-4 py-2 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed';
+            prevButton.disabled = page <= 1;
+            prevButton.addEventListener('click', () => executeSearch('prev'));
+            
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
+            nextButton.className = 'btn-secondary text-white px-4 py-2 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed';
+            nextButton.disabled = isLastPage;
+            nextButton.addEventListener('click', () => executeSearch('next'));
+
+            pagination.appendChild(prevButton);
+            pagination.appendChild(nextButton);
         }
 
         function updateActiveFiltersDisplay(filters) {
@@ -580,7 +634,7 @@
                         const filterKey = e.target.dataset.filter;
                         const inputElement = document.getElementById(filterKey);
                         if (inputElement) inputElement.value = '';
-                        performSearchAndFilter();
+                        executeSearch('first');
                     });
                     activeFilters.appendChild(pill);
                 }
@@ -836,15 +890,17 @@
         function setupEventListeners() {
             initAutosuggest(DOMElements.search, DOMElements.autosuggestDropdown);
             initAutosuggest(DOMElements.newPlaylistModalSongSearchInput, DOMElements.newPlaylistModalAutosuggestDropdown);
-            DOMElements.searchBtn.addEventListener('click', performSearchAndFilter);
+            
+            const startSearch = () => executeSearch('first');
+            DOMElements.searchBtn.addEventListener('click', startSearch);
             DOMElements.clearBtn.addEventListener('click', resetToEmptyState);
-            [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', performSearchAndFilter); });
+            [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', startSearch); });
             
             DOMElements.search.addEventListener('input', () => DOMElements.searchClearBtn.classList.toggle('hidden', !DOMElements.search.value));
             DOMElements.searchClearBtn.addEventListener('click', () => {
                 DOMElements.search.value = '';
                 DOMElements.searchClearBtn.classList.add('hidden');
-                performSearchAndFilter();
+                startSearch();
             });
 
             DOMElements.songCardsContainer.addEventListener('click', async (e) => {
@@ -1057,8 +1113,11 @@
             } else {
                 songsToExclude = songsForNewPlaylist.map(s => s.id);
             }
+            
+            const baseQuery = buildBaseQuery(); // Re-use the main query builder
+            const querySnapshot = await getDocs(baseQuery);
+            const filtered = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            const filtered = await getFilteredSongsFromFirestore(filters);
             container.innerHTML = '';
             
             const displaySongs = filtered.filter(song => !songsToExclude.includes(song.id));
