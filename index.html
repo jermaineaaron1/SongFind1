@@ -213,7 +213,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbz-jR-yw7tKUEvi06HGQvqqrgZTtXZfisjr6vf83BTnrmHTSg0BG-2BUSWQZaHZ2HbD/exec";
         const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbxkvzBbKmFdqjEa1L-fMXzx2Ygh3yw1kgjEQofZ6CYmkfk3DbtkpfSoDof5AGhPgZYl/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
@@ -501,6 +501,28 @@
             });
         }
 
+        function getFiltersFromUI(prefix = '') {
+            const getElVal = (el) => (el ? el.value : '');
+
+            if (prefix === 'newPlaylistModal') {
+                 return { 
+                     term: getElVal(DOMElements.newPlaylistModalSongSearchInput).toLowerCase().trim(), 
+                     theme: getElVal(DOMElements.newPlaylistModalThemeFilter), 
+                     key: getElVal(DOMElements.newPlaylistModalKeyFilter), 
+                     style: getElVal(DOMElements.newPlaylistModalStyleFilter), 
+                 };
+            } else {
+                 return { 
+                     term: getElVal(DOMElements.search).toLowerCase().trim(), 
+                     theme: getElVal(DOMElements.theme), 
+                     key: getElVal(DOMElements.key), 
+                     style: getElVal(DOMElements.style), 
+                     tempo: getElVal(DOMElements.tempoFilter), 
+                     season: getElVal(DOMElements.liturgicalSeasonFilter), 
+                 };
+            }
+        }
+
         function renderSongCards(songs) {
             const { songCardsContainer, emptyState, songResults, resultCount, totalCount, showingCount } = DOMElements;
             songCardsContainer.innerHTML = '';
@@ -736,56 +758,61 @@
             showAppView('worshipSetlistPageView');
         }
 
-        function renderRosterGrid(rosterData) {
+        function renderRosterGrid(allRosters) {
             const container = DOMElements.rosterGridContainer;
-            if (!container || !rosterData) {
-                container.innerHTML = '<p class="text-center p-4 text-red-500">Could not render roster data.</p>';
+            if (!container || !allRosters || allRosters.length === 0) {
+                container.innerHTML = '<p class="text-center p-4 text-gray-500">No roster data available.</p>';
                 return;
             }
+            
+            let finalHtml = '';
 
-            // Get all unique role names in order
-            const allRoles = new Set();
-            rosterData.sundays.forEach(sunday => {
-                sunday.roles.forEach(role => allRoles.add(role.name));
-            });
-            const rolesInOrder = Array.from(allRoles);
-
-            let tableHTML = `
-                <div class="text-center mb-6">
-                    <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
-                    <p class="text-lg text-green-700 font-semibold">${rosterData.season}</p>
-                </div>
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-400 p-2 text-left w-1/5"></th>
-            `;
-
-            rosterData.sundays.forEach(sunday => {
-                tableHTML += `<th class="border border-gray-400 p-2 text-center">
-                                <div class="font-semibold">${sunday.title}</div>
-                                <div class="font-bold text-lg">${sunday.date}</div>
-                              </th>`;
-            });
-
-            tableHTML += `</tr></thead><tbody>`;
-
-            rolesInOrder.forEach(roleName => {
-                tableHTML += `<tr class="border-t border-gray-300">
-                                <td class="border border-gray-400 p-2 font-bold text-right">${roleName}</td>`;
-                
+            allRosters.forEach(rosterData => {
+                const allRoles = new Set();
                 rosterData.sundays.forEach(sunday => {
-                    const role = sunday.roles.find(r => r.name === roleName);
-                    const people = role ? role.people.join('<br>') : '';
-                    const cellClass = !people ? 'bg-gray-600' : '';
-                    tableHTML += `<td class="border border-gray-400 p-2 text-center align-top ${cellClass}">${people}</td>`;
+                    sunday.roles.forEach(role => allRoles.add(role.name));
                 });
-                
-                tableHTML += `</tr>`;
+                const rolesInOrder = Array.from(allRoles);
+
+                let tableHTML = `
+                    <div class="text-center mb-6 mt-8">
+                        <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
+                        <p class="text-lg text-green-700 font-semibold">${rosterData.season}</p>
+                    </div>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-400 p-2 text-left w-1/5"></th>
+                `;
+
+                rosterData.sundays.forEach(sunday => {
+                    tableHTML += `<th class="border border-gray-400 p-2 text-center">
+                                    <div class="font-semibold">${sunday.title}</div>
+                                    <div class="font-bold text-lg">${sunday.date}</div>
+                                  </th>`;
+                });
+
+                tableHTML += `</tr></thead><tbody>`;
+
+                rolesInOrder.forEach(roleName => {
+                    tableHTML += `<tr class="border-t border-gray-300">
+                                    <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>`;
+                    
+                    rosterData.sundays.forEach(sunday => {
+                        const role = sunday.roles.find(r => r.name === roleName);
+                        const people = role ? role.people.join('<br>') : '';
+                        const cellClass = !people ? 'bg-gray-200' : '';
+                        tableHTML += `<td class="border border-gray-400 p-2 text-center align-top ${cellClass}">${people}</td>`;
+                    });
+                    
+                    tableHTML += `</tr>`;
+                });
+
+                tableHTML += `</tbody></table>`;
+                finalHtml += tableHTML;
             });
 
-            tableHTML += `</tbody></table>`;
-            container.innerHTML = tableHTML;
+            container.innerHTML = finalHtml;
         }
 
         function openPreviewModal(url, title) {
