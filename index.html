@@ -6,7 +6,6 @@
     <title>Worship Song Selection | Luther House Chapel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Include the Fuse.js library for fuzzy searching -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
@@ -113,14 +112,14 @@
             <div id="mainPageContainer" class="flex-1 lg:ml-64 transition-all duration-300 ease-in-out"> 
                 <header id="mainHeader" class="bg-white shadow-sm sticky top-0 z-20">
                     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                         <div class="flex items-center">
-                             <button id="mobileMenuButton" class="lg:hidden text-gray-600 mr-4"><i class="fas fa-bars text-2xl"></i></button>
-                             <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-xl"></i></div>
-                             <div class="ml-3"><h1 class="text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-sm text-gray-500">Worship Song Selection Tool</p></div>
-                         </div>
-                         <div>
-                             <button id="worshipRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-calendar-alt mr-2"></i> Worship Roster</button>
-                         </div>
+                          <div class="flex items-center">
+                              <button id="mobileMenuButton" class="lg:hidden text-gray-600 mr-4"><i class="fas fa-bars text-2xl"></i></button>
+                              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-xl"></i></div>
+                              <div class="ml-3"><h1 class="text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-sm text-gray-500">Worship Song Selection Tool</p></div>
+                          </div>
+                          <div>
+                              <button id="worshipRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-calendar-alt mr-2"></i> Worship Roster</button>
+                          </div>
                     </div>
                 </header>
                 <div id="songFinderView">
@@ -146,21 +145,20 @@
                     </main>
                 </div>
                 <div id="worshipRosterView" class="hidden container mx-auto px-6 py-8">
-                     <div class="flex justify-between items-center mb-6">
-                         <h2 class="text-3xl font-semibold text-[#3a3a3a]">Worship Roster</h2>
-                         <button id="backToFinderFromRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button>
-                     </div>
-                     <div id="rosterGridContainer" class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
-                        <!-- The roster grid will be dynamically generated here -->
-                        <p class="text-center text-gray-500 py-8">Loading Roster...</p>
-                     </div>
+                       <div class="flex justify-between items-center mb-6">
+                           <h2 class="text-3xl font-semibold text-[#3a3a3a]">Worship Roster</h2>
+                           <button id="backToFinderFromRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button>
+                       </div>
+                       <div id="rosterGridContainer" class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
+                           <p class="text-center text-gray-500 py-8">Loading Roster...</p>
+                       </div>
                 </div>
                 <div id="songDetailPageView" class="hidden container mx-auto px-6 py-8">
                     <button id="backToSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md mb-6 flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back</button>
                     <div class="bg-white rounded-lg shadow-md p-8"><div id="songDetailHeaderLHC" class="mb-4 border-b pb-4"></div><div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm"></div><div id="songDetailDocsLHC" class="mb-6"></div><div class="grid md:grid-cols-2 gap-8"><div><h3 class="text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3><div id="songDetailLyricsLHC" class="song-detail-lyrics p-2 bg-gray-50 rounded"></div></div><div id="youtubeContainer"></div></div></div>
                 </div>
                 <div id="worshipSetlistPageView" class="hidden container mx-auto px-6 py-8">
-                     <div class="flex justify-between items-center mb-6"><button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button><button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i> Add More Songs</button></div>
+                       <div class="flex justify-between items-center mb-6"><button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button><button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i> Add More Songs</button></div>
                     <div class="bg-white rounded-lg shadow-md p-6"><h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2><div id="setlistSongsContainer" class="custom-scrollbar"></div><div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-4"></div></div>
                 </div>
             </div> 
@@ -182,7 +180,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="previewModalTitle" class="modal-title">Document Preview</h3>
-                <button id="previewModalCloseBtn" class="modal-close-button">&times;</button>
+                <button id="previewModalCloseBtn" class="modal-close-button">×</button>
             </div>
             <div class="modal-body">
                 <iframe id="previewModalIframe" src="about:blank" title="Document Preview"></iframe>
@@ -273,7 +271,7 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await Promise.all([fetchSongDataWithJSONP(), fetchRosterData()]);
+                await Promise.all([fetchSongDataWithJSONP(), fetchRosterDataWithJSONP()]);
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
                 if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library. Please check the Google Sheet link and deployment.</p>`;
@@ -336,21 +334,43 @@
             resetToEmptyState();
         }
 
-        async function fetchRosterData() {
-            if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_NEW_ROSTER_URL") {
-                console.warn("Roster URL is a placeholder. Roster feature will be disabled.");
-                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-gray-500">Roster feature not configured.</p>';
-                return;
-            };
-            try {
-                const response = await fetch(ROSTER_JSON_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                allRosterData = await response.json();
-                renderRosterGrid(allRosterData);
-            } catch (error) {
-                console.error("Could not fetch roster data:", error);
-                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-red-500">Could not load roster data. Please check the ROSTER_JSON_URL and your Apps Script deployment.</p>';
-            }
+        function fetchRosterDataWithJSONP() {
+            return new Promise((resolve, reject) => {
+                if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_NEW_ROSTER_URL" || !ROSTER_JSON_URL) {
+                    console.warn("Roster URL is a placeholder or not provided. Roster feature will be disabled.");
+                    if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-gray-500">Roster feature not configured.</p>';
+                    resolve(); // Resolve so the app doesn't hang
+                    return;
+                }
+
+                const callbackName = 'handleRosterData';
+
+                window[callbackName] = (data) => {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    if (data.error) {
+                        if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = `<p class="text-center p-4 text-red-500">Could not load roster data: ${data.details || data.error}</p>`;
+                        reject(new Error(data.details || data.error));
+                        return;
+                    }
+                    allRosterData = data;
+                    renderRosterGrid(allRosterData);
+                    resolve();
+                };
+
+                const script = document.createElement('script');
+                script.src = `${ROSTER_JSON_URL}?callback=${callbackName}`; // Add the callback parameter
+                script.onerror = () => {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    const errorMessage = 'Could not load roster data. Please check the ROSTER_JSON_URL and your Apps Script deployment.';
+                    console.error(errorMessage);
+                    if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = `<p class="text-center p-4 text-red-500">${errorMessage}</p>`;
+                    reject(new Error(errorMessage));
+                };
+
+                document.body.appendChild(script);
+            });
         }
 
         function populateAllDropdowns() {
@@ -787,16 +807,16 @@
 
                 rosterData.sundays.forEach(sunday => {
                     tableHTML += `<th class="border border-gray-400 p-2 text-center">
-                                    <div class="font-semibold">${sunday.title}</div>
-                                    <div class="font-bold text-lg">${sunday.date}</div>
-                                  </th>`;
+                                        <div class="font-semibold">${sunday.title}</div>
+                                        <div class="font-bold text-lg">${sunday.date}</div>
+                                      </th>`;
                 });
 
                 tableHTML += `</tr></thead><tbody>`;
 
                 rolesInOrder.forEach(roleName => {
                     tableHTML += `<tr class="border-t border-gray-300">
-                                    <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>`;
+                                        <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>`;
                     
                     rosterData.sundays.forEach(sunday => {
                         const role = sunday.roles.find(r => r.name === roleName);
