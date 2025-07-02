@@ -100,7 +100,7 @@
     </div>
     <div class="min-h-screen relative">
         <div class="flex">
-            <aside id="playlistSidebar" class="playlist-sidebar w-72 lg:w-64 fixed lg:sticky lg:top-0 h-screen text-white z-30 custom-scrollbar overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <aside id="playlistSidebar" class="playlist-sidebar w-72 lg:w-80 fixed lg:sticky lg:top-0 h-screen text-white z-30 custom-scrollbar overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
                 <div class="p-4 flex flex-col h-full">
                     <button id="closeMobileMenuButton" class="lg:hidden absolute top-3 right-3 p-2 text-white hover:text-blue-200"><i class="fas fa-times text-2xl"></i></button>
                     <div class="mt-8 lg:mt-0 mb-6 text-center"><button id="createSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md w-full flex items-center justify-center"><i class="fas fa-plus-circle mr-2"></i> Create Song List</button></div>
@@ -109,57 +109,67 @@
                     <div id="authStatus" class="flex-shrink-0 mt-4 p-2 bg-black/20 rounded text-center text-xs">Connecting...</div>
                 </div>
             </aside>
-            <div id="mainPageContainer" class="flex-1 lg:ml-64 transition-all duration-300 ease-in-out"> 
+            <div id="mainPageContainer" class="flex-1 lg:ml-80 transition-all duration-300 ease-in-out"> 
                 <header id="mainHeader" class="bg-white shadow-sm sticky top-0 z-20">
-                    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
                           <div class="flex items-center">
                               <button id="mobileMenuButton" class="lg:hidden text-gray-600 mr-4"><i class="fas fa-bars text-2xl"></i></button>
-                              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-xl"></i></div>
-                              <div class="ml-3"><h1 class="text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-sm text-gray-500">Worship Song Selection Tool</p></div>
+                              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg flex-shrink-0"><i class="fas fa-church text-xl"></i></div>
+                              <div class="ml-3"><h1 class="text-xl sm:text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-xs sm:text-sm text-gray-500">Worship Song Selection Tool</p></div>
                           </div>
-                          <div>
-                              <button id="worshipRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-calendar-alt mr-2"></i> Worship Roster</button>
+                          <div class="ml-2">
+                              <button id="worshipRosterBtn" class="btn-secondary text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base"><i class="fas fa-calendar-alt mr-2"></i><span class="hidden sm:inline">Worship </span>Roster</button>
                           </div>
                     </div>
                 </header>
                 <div id="songFinderView">
-                    <main class="container mx-auto px-6 py-8">
-                        <div class="bg-white rounded-lg shadow-md p-6 mb-8" id="searchFilterSection">
+                    <main class="container mx-auto px-4 sm:px-6 py-8">
+                        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8" id="searchFilterSection">
                             <h2 class="text-xl font-semibold mb-6 text-[#3a3a3a] flex items-center"><i class="fas fa-search mr-2 text-[#4a6da7]"></i> Find Worship Songs</h2>
-                            <div class="mb-6"><div class="flex items-center"><div class="relative flex-grow"><input type="text" id="search" placeholder="Keywords, scripture, title" class="w-full p-3 rounded-l-md bg-gray-50 pr-8"><button id="searchClearBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"><i class="fas fa-times-circle"></i></button><div id="autosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div></div><button id="searchBtn" class="btn-primary text-white px-6 py-3 rounded-none flex items-center"><i class="fas fa-search mr-2"></i> Search</button><button id="clearBtn" class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-6 py-3 rounded-r-md flex items-center ml-2"><i class="fas fa-times mr-2"></i> Clear</button></div></div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> 
+                            <div class="mb-6">
+                                <div class="flex flex-col sm:flex-row items-stretch">
+                                    <div class="relative flex-grow">
+                                        <input type="text" id="search" placeholder="Keywords, scripture, title" class="w-full p-3 rounded-t-md sm:rounded-l-md sm:rounded-t-none bg-gray-50 pr-8">
+                                        <button id="searchClearBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"><i class="fas fa-times-circle"></i></button>
+                                        <div id="autosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div>
+                                    </div>
+                                    <button id="searchBtn" class="btn-primary text-white px-6 py-3 sm:rounded-none flex items-center justify-center"><i class="fas fa-search mr-2"></i> Search</button>
+                                    <button id="clearBtn" class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-6 py-3 rounded-b-md sm:rounded-r-md sm:rounded-b-none flex items-center justify-center sm:ml-2 mt-2 sm:mt-0"><i class="fas fa-times mr-2"></i> Clear</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> 
                                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Song Theme</label><select id="theme" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Theme</option></select></div>
                                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Musical Key</label><select id="key" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Key</option></select></div>
                                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Song Style</label><select id="style" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Style</option></select></div>
                                 <div><label for="tempoFilter" class="block text-sm font-medium text-gray-700 mb-1">Tempo</label><select id="tempoFilter" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Tempo</option></select></div>
-                                <div class="md:col-span-2"><label for="liturgicalSeasonFilter" class="block text-sm font-medium text-gray-700 mb-1">Liturgical Seasons</label><select id="liturgicalSeasonFilter" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Season</option></select></div>
+                                <div class="md:col-span-2 lg:col-span-1"><label for="liturgicalSeasonFilter" class="block text-sm font-medium text-gray-700 mb-1">Liturgical Seasons</label><select id="liturgicalSeasonFilter" class="w-full p-2 rounded-md bg-gray-50"><option value="">No Season</option></select></div>
                             </div>
                         </div>
-                        <div id="songResults" class="bg-white rounded-lg shadow-md p-6 hidden">
-                            <div class="flex flex-wrap justify-between items-center mb-6 gap-4"><h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center"><i class="fas fa-music mr-2 text-[#4a6da7]"></i> Song Results <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500"></span></h2><div class="flex items-center"><label class="text-sm text-gray-600 mr-2">Sort by:</label><select id="sortBy" class="p-1 text-sm rounded border-gray-200"><option value="relevance">Relevance</option><option value="title">Title (A-Z)</option></select></div></div>
+                        <div id="songResults" class="bg-white rounded-lg shadow-md p-4 sm:p-6 hidden">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center"><i class="fas fa-music mr-2 text-[#4a6da7]"></i> Song Results <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500"></span></h2><div class="flex items-center"><label class="text-sm text-gray-600 mr-2">Sort by:</label><select id="sortBy" class="p-1 text-sm rounded border-gray-200"><option value="relevance">Relevance</option><option value="title">Title (A-Z)</option></select></div></div>
                             <div id="activeFilters" class="mb-4 flex flex-wrap gap-2"></div>
                             <div id="songCardsContainer" class="min-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-                            <div class="mt-6 flex justify-between items-center"><div><span class="text-sm text-gray-600">Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs</span></div><div id="pagination" class="flex items-center"></div></div>
+                            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4"><div><span class="text-sm text-gray-600">Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs</span></div><div id="pagination" class="flex items-center flex-wrap"></div></div>
                         </div>
                         <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center"><i class="fas fa-music text-5xl text-[#6b9ac4] opacity-70 mb-4"></i><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above to begin.</p></div>
                     </main>
                 </div>
-                <div id="worshipRosterView" class="hidden container mx-auto px-6 py-8">
-                       <div class="flex justify-between items-center mb-6">
-                           <h2 class="text-3xl font-semibold text-[#3a3a3a]">Worship Roster</h2>
-                           <button id="backToFinderFromRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button>
+                <div id="worshipRosterView" class="hidden container mx-auto px-0 sm:px-6 py-8">
+                       <div class="flex justify-between items-center mb-6 px-4 sm:px-0">
+                           <h2 class="text-2xl sm:text-3xl font-semibold text-[#3a3a3a]">Worship Roster</h2>
+                           <button id="backToFinderFromRosterBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back</span></button>
                        </div>
-                       <div id="rosterGridContainer" class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
+                       <div id="rosterGridContainer" class="bg-white rounded-lg shadow-md sm:p-6">
                            <p class="text-center text-gray-500 py-8">Loading Roster...</p>
                        </div>
                 </div>
-                <div id="songDetailPageView" class="hidden container mx-auto px-6 py-8">
+                <div id="songDetailPageView" class="hidden container mx-auto px-4 sm:px-6 py-8">
                     <button id="backToSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md mb-6 flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back</button>
-                    <div class="bg-white rounded-lg shadow-md p-8"><div id="songDetailHeaderLHC" class="mb-4 border-b pb-4"></div><div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm"></div><div id="songDetailDocsLHC" class="mb-6"></div><div class="grid md:grid-cols-2 gap-8"><div><h3 class="text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3><div id="songDetailLyricsLHC" class="song-detail-lyrics p-2 bg-gray-50 rounded"></div></div><div id="youtubeContainer"></div></div></div>
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-8"><div id="songDetailHeaderLHC" class="mb-4 border-b pb-4"></div><div id="songDetailMetaLHC" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm"></div><div id="songDetailDocsLHC" class="mb-6"></div><div class="grid md:grid-cols-2 gap-8"><div><h3 class="text-xl font-semibold text-[#3a3a3a] mb-3">Lyrics</h3><div id="songDetailLyricsLHC" class="song-detail-lyrics p-2 bg-gray-50 rounded"></div></div><div id="youtubeContainer"></div></div></div>
                 </div>
-                <div id="worshipSetlistPageView" class="hidden container mx-auto px-6 py-8">
-                       <div class="flex justify-between items-center mb-6"><button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i> Back to Song Finder</button><button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i> Add More Songs</button></div>
-                    <div class="bg-white rounded-lg shadow-md p-6"><h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2><div id="setlistSongsContainer" class="custom-scrollbar"></div><div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-4"></div></div>
+                <div id="worshipSetlistPageView" class="hidden container mx-auto px-4 sm:px-6 py-8">
+                       <div class="flex justify-between items-center mb-6"><button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back to Finder</span></button><button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i><span class="hidden sm:inline">Add Songs</span></button></div>
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6"><h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2><div id="setlistSongsContainer" class="custom-scrollbar"></div><div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-2 sm:space-x-4"></div></div>
                 </div>
             </div> 
         </div> 
@@ -339,7 +349,7 @@
                 if (ROSTER_JSON_URL === "REPLACE_WITH_YOUR_NEW_ROSTER_URL" || !ROSTER_JSON_URL) {
                     console.warn("Roster URL is a placeholder or not provided. Roster feature will be disabled.");
                     if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = '<p class="text-center p-4 text-gray-500">Roster feature not configured.</p>';
-                    resolve(); // Resolve so the app doesn't hang
+                    resolve();
                     return;
                 }
 
@@ -359,7 +369,7 @@
                 };
 
                 const script = document.createElement('script');
-                script.src = `${ROSTER_JSON_URL}?callback=${callbackName}`; // Add the callback parameter
+                script.src = `${ROSTER_JSON_URL}?callback=${callbackName}`;
                 script.onerror = () => {
                     document.body.removeChild(script);
                     delete window[callbackName];
@@ -785,54 +795,76 @@
                 return;
             }
             
-            let finalHtml = '';
+            let desktopTableHTML = '';
+            let mobileCardsHTML = '';
 
             allRosters.forEach(rosterData => {
                 const allRoles = new Set();
-                rosterData.sundays.forEach(sunday => {
-                    sunday.roles.forEach(role => allRoles.add(role.name));
-                });
+                rosterData.sundays.forEach(sunday => sunday.roles.forEach(role => allRoles.add(role.name)));
                 const rolesInOrder = Array.from(allRoles);
 
-                let tableHTML = `
+                // --- Build Desktop Table ---
+                desktopTableHTML += `
                     <div class="text-center mb-6 mt-8">
                         <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
                         <p class="text-lg text-green-700 font-semibold">${rosterData.season}</p>
                     </div>
                     <table class="w-full border-collapse">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border border-gray-400 p-2 text-left w-1/5"></th>
-                `;
+                        <thead><tr class="bg-gray-200">
+                            <th class="border border-gray-400 p-2 text-left w-1/5"></th>
+                            ${rosterData.sundays.map(sunday => `
+                                <th class="border border-gray-400 p-2 text-center">
+                                    <div class="font-semibold">${sunday.title}</div>
+                                    <div class="font-bold text-lg">${sunday.date}</div>
+                                </th>
+                            `).join('')}
+                        </tr></thead>
+                        <tbody>
+                            ${rolesInOrder.map(roleName => `
+                                <tr class="border-t border-gray-300">
+                                    <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>
+                                    ${rosterData.sundays.map(sunday => {
+                                        const role = sunday.roles.find(r => r.name === roleName);
+                                        const people = role ? role.people.join('<br>') : '';
+                                        return `<td class="border border-gray-400 p-2 text-center align-top ${!people ? 'bg-gray-100' : ''}">${people}</td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
 
-                rosterData.sundays.forEach(sunday => {
-                    tableHTML += `<th class="border border-gray-400 p-2 text-center">
-                                        <div class="font-semibold">${sunday.title}</div>
-                                        <div class="font-bold text-lg">${sunday.date}</div>
-                                      </th>`;
-                });
-
-                tableHTML += `</tr></thead><tbody>`;
-
-                rolesInOrder.forEach(roleName => {
-                    tableHTML += `<tr class="border-t border-gray-300">
-                                        <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>`;
-                    
-                    rosterData.sundays.forEach(sunday => {
-                        const role = sunday.roles.find(r => r.name === roleName);
-                        const people = role ? role.people.join('<br>') : '';
-                        const cellClass = !people ? 'bg-gray-200' : '';
-                        tableHTML += `<td class="border border-gray-400 p-2 text-center align-top ${cellClass}">${people}</td>`;
-                    });
-                    
-                    tableHTML += `</tr>`;
-                });
-
-                tableHTML += `</tbody></table>`;
-                finalHtml += tableHTML;
+                // --- Build Mobile Cards ---
+                mobileCardsHTML += `
+                    <div class="text-center mb-6 mt-4">
+                        <h3 class="text-3xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
+                        <p class="text-md text-green-700 font-semibold">${rosterData.season}</p>
+                    </div>`;
+                
+                mobileCardsHTML += rosterData.sundays.map(sunday => `
+                    <div class="border rounded-lg shadow-md mb-6">
+                        <div class="bg-gray-200 p-3 rounded-t-lg">
+                            <p class="font-semibold text-center">${sunday.title}</p>
+                            <p class="font-bold text-lg text-center">${sunday.date}</p>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            ${sunday.roles.map(role => `
+                                <div>
+                                    <p class="font-bold text-gray-700">${role.name}</p>
+                                    ${role.people.length > 0 
+                                        ? `<div class="pl-4 text-gray-600">${role.people.join('<br>')}</div>` 
+                                        : '<p class="pl-4 text-gray-400 italic">--</p>'
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
             });
 
-            container.innerHTML = finalHtml;
+            container.innerHTML = `
+                <div class="hidden sm:block overflow-x-auto">${desktopTableHTML}</div>
+                <div class="block sm:hidden px-4 py-2">${mobileCardsHTML}</div>
+            `;
         }
 
         function openPreviewModal(url, title) {
