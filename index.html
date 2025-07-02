@@ -96,6 +96,35 @@
         #scrollToTopBtn {
             transition: opacity 0.3s, transform 0.3s;
         }
+        
+        .diag-split {
+            position: relative;
+            background: #e5e7eb; /* bg-gray-200 */
+        }
+        .diag-split-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top right, transparent calc(50% - 1px), #a0aec0, transparent calc(50% + 1px));
+        }
+        .diag-split-top {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .diag-split-bottom {
+            position: absolute;
+            bottom: 4px;
+            left: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
 
     </style>
 </head>
@@ -229,8 +258,8 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbyFdu9RWE_SRL4zRTojWwUqI90HDYirCkbBLDsNxqy4ExAa3kJvxDCqmXEZzpqFjuT0/exec";
-        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbyFdu9RWE_SRL4zRTojWwUqI90HDYirCkbBLDsNxqy4ExAa3kJvxDCqmXEZzpqFjuT0/exec";
+        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -779,11 +808,15 @@
                     </div>
                     <table class="w-full border-collapse">
                         <thead><tr class="bg-gray-200">
-                            <th class="border border-gray-400 p-2 text-left w-1/5"></th>
+                            <th class="border border-gray-400 p-2 text-left w-1/5 diag-split">
+                                <div class="diag-split-line"></div>
+                                <div class="diag-split-top">Liturgical Season</div>
+                                <div class="diag-split-bottom">Date</div>
+                            </th>
                             ${rosterData.sundays.map(sunday => `
                                 <th class="border border-gray-400 p-2 text-center">
-                                    <div class="font-semibold">${sunday.title}</div>
-                                    <div class="font-bold text-lg">${sunday.date}</div>
+                                    <div class="font-semibold text-sm">${sunday.title}</div>
+                                    <div class="font-bold text-lg mt-1">${sunday.date}</div>
                                 </th>
                             `).join('')}
                         </tr></thead>
