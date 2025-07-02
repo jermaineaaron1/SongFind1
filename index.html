@@ -223,8 +223,8 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbxS6EJ4xKYHPJHWVDGyj6SlYD8Sf0OQh4PmO4XxqDdzQeLo1i0SDglBljuB9_xVWfq3/exec";
-        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbxS6EJ4xKYHPJHWVDGyj6SlYD8Sf0OQh4PmO4XxqDdzQeLo1i0SDglBljuB9_xVWfq3/exec";
+        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -475,18 +475,30 @@
             }
             renderSongCards(filteredSongs);
             updateActiveFiltersDisplay(filters);
+            
+            // Auto-scroll to results if any are found
+            if (filteredSongs.length > 0) {
+                DOMElements.songResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function initAutosuggest(inputElement, dropdownElement) {
-            if (!inputElement || !dropdownElement || !fuse) return;
+            if (!inputElement || !dropdownElement) return;
+
             inputElement.addEventListener('input', () => {
-                const query = inputElement.value.trim();
+                const query = inputElement.value.trim().toLowerCase();
                 dropdownElement.innerHTML = ''; 
-                if (query.length < 2) {
+
+                if (query.length < 1) { // Changed to 1 character
                     dropdownElement.classList.remove('show');
                     return;
                 }
-                const suggestions = fuse.search(query, { limit: 7 }).map(result => result.item);
+                
+                // Changed to a "starts with" filter instead of Fuse.js fuzzy search
+                const suggestions = allSongsData
+                    .filter(song => song.title.toLowerCase().startsWith(query))
+                    .slice(0, 7);
+
                 if (suggestions.length > 0) {
                     suggestions.forEach(song => {
                         const item = document.createElement('div');
@@ -764,7 +776,6 @@
                 desktopTableHTML += `
                     <div class="text-center mb-6 mt-8">
                         <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
-                        <p class="text-lg text-green-700 font-semibold">${rosterData.season}</p>
                     </div>
                     <table class="w-full border-collapse">
                         <thead><tr class="bg-gray-200">
@@ -791,22 +802,21 @@
                     </table>`;
                 mobileCardsHTML += `
                     <div class="text-center mb-6 mt-4">
-                        <h3 class="text-3xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
-                        <p class="text-md text-green-700 font-semibold">${rosterData.season}</p>
+                        <h3 class="text-2xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
                     </div>`;
                 mobileCardsHTML += rosterData.sundays.map(sunday => `
                     <div class="border rounded-lg shadow-md mb-6">
                         <div class="bg-gray-200 p-3 rounded-t-lg">
-                            <p class="font-semibold text-center">${sunday.title}</p>
-                            <p class="font-bold text-lg text-center">${sunday.date}</p>
+                            <p class="font-semibold text-center text-sm">${sunday.title}</p>
+                            <p class="font-bold text-base text-center">${sunday.date}</p>
                         </div>
                         <div class="p-4 space-y-3">
                             ${sunday.roles.map(role => `
                                 <div>
-                                    <p class="font-bold text-gray-700">${role.name}</p>
+                                    <p class="font-bold text-sm text-gray-700">${role.name}</p>
                                     ${role.people.length > 0 
-                                        ? `<div class="pl-4 text-gray-600">${role.people.join('<br>')}</div>` 
-                                        : '<p class="pl-4 text-gray-400 italic">--</p>'
+                                        ? `<div class="pl-4 text-sm text-gray-600">${role.people.join('<br>')}</div>` 
+                                        : '<p class="pl-4 text-sm text-gray-400 italic">--</p>'
                                     }
                                 </div>
                             `).join('')}
@@ -1036,7 +1046,7 @@
             }
             let results = [];
             if (filters.term) {
-                results = fuse.search(filters.term).map(result => result.item);
+                results = allSongsData.filter(song => song.title.toLowerCase().startsWith(filters.term));
             } else {
                 results = [...allSongsData];
             }
