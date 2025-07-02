@@ -93,6 +93,16 @@
             bottom: 20px;
         }
 
+        #scrollToTopBtn {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(20px);
+        }
+        #scrollToTopBtn.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 <body>
@@ -118,7 +128,8 @@
                               <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg flex-shrink-0"><i class="fas fa-church text-xl"></i></div>
                               <div class="ml-3"><h1 class="text-xl sm:text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-xs sm:text-sm text-gray-500">Worship Song Selection Tool</p></div>
                           </div>
-                          <div class="ml-2">
+                          <div class="flex items-center space-x-2">
+                              <button id="homeBtn" class="btn-primary text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base"><i class="fas fa-home mr-2"></i><span class="hidden sm:inline">Home</span></button>
                               <button id="worshipRosterBtn" class="btn-secondary text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base"><i class="fas fa-calendar-alt mr-2"></i><span class="hidden sm:inline">Worship </span>Roster</button>
                           </div>
                     </div>
@@ -147,7 +158,7 @@
                             </div>
                         </div>
                         <div id="songResults" class="bg-white rounded-lg shadow-md p-4 sm:p-6 hidden">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center"><i class="fas fa-music mr-2 text-[#4a6da7]"></i> Song Results <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500"></span></h2><div class="flex items-center"><label class="text-sm text-gray-600 mr-2">Sort by:</label><select id="sortBy" class="p-1 text-sm rounded border-gray-200"><option value="relevance">Relevance</option><option value="title">Title (A-Z)</option></select></div></div>
+                            <div id="songResultsHeader" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h2 class="text-xl font-semibold text-[#3a3a3a] flex items-center"><i class="fas fa-music mr-2 text-[#4a6da7]"></i> Song Results <span id="resultCount" class="ml-2 text-sm font-normal text-gray-500"></span></h2><div class="flex items-center"><label class="text-sm text-gray-600 mr-2">Sort by:</label><select id="sortBy" class="p-1 text-sm rounded border-gray-200"><option value="relevance">Relevance</option><option value="title">Title (A-Z)</option></select></div></div>
                             <div id="activeFilters" class="mb-4 flex flex-wrap gap-2"></div>
                             <div id="songCardsContainer" class="min-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
                             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4"><div><span class="text-sm text-gray-600">Showing <span id="showingCount">0-0</span> of <span id="totalCount">0</span> songs</span></div><div id="pagination" class="flex items-center flex-wrap"></div></div>
@@ -214,6 +225,7 @@
         </div>
     </div>
     <div id="toast-notification">Link copied to clipboard!</div>
+    <button id="scrollToTopBtn" class="fixed bottom-5 right-5 bg-gray-600 text-white w-12 h-12 rounded-full hidden justify-center items-center shadow-lg z-50"><i class="fas fa-arrow-up text-lg"></i></button>
 
 
     <script type="module">
@@ -223,8 +235,8 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbw8JIcWoxM-KMypdeESEKI0ZskJ70L2GrfQHF0lUM58pslZ7E4UOzKbpPenjnfhc9CE/exec";
-        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbw8JIcWoxM-KMypdeESEKI0ZskJ70L2GrfQHF0lUM58pslZ7E4UOzKbpPenjnfhc9CE/exec";
+        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -235,7 +247,7 @@
         let fuse; // This will hold our fuzzy search instance
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "backToFinderFromRosterBtn", "rosterGridContainer" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "mainPageContainer", "songFinderView", "worshipRosterView", "songDetailPageView", "worshipSetlistPageView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "backToSongListBtn", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistItemsContainer", "createSongListBtn", "authStatus", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "addSongsToCurrentSetlistBtn", "createPlaylistModal", "newPlaylistName", "newPlaylistSubtitle", "openSearchForNewPlaylistModalBtn", "modalSelectedSongsContainer", "modalSelectedSongsCount", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "searchSongsForNewPlaylistModal", "searchSongsModalTitle", "searchSongsForNewPlaylistModalCloseBtn", "doneAddingToNewPlaylistBtn", "newPlaylistModalSongSearchInput", "newPlaylistModalAutosuggestDropdown", "newPlaylistModalThemeFilter", "newPlaylistModalKeyFilter", "newPlaylistModalStyleFilter", "newPlaylistModalApplyFiltersBtn", "newPlaylistModalClearFiltersBtn", "newPlaylistModalSongResultsContainer", "confirmationModal", "confirmationModalTitle", "confirmationModalMessage", "confirmActionBtn", "cancelActionBtn", "songDetailHeaderLHC", "songDetailMetaLHC", "songDetailDocsLHC", "songDetailLyricsLHC", "youtubeContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "playlistActionsContainer", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "toast-notification", "searchClearBtn", "modalSearchClearBtn", "worshipRosterBtn", "backToFinderFromRosterBtn", "rosterGridContainer", "homeBtn", "scrollToTopBtn", "songResultsHeader" ];
         
         // --- BOOTSTRAPPING ---
         document.addEventListener("DOMContentLoaded", main);
@@ -476,29 +488,23 @@
             renderSongCards(filteredSongs);
             updateActiveFiltersDisplay(filters);
             
-            // Auto-scroll to results if any are found
             if (filteredSongs.length > 0) {
-                DOMElements.songResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                DOMElements.songResultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
         function initAutosuggest(inputElement, dropdownElement) {
             if (!inputElement || !dropdownElement) return;
-
             inputElement.addEventListener('input', () => {
                 const query = inputElement.value.trim().toLowerCase();
                 dropdownElement.innerHTML = ''; 
-
-                if (query.length < 1) { // Changed to 1 character
+                if (query.length < 1) {
                     dropdownElement.classList.remove('show');
                     return;
                 }
-                
-                // Changed to a "starts with" filter instead of Fuse.js fuzzy search
                 const suggestions = allSongsData
                     .filter(song => song.title.toLowerCase().startsWith(query))
                     .slice(0, 7);
-
                 if (suggestions.length > 0) {
                     suggestions.forEach(song => {
                         const item = document.createElement('div');
@@ -912,6 +918,7 @@
             DOMElements.worshipRosterBtn.addEventListener('click', () => { 
                 showAppView('worshipRosterView'); 
             });
+            DOMElements.homeBtn.addEventListener('click', () => showAppView('songFinderView'));
             DOMElements.previewModalCloseBtn.addEventListener('click', () => DOMElements.previewModal.classList.remove('active'));
             DOMElements.previewModal.addEventListener('click', (e) => {
                 if(e.target === DOMElements.previewModal) {
@@ -1014,6 +1021,18 @@
                 if(currentChordIndex > 0) {
                     currentChordIndex--;
                     renderChordPlayerPage();
+                }
+            });
+            DOMElements.scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    DOMElements.scrollToTopBtn.classList.add('visible');
+                    DOMElements.scrollToTopBtn.classList.remove('hidden');
+                    DOMElements.scrollToTopBtn.style.display = 'flex';
+                } else {
+                    DOMElements.scrollToTopBtn.classList.remove('visible');
                 }
             });
             setupDragAndDrop();
