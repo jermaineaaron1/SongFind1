@@ -94,13 +94,7 @@
         }
 
         #scrollToTopBtn {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            transform: translateY(20px);
-        }
-        #scrollToTopBtn.visible {
-            opacity: 1;
-            transform: translateY(0);
+            transition: opacity 0.3s, transform 0.3s;
         }
 
     </style>
@@ -235,8 +229,8 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwl_gcgcVKcqGW6Aa4OIuOoHU6u4jb7RMUdFP4km9Y3ueAyy3b_2t_xIVleDqsCla69/exec";
-        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbwl_gcgcVKcqGW6Aa4OIuOoHU6u4jb7RMUdFP4km9Y3ueAyy3b_2t_xIVleDqsCla69/exec";
+        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const ROSTER_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [], songsForNewPlaylist = [], currentChordDocs = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -1028,11 +1022,9 @@
             });
             window.addEventListener('scroll', () => {
                 if (window.pageYOffset > 300) {
-                    DOMElements.scrollToTopBtn.classList.add('visible');
                     DOMElements.scrollToTopBtn.classList.remove('hidden');
-                    DOMElements.scrollToTopBtn.style.display = 'flex';
                 } else {
-                    DOMElements.scrollToTopBtn.classList.remove('visible');
+                    DOMElements.scrollToTopBtn.classList.add('hidden');
                 }
             });
             setupDragAndDrop();
