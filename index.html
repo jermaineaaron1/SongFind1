@@ -59,6 +59,11 @@
         details summary .arrow { transition: transform 0.2s; }
         details[open] summary .arrow { transform: rotate(90deg); }
 
+        .diag-split { position: relative; background: #e5e7eb; }
+        .diag-split-line { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top right, transparent calc(50% - 1px), #a0aec0, transparent calc(50% + 1px)); }
+        .diag-split-top { position: absolute; top: 4px; right: 8px; font-size: 0.75rem; font-weight: 600; color: #4a5568; }
+        .diag-split-bottom { position: absolute; bottom: 4px; left: 8px; font-size: 0.75rem; font-weight: 600; color: #4a5568; }
+
     </style>
 </head>
 <body>
@@ -73,7 +78,7 @@
                 
                 <nav class="flex-1 space-y-4">
                     <a href="#" class="nav-link playlist-item p-2 rounded-md flex items-center" data-page="songFinderView"><i class="fas fa-search w-6 text-center mr-2"></i> Song Finder</a>
-                    <a href="#" class="nav-link playlist-item p-2 rounded-md flex items-center" data-page="worshipOrderView"><i class="fas fa-calendar-alt w-6 text-center mr-2"></i> Worship Order</a>
+                    <a href="#" class="nav-link playlist-item p-2 rounded-md flex items-center" data-page="worshipRosterView"><i class="fas fa-calendar-alt w-6 text-center mr-2"></i> Worship Roster</a>
                     
                     <details class="group" open>
                         <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
@@ -124,27 +129,11 @@
                 </div>
             </header>
             <div id="main-content-container" class="flex-1 overflow-y-auto">
-                <!-- VIEW 1: Worship Order Page -->
-                <main id="worshipOrderView" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="max-w-7xl mx-auto">
-                        <header class="mb-8">
-                            <h2 class="text-4xl font-bold text-gray-500 tracking-widest text-center uppercase">July 2025</h2>
-                            <p class="text-center text-gray-500 mt-2">Worship Roster & Order of Service</p>
-                        </header>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-blue-500 flex flex-col">
-                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 6 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><i class="fas fa-music"></i></a></div>
-                                <div class="mt-4 flex-grow"><p class="text-sm text-gray-500">Worship Leader: <span class="font-semibold text-gray-800">Edwin</span></p><p class="text-sm text-gray-500">Theme: <span class="font-semibold text-gray-800">Grace Abounds</span></p></div>
-                                <button class="mt-4 text-sm text-blue-500 hover:underline w-full text-right">View Roster</button>
-                            </div>
-                            <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-purple-500 flex flex-col">
-                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 13 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><i class="fas fa-music"></i></a></div>
-                                <div class="mt-4 flex-grow"><p class="text-sm text-gray-500">Worship Leader: <span class="font-semibold text-gray-800">Dorine</span></p><p class="text-sm text-gray-500">Theme: <span class="font-semibold text-gray-800">He is Risen</span></p></div>
-                                <button class="mt-4 text-sm text-purple-500 hover:underline w-full text-right">View Roster</button>
-                            </div>
-                            <div class="bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center min-h-[150px]"><p class="text-gray-500">Sunday, 20 July</p></div>
-                            <div class="bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center min-h-[150px]"><p class="text-gray-500">Sunday, 27 July</p></div>
-                        </div>
+                <!-- VIEW 1: Worship Roster Page -->
+                <main id="worshipRosterView" class="page-view container mx-auto px-0 sm:px-6 py-8">
+                    <div id="rosterGridContainer" class="sm:p-6">
+                        <!-- The roster will be dynamically generated here -->
+                        <p class="text-center text-gray-500 py-8">Loading Roster...</p>
                     </div>
                 </main>
                 <!-- VIEW 2: Song Finder Page -->
@@ -253,9 +242,9 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SONGS_JSON_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
         
-        let allSongsData = [], sitePlaylists = [];
+        let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
         let isAppInitialized = false;
         let currentPage = 1, songsPerPage = 20;
@@ -263,7 +252,7 @@
         let currentSongForPlaylist = null;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipOrderView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults", "rosterGridContainer" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -307,10 +296,9 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await fetchSongDataWithJSONP();
+                await Promise.all([fetchSongData(), fetchRosterData()]);
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
-                if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library. Please check the Google Sheet link and deployment.</p>`;
             }
             setupEventListeners();
             if(DOMElements.loadingIndicator) {
@@ -319,9 +307,9 @@
             }
         }
 
-        function fetchSongDataWithJSONP() {
-            return new Promise((resolve, reject) => {
-                const callbackName = 'handleSongData';
+        function fetchDataWithJSONP(action) {
+             return new Promise((resolve, reject) => {
+                const callbackName = `handle${action.charAt(0).toUpperCase() + action.slice(1)}Data`;
                 window[callbackName] = (data) => {
                     document.body.removeChild(script);
                     delete window[callbackName];
@@ -329,18 +317,38 @@
                         reject(new Error(data.details || data.error));
                         return;
                     }
-                    processSongData(data);
-                    resolve();
+                    resolve(data);
                 };
                 const script = document.createElement('script');
-                script.src = `${SONGS_JSON_URL}?callback=${callbackName}`;
+                script.src = `${SCRIPT_URL}?action=${action}&callback=${callbackName}`;
                 script.onerror = () => {
                     document.body.removeChild(script);
                     delete window[callbackName];
-                    reject(new Error('Failed to load song data script. Check the Apps Script URL and deployment.'));
+                    reject(new Error(`Failed to load ${action} data script.`));
                 };
                 document.body.appendChild(script);
             });
+        }
+
+        async function fetchSongData() {
+            try {
+                const data = await fetchDataWithJSONP('songs');
+                processSongData(data);
+            } catch (error) {
+                console.error("Error fetching song data:", error);
+                if (DOMElements.emptyState) DOMElements.emptyState.innerHTML = `<h3 class="text-xl font-semibold mb-2 text-red-500">Error Loading Songs</h3><p class="text-gray-600">Could not load song library. Please check the Google Sheet link and deployment.</p>`;
+            }
+        }
+
+        async function fetchRosterData() {
+             try {
+                const data = await fetchDataWithJSONP('roster');
+                allRosterData = data;
+                renderRosterGrid(allRosterData);
+            } catch (error) {
+                console.error("Error fetching roster data:", error);
+                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = `<p class="text-center p-4 text-red-500">Could not load roster data: ${error.message}</p>`;
+            }
         }
 
         function processSongData(rawData) {
@@ -796,6 +804,80 @@
                 }
             });
         }
+        
+        function renderRosterGrid(allRosters) {
+            const container = DOMElements.rosterGridContainer;
+            if (!container || !allRosters || allRosters.length === 0) {
+                if(container) container.innerHTML = '<p class="text-center p-4 text-gray-500">No roster data available.</p>';
+                return;
+            }
+            let desktopTableHTML = '';
+            let mobileCardsHTML = '';
+            allRosters.forEach(rosterData => {
+                const allRoles = new Set();
+                rosterData.sundays.forEach(sunday => sunday.roles.forEach(role => allRoles.add(role.name)));
+                const rolesInOrder = Array.from(allRoles);
+                desktopTableHTML += `
+                    <div class="text-center mb-6 mt-8">
+                        <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
+                    </div>
+                    <table class="w-full border-collapse">
+                        <thead><tr class="bg-gray-200">
+                            <th class="border border-gray-400 p-2 text-left w-1/5 diag-split">
+                                <div class="diag-split-line"></div>
+                                <div class="diag-split-top">Liturgical Season</div>
+                                <div class="diag-split-bottom">Date</div>
+                            </th>
+                            ${rosterData.sundays.map(sunday => `
+                                <th class="border border-gray-400 p-2 text-center">
+                                    <div class="font-semibold text-sm">${sunday.title}</div>
+                                    <div class="font-bold text-lg mt-1">${sunday.date}</div>
+                                </th>
+                            `).join('')}
+                        </tr></thead>
+                        <tbody>
+                            ${rolesInOrder.map(roleName => `
+                                <tr class="border-t border-gray-300">
+                                    <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>
+                                    ${rosterData.sundays.map(sunday => {
+                                        const role = sunday.roles.find(r => r.name === roleName);
+                                        const people = role ? role.people.join('<br>') : '';
+                                        return `<td class="border border-gray-400 p-2 text-center align-top ${!people ? 'bg-gray-100' : ''}">${people}</td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
+                mobileCardsHTML += `
+                    <div class="text-center mb-6 mt-4">
+                        <h3 class="text-2xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
+                    </div>`;
+                mobileCardsHTML += rosterData.sundays.map(sunday => `
+                    <div class="border rounded-lg shadow-md mb-6">
+                        <div class="bg-gray-200 p-3 rounded-t-lg">
+                            <p class="font-semibold text-center text-sm">${sunday.title}</p>
+                            <p class="font-bold text-base text-center">${sunday.date}</p>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            ${sunday.roles.map(role => `
+                                <div>
+                                    <p class="font-bold text-sm text-gray-700">${role.name}</p>
+                                    ${role.people.length > 0 
+                                        ? `<div class="pl-4 text-sm text-gray-600">${role.people.join('<br>')}</div>` 
+                                        : '<p class="pl-4 text-sm text-gray-400 italic">--</p>'
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            });
+            container.innerHTML = `
+                <div class="hidden sm:block overflow-x-auto">${desktopTableHTML}</div>
+                <div class="block sm:hidden px-4 py-2">${mobileCardsHTML}</div>
+            `;
+        }
+
     </script>
 </body>
 </html>
