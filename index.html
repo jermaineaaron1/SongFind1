@@ -296,7 +296,8 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                await Promise.all([fetchSongData(), fetchRosterData()]);
+                // Using a local sample for roster, but still fetching songs
+                await Promise.all([fetchSongData(), useSampleRosterData()]);
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
             }
@@ -340,15 +341,77 @@
             }
         }
 
-        async function fetchRosterData() {
-             try {
-                const data = await fetchDataWithJSONP('roster');
-                allRosterData = data;
-                renderRosterGrid(allRosterData);
-            } catch (error) {
-                console.error("Error fetching roster data:", error);
-                if (DOMElements.rosterGridContainer) DOMElements.rosterGridContainer.innerHTML = `<p class="text-center p-4 text-red-500">Could not load roster data: ${error.message}</p>`;
-            }
+        function useSampleRosterData() {
+            const sampleRoster = [
+                {
+                    month: "JULY 2025",
+                    sundays: [
+                        {
+                            title: "First Sunday", date: "6",
+                            roles: [
+                                { name: "Worship Leader", people: ["Edwin"] },
+                                { name: "Vocalist 1", people: ["Lani"] },
+                                { name: "Vocalist 2", people: ["Eva"] },
+                                { name: "Keyboardist", people: ["Peter"] },
+                                { name: "Acoustic Guitar", people: ["Aaron"] },
+                                { name: "Electric Guitar", people: ["-"] },
+                                { name: "Bassist", people: ["Margaret"] },
+                                { name: "Drummer", people: ["Esther"] },
+                                { name: "Sound", people: ["Tech Team"] },
+                                { name: "Media", people: ["Tech Team"] }
+                            ]
+                        },
+                        {
+                            title: "Second Sunday", date: "13",
+                            roles: [
+                                { name: "Worship Leader", people: ["Dorine"] },
+                                { name: "Vocalist 1", people: ["Aaron"] },
+                                { name: "Vocalist 2", people: ["Margaret"] },
+                                { name: "Keyboardist", people: ["Esther"] },
+                                { name: "Acoustic Guitar", people: ["Edwin"] },
+                                { name: "Electric Guitar", people: ["-"] },
+                                { name: "Bassist", people: ["Peter"] },
+                                { name: "Drummer", people: ["Lani"] },
+                                { name: "Sound", people: ["Tech Team"] },
+                                { name: "Media", people: ["Tech Team"] }
+                            ]
+                        },
+                        {
+                            title: "Third Sunday", date: "20",
+                            roles: [
+                                { name: "Worship Leader", people: ["Peter"] },
+                                { name: "Vocalist 1", people: ["Eva"] },
+                                { name: "Vocalist 2", people: ["Dorine"] },
+                                { name: "Keyboardist", people: ["Margaret"] },
+                                { name: "Acoustic Guitar", people: ["Lani"] },
+                                { name: "Electric Guitar", people: ["Aaron"] },
+                                { name: "Bassist", people: ["-"] },
+                                { name: "Drummer", people: ["Edwin"] },
+                                { name: "Sound", people: ["Tech Team"] },
+                                { name: "Media", people: ["Tech Team"] }
+                            ]
+                        },
+                        {
+                            title: "Fourth Sunday", date: "27",
+                            roles: [
+                                { name: "Worship Leader", people: ["Margaret"] },
+                                { name: "Vocalist 1", people: ["Esther"] },
+                                { name: "Vocalist 2", people: ["Lani"] },
+                                { name: "Keyboardist", people: ["Dorine"] },
+                                { name: "Acoustic Guitar", people: ["Peter"] },
+                                { name: "Electric Guitar", people: ["-"] },
+                                { name: "Bassist", people: ["Edwin"] },
+                                { name: "Drummer", people: ["Aaron"] },
+                                { name: "Sound", people: ["Tech Team"] },
+                                { name: "Media", people: ["Tech Team"] }
+                            ]
+                        }
+                    ]
+                }
+            ];
+            allRosterData = sampleRoster;
+            renderRosterGrid(allRosterData);
+            return Promise.resolve();
         }
 
         function processSongData(rawData) {
@@ -825,7 +888,7 @@
                         <thead><tr class="bg-gray-200">
                             <th class="border border-gray-400 p-2 text-left w-1/5 diag-split">
                                 <div class="diag-split-line"></div>
-                                <div class="diag-split-top">Liturgical Season</div>
+                                <div class="diag-split-top">Role</div>
                                 <div class="diag-split-bottom">Date</div>
                             </th>
                             ${rosterData.sundays.map(sunday => `
