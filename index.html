@@ -6,38 +6,50 @@
     <title>LHC Worship Prep Tool</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <style>
-        /* Custom scrollbar for a more modern look */
-        ::-webkit-scrollbar {
-            width: 8px;
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+        
+        /* --- Core Styles from Previous Design --- */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8f7f5; 
+            color: #3a3a3a; 
+            overflow-x: hidden;
         }
-        ::-webkit-scrollbar-track {
-            background: #2d3748; /* dark-gray-800 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4a5568; /* dark-gray-600 */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #718096; /* dark-gray-500 */
-        }
+        
+        html { scroll-behavior: smooth; }
+        h1, h2, h3, h4, h5 { font-family: 'Cinzel', serif; }
+        
+        .btn-primary { background-color: #4a6da7; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(74, 109, 167, 0.4); }
+        .btn-primary:hover { background-color: #3a5d97; box-shadow: 0 0 20px rgba(74, 109, 167, 0.6); }
+        .btn-secondary { background-color: #6b9ac4; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(107, 154, 196, 0.3); }
+        .btn-secondary:hover { background-color: #5b8ab4; box-shadow: 0 0 15px rgba(107, 154, 196, 0.5); }
 
-        /* Style for the <details> summary arrow */
-        summary::marker {
-            color: #a0aec0; /* text-gray-400 */
-        }
+        .song-card { transition: all 0.3s ease; border-left: 4px solid transparent; animation: waterfall 0.5s ease forwards; opacity: 0; }
+        .song-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-left: 4px solid #4a6da7; }
+        
+        select:focus, input[type="text"]:focus, input[type="search"]:focus { border-color: #4a6da7; box-shadow: 0 0 0 3px rgba(74, 109, 167, 0.2); }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #a5c8e4; border-radius: 10px; }
+        
+        .playlist-sidebar { background: linear-gradient(180deg, #4a6da7 0%, #6b9ac4 100%); }
+        .playlist-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
+        .playlist-item:hover { background-color: rgba(255, 255, 255, 0.1); border-left: 3px solid #a5c8e4; }
+        
+        @keyframes waterfall { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        
+        #loadingIndicator { transition: opacity 0.5s ease-out; }
+        .loading-note { font-size: 80px; color: #4a6da7; animation: pulse-note 1.5s infinite ease-in-out; }
+        @keyframes pulse-note { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
 
-        /* Basic animation for collapsible sections */
-        details > summary {
-            list-style: none;
-        }
-        details[open] > summary ~ * {
-            animation: sweep .5s ease-in-out;
-        }
-        @keyframes sweep {
-            0%    {opacity: 0; transform: translateY(-10px)}
-            100%  {opacity: 1; transform: translateY(0)}
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: #fff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; }
         
         /* Hide all page views by default */
         .page-view {
@@ -48,95 +60,41 @@
 <body class="bg-gray-100 text-gray-800">
 
     <div class="relative min-h-screen md:flex">
-        <!-- START: Mobile Header -->
-        <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
-            <a href="#" class="block p-4 text-white font-bold">LHC Worship Prep</a>
-            <button id="mobile-menu-button" class="p-4 focus:outline-none focus:bg-gray-700">
-                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </div>
-        <!-- END: Mobile Header -->
-
-        <!-- START: Sidebar -->
-        <aside id="sidebar" class="bg-gray-800 text-white w-72 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 flex flex-col">
-            <!-- Sidebar Header -->
-            <div class="p-4 border-b border-gray-700 flex items-center space-x-3">
-                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-green-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v3.75M9 9l-3.75 1.5M9 9V2.25m0 0l-3.75 1.5M3 13.5l3.75-1.5m0 0L9 15l-3.75-1.5M9 15v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15Zm-6 0h3.75v3.75z" />
-                </svg>
-                <h1 class="text-xl font-bold tracking-wider">LHC Worship Prep</h1>
-            </div>
-
-            <!-- Sidebar Navigation -->
-            <nav class="flex-1 p-4 space-y-4 overflow-y-auto">
-                <!-- Section 1: Create Custom Songlist -->
-                <details class="group" open>
-                    <summary class="flex items-center justify-between cursor-pointer py-2 px-3 rounded-md hover:bg-gray-700">
-                        <div class="flex items-center space-x-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>
-                            <span class="font-semibold">Custom Songlists</span>
-                        </div>
-                         <svg class="w-5 h-5 text-gray-400 transform transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </summary>
-                    <ul class="pl-8 mt-2 space-y-2 text-gray-300">
-                        <li><a href="#" class="block hover:text-white">Sunday Morning Mix</a></li>
-                        <li><a href="#" class="block hover:text-white">Youth Camp Songs</a></li>
-                        <li><a href="#" class="block hover:text-white">Christmas Special</a></li>
-                        <li><button class="text-green-400 hover:text-green-300 w-full text-left mt-2">+ Add New Songlist</button></li>
-                    </ul>
-                </details>
-
-                <!-- Section 2: Worship Leaders Collection -->
-                <details class="group">
-                    <summary class="flex items-center justify-between cursor-pointer py-2 px-3 rounded-md hover:bg-gray-700">
-                        <div class="flex items-center space-x-3">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5a.75.75 0 0 0-.75.75v13.5a.75.75 0 0 0 .75.75h16.5a.75.75 0 0 0 .75-.75V5.25a.75.75 0 0 0-.75-.75H3.75Z" /></svg>
-                             <span class="font-semibold">Worship Leaders</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-400 transform transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </summary>
-                    <ul class="pl-8 mt-2 space-y-2 text-gray-300">
-                        <li><a href="#" class="block hover:text-white">Dorine</a></li>
-                        <li><a href="#" class="block hover:text-white">Edwin</a></li>
-                        <li><a href="#" class="block hover:text-white">Peter</a></li>
-                        <li><a href="#" class="block hover:text-white">Margaret</a></li>
-                        <li><a href="#" class="block hover:text-white">Esther</a></li>
-                        <li><a href="#" class="block hover:text-white">Lani</a></li>
-                        <li><a href="#" class="block hover:text-white">Eva</a></li>
-                        <li><a href="#" class="block hover:text-white">Aaron</a></li>
-                    </ul>
-                </details>
-
-                <!-- Section 3: Navigation Links to switch pages -->
-                <div class="space-y-2 pt-4 border-t border-gray-700">
-                     <a href="#worship-order" data-page="worship-order" class="nav-link flex items-center space-x-3 py-2 px-3 rounded-md bg-gray-900 font-bold">
-                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18M-4.5 12h22.5" /></svg>
-                         <span>Worship Order</span>
-                     </a>
+        <!-- START: Sidebar (Old design, new responsive classes) -->
+        <aside id="sidebar" class="playlist-sidebar w-72 lg:w-80 text-white z-40 custom-scrollbar overflow-y-auto transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-screen fixed md:sticky top-0">
+            <div class="p-4 flex flex-col h-full">
+                <button id="closeMobileMenuButton" class="md:hidden absolute top-3 right-3 p-2 text-white hover:text-blue-200"><i class="fas fa-times text-2xl"></i></button>
+                <div class="mt-8 md:mt-4 mb-6 text-center">
+                    <h2 class="text-2xl font-semibold mb-4">LHC Worship Prep</h2>
+                </div>
                 
-                     <a href="#song-finder" data-page="song-finder" class="nav-link flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-700">
-                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-                         <span>Song Finder</span>
-                     </a>
+                <h3 class="text-lg font-semibold mb-3 flex items-center px-2"><i class="fas fa-calendar-alt mr-2"></i> Planning</h3>
+                <div class="space-y-1 mb-6">
+                    <a href="#worship-order" data-page="worship-order" class="nav-link playlist-item p-2 cursor-pointer flex items-center">Worship Order</a>
+                    <a href="#song-finder" data-page="song-finder" class="nav-link playlist-item p-2 cursor-pointer flex items-center">Song Finder</a>
                 </div>
 
-            </nav>
-            
-            <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-gray-700">
-                <a href="#" class="flex items-center space-x-3 text-gray-400 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.43.992a6.759 6.759 0 0 1 0 1.985c-.008.379.137.752.43.992l1.003.827c.424.35.534.954.26 1.431l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.127c-.331.183-.581.495-.644.87l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 0 1-1.37-.49l-1.296-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.759 6.759 0 0 1 0-1.985c.008-.379-.137-.752-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.431l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.127.332-.183.582-.495.645-.87l.213-1.281Z" /></svg>
-                    <span>Settings</span>
-                </a>
+                <h3 class="text-lg font-semibold mb-3 flex items-center px-2"><i class="fas fa-list-ul mr-2"></i> Your Playlists</h3>
+                <div id="playlistItemsContainer" class="space-y-1 flex-grow"><p class="text-xs text-blue-200 italic px-2">Loading playlists...</p></div>
+                <div class="flex-shrink-0 mt-4">
+                    <button id="createSongListBtn" class="btn-secondary bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-md w-full flex items-center justify-center"><i class="fas fa-plus-circle mr-2"></i> Create Song List</button>
+                </div>
+                <div id="authStatus" class="flex-shrink-0 mt-4 p-2 bg-black/20 rounded text-center text-xs">Connecting...</div>
             </div>
         </aside>
         <!-- END: Sidebar -->
 
         <!-- START: Main Content Area -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- This is where the page views will be swapped -->
+            <header id="mainHeader" class="bg-white shadow-sm sticky top-0 z-20">
+                <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <button id="mobileMenuButton" class="md:hidden text-gray-600 mr-4"><i class="fas fa-bars text-2xl"></i></button>
+                        <h2 id="page-title" class="text-xl sm:text-2xl font-semibold text-[#3a3a3a]">Worship Order</h2>
+                    </div>
+                </div>
+            </header>
+
             <div id="main-content-container" class="flex-1 overflow-x-hidden overflow-y-auto">
                 <!-- VIEW 1: Worship Order Page -->
                 <main id="worship-order" class="page-view p-6 md:p-10">
@@ -147,28 +105,39 @@
                         </header>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-blue-500 flex flex-col">
-                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 6 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v3.75M9 9l3 1.5m-3-1.5L6 9m6 3v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15m-3 0h3.75v3.75z" /></svg></a></div>
+                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 6 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><i class="fas fa-music"></i></a></div>
                                 <div class="mt-4 flex-grow"><p class="text-sm text-gray-500">Worship Leader: <span class="font-semibold text-gray-800">Edwin</span></p><p class="text-sm text-gray-500">Theme: <span class="font-semibold text-gray-800">Grace Abounds</span></p></div>
                                 <button class="mt-4 text-sm text-blue-500 hover:underline w-full text-right">View Roster</button>
                             </div>
                             <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-purple-500 flex flex-col">
-                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 13 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v3.75M9 9l3 1.5m-3-1.5L6 9m6 3v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15m-3 0h3.75v3.75z" /></svg></a></div>
+                                <div class="flex justify-between items-start"><h3 class="text-lg font-bold text-gray-700">Sunday - 13 July</h3><a href="#" title="Go to Worship Order" class="music-button bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110"><i class="fas fa-music"></i></a></div>
                                 <div class="mt-4 flex-grow"><p class="text-sm text-gray-500">Worship Leader: <span class="font-semibold text-gray-800">Dorine</span></p><p class="text-sm text-gray-500">Theme: <span class="font-semibold text-gray-800">He is Risen</span></p></div>
                                 <button class="mt-4 text-sm text-purple-500 hover:underline w-full text-right">View Roster</button>
                             </div>
                             <div class="bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center min-h-[150px]"><p class="text-gray-500">Sunday, 20 July</p></div>
                             <div class="bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center min-h-[150px]"><p class="text-gray-500">Sunday, 27 July</p></div>
                         </div>
-                        <div id="drag-drop-section" class="mt-12 p-6 bg-white rounded-lg shadow-md hidden">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Worship Order Builder</h3>
-                            <div class="flex flex-col md:flex-row gap-8"><div id="source-items" class="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg border"><h4 class="font-bold mb-2">Available Items</h4><div class="p-3 bg-blue-100 text-blue-800 rounded mb-2 cursor-grab" draggable="true">Song: 10,000 Reasons</div><div class="p-3 bg-green-100 text-green-800 rounded mb-2 cursor-grab" draggable="true">Element: Welcome</div><div class="p-3 bg-yellow-100 text-yellow-800 rounded mb-2 cursor-grab" draggable="true">Element: Scripture</div><div class="p-3 bg-red-100 text-red-800 rounded mb-2 cursor-grab" draggable="true">Element: Announcements</div></div><div id="main-field" class="w-full md:w-2/3 bg-gray-200 p-4 rounded-lg border-2 border-dashed border-gray-400 min-h-[200px]"><h4 class="font-bold mb-2 text-gray-600">Worship Flow</h4><p class="text-center text-gray-500">Drop items here</p></div></div>
-                        </div>
                     </div>
                 </main>
 
                 <!-- VIEW 2: Song Finder Page -->
                 <main id="song-finder" class="page-view p-6 md:p-10">
-                    <div class="max-w-4xl mx-auto"><div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg"><div class="text-center mb-8"><h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Song Finder</h1><p class="text-gray-500 mt-2">Search our database for songs by keyword or tempo.</p></div><div class="flex flex-col sm:flex-row gap-4 mb-6"><input type="text" id="keywordSearch" placeholder="Enter keyword (title, artist, lyrics)..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"><select id="tempoFilter" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"><option value="">All Tempos</option><option value="Slow">Slow</option><option value="Medium">Medium</option><option value="Fast">Fast</option></select><button id="searchButton" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">Search</button></div><div id="songResults" class="space-y-4"><p class="no-results-message text-center text-gray-500 py-8" style="display: none;">No songs found. Try different filters.</p></div></div></div>
+                     <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8" id="searchFilterSection">
+                        <h2 class="text-xl font-semibold mb-6 text-[#3a3a3a] flex items-center"><i class="fas fa-search mr-2 text-[#4a6da7]"></i> Find Worship Songs</h2>
+                        <div class="flex flex-col sm:flex-row items-stretch">
+                            <input type="text" id="keywordSearch" placeholder="Keywords, scripture, title" class="w-full p-3 rounded-t-md sm:rounded-l-md sm:rounded-t-none bg-gray-50 border border-gray-300">
+                            <button id="searchButton" class="btn-primary text-white px-6 py-3 sm:rounded-none flex items-center justify-center"><i class="fas fa-search mr-2"></i> Search</button>
+                            <button id="clearBtn" class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-6 py-3 rounded-b-md sm:rounded-r-md sm:rounded-b-none flex items-center justify-center sm:ml-2 mt-2 sm:mt-0"><i class="fas fa-times mr-2"></i> Clear</button>
+                        </div>
+                     </div>
+                     <div id="songResults" class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <div id="songResultsHeader" class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Results</h2>
+                            <span id="resultCount" class="text-sm text-gray-500"></span>
+                        </div>
+                        <div id="songCardsContainer" class="min-h-[500px] space-y-3"></div>
+                     </div>
+                     <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center"><i class="fas fa-music text-5xl text-[#6b9ac4] opacity-70 mb-4"></i><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above to begin.</p></div>
                 </main>
             </div>
         </div>
@@ -180,39 +149,59 @@
             
             // --- DATA: Sample Song Database ---
             const allSongs = [
-                { title: "Great Are You Lord", artist: "All Sons & Daughters", lyricsSnippet: "It's Your breath in our lungs...", tempo: "Slow", key: "G" },
-                { title: "10,000 Reasons", artist: "Matt Redman", lyricsSnippet: "Bless the Lord, O my soul...", tempo: "Medium", key: "G" },
-                { title: "This Is Amazing Grace", artist: "Phil Wickham", lyricsSnippet: "This is amazing grace...", tempo: "Medium", key: "Bb" },
-                { title: "What A Beautiful Name", artist: "Hillsong Worship", lyricsSnippet: "What a beautiful Name it is...", tempo: "Slow", key: "D" },
-                { title: "Raise a Hallelujah", artist: "Bethel Music", lyricsSnippet: "I raise a hallelujah...", tempo: "Fast", key: "Db" },
-                { title: "Good Good Father", artist: "Chris Tomlin", lyricsSnippet: "You're a good good Father...", tempo: "Medium", key: "A" },
-                { title: "King of My Heart", artist: "Steffany Gretzinger, Jeremy Riddle", lyricsSnippet: "You are good, You're good...", tempo: "Slow", key: "G" },
-                { title: "Glorious Day", artist: "Passion", lyricsSnippet: "You called my name...", tempo: "Fast", key: "D" }
+                { id: 'song1', title: "Great Are You Lord", artist: "All Sons & Daughters", lyricsSnippet: "It's Your breath in our lungs...", tempo: "Slow", key: "G" },
+                { id: 'song2', title: "10,000 Reasons", artist: "Matt Redman", lyricsSnippet: "Bless the Lord, O my soul...", tempo: "Medium", key: "G" },
+                { id: 'song3', title: "This Is Amazing Grace", artist: "Phil Wickham", lyricsSnippet: "This is amazing grace...", tempo: "Medium", key: "Bb" },
+                { id: 'song4', title: "What A Beautiful Name", artist: "Hillsong Worship", lyricsSnippet: "What a beautiful Name it is...", tempo: "Slow", key: "D" },
+                { id: 'song5', title: "Raise a Hallelujah", artist: "Bethel Music", lyricsSnippet: "I raise a hallelujah...", tempo: "Fast", key: "Db" },
+                { id: 'song6', title: "Good Good Father", artist: "Chris Tomlin", lyricsSnippet: "You're a good good Father...", tempo: "Medium", key: "A" },
+                { id: 'song7', title: "King of My Heart", artist: "Steffany Gretzinger, Jeremy Riddle", lyricsSnippet: "You are good, You're good...", tempo: "Slow", key: "G" },
+                { id: 'song8', title: "Glorious Day", artist: "Passion", lyricsSnippet: "You called my name...", tempo: "Fast", key: "D" }
             ];
 
-            // --- MOBILE SIDEBAR LOGIC ---
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            // --- DOM ELEMENT REFERENCES ---
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const closeMobileMenuButton = document.getElementById('closeMobileMenuButton');
             const sidebar = document.getElementById('sidebar');
-
-            mobileMenuButton.addEventListener('click', () => {
-                sidebar.classList.toggle('-translate-x-full');
-            });
-
-            // --- PAGE NAVIGATION LOGIC ---
+            const pageTitle = document.getElementById('page-title');
             const navLinks = document.querySelectorAll('.nav-link');
             const pageViews = document.querySelectorAll('.page-view');
+            
+            // Song Finder elements
+            const keywordInput = document.getElementById('keywordSearch');
+            const searchButton = document.getElementById('searchButton');
+            const clearButton = document.getElementById('clearBtn');
+            const songCardsContainer = document.getElementById('songCardsContainer');
+            const emptyState = document.getElementById('emptyState');
+            const songResults = document.getElementById('songResults');
+            const resultCount = document.getElementById('resultCount');
 
+
+            // --- MOBILE SIDEBAR LOGIC ---
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    sidebar.classList.remove('-translate-x-full');
+                });
+            }
+            if (closeMobileMenuButton) {
+                closeMobileMenuButton.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                });
+            }
+
+            // --- PAGE NAVIGATION LOGIC ---
             function switchPage(pageId) {
                 pageViews.forEach(view => {
                     view.style.display = view.id === pageId ? 'block' : 'none';
                 });
                 navLinks.forEach(link => {
-                    if (link.dataset.page === pageId) {
-                        link.classList.add('bg-gray-900', 'font-bold');
-                        link.classList.remove('hover:bg-gray-700');
+                    const linkPageId = link.dataset.page;
+                    const parentItem = link.closest('.playlist-item');
+                    if (linkPageId === pageId) {
+                        if(parentItem) parentItem.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        if(pageTitle) pageTitle.textContent = link.textContent;
                     } else {
-                        link.classList.remove('bg-gray-900', 'font-bold');
-                        link.classList.add('hover:bg-gray-700');
+                        if(parentItem) parentItem.style.backgroundColor = 'transparent';
                     }
                 });
                 // Update URL hash
@@ -235,59 +224,69 @@
             const initialPage = window.location.hash.substring(1) || 'worship-order';
             switchPage(initialPage);
 
-            // --- WORSHIP ORDER PAGE LOGIC ---
-            const musicButtons = document.querySelectorAll('.music-button');
-            const dragDropSection = document.getElementById('drag-drop-section');
-            musicButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (dragDropSection) {
-                        dragDropSection.classList.toggle('hidden');
-                        if (!dragDropSection.classList.contains('hidden')) {
-                           dragDropSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    }
-                });
-            });
 
             // --- SONG FINDER PAGE LOGIC ---
-            const keywordInput = document.getElementById('keywordSearch');
-            const tempoFilterSelect = document.getElementById('tempoFilter');
-            const searchButton = document.getElementById('searchButton');
-            const songResultsDiv = document.getElementById('songResults');
-            const noResultsMessage = document.querySelector('.no-results-message');
-
-            function displaySongs(songsToDisplay) {
-                songResultsDiv.innerHTML = ''; 
-                if (songsToDisplay.length === 0) {
-                    noResultsMessage.style.display = 'block';
+            function renderSongCards(songsToDisplay) {
+                songCardsContainer.innerHTML = '';
+                if (songsToDisplay.length > 0) {
+                    emptyState.style.display = 'none';
+                    songResults.style.display = 'block';
+                    resultCount.textContent = `${songsToDisplay.length} songs found`;
                 } else {
-                    noResultsMessage.style.display = 'none';
-                    songsToDisplay.forEach(song => {
-                        const songElement = document.createElement('div');
-                        songElement.className = 'song-item bg-gray-50 border border-gray-200 p-4 rounded-lg hover:shadow-md hover:border-blue-300 transition';
-                        songElement.innerHTML = `<h3 class="text-xl font-bold text-blue-700">${song.title}</h3><p class="text-md text-gray-600"><strong>Artist:</strong> ${song.artist}</p><p class="text-sm text-gray-500 italic my-2">"${song.lyricsSnippet}"</p><div class="mt-2"><span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Tempo: ${song.tempo}</span><span class="inline-block bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Key: ${song.key}</span></div>`;
-                        songResultsDiv.appendChild(songElement);
-                    });
+                    emptyState.style.display = 'block';
+                    songResults.style.display = 'none';
+                    resultCount.textContent = '';
+                    return;
                 }
-                songResultsDiv.appendChild(noResultsMessage);
+
+                songsToDisplay.forEach((song, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'song-card bg-white p-4 rounded-lg shadow-sm flex items-center justify-between';
+                    card.style.animationDelay = `${i * 0.03}s`;
+                    card.innerHTML = `
+                        <div>
+                            <h3 class="font-semibold text-md text-[#3a5d97] cursor-pointer hover:underline">${song.title}</h3>
+                            <p class="text-xs text-gray-500">${song.artist}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                             <button class="add-to-list-btn btn-secondary text-white px-3 py-1 rounded-md text-xs flex items-center" data-song-id="${song.id}"><i class="fas fa-plus"></i></button>
+                        </div>`;
+                    songCardsContainer.appendChild(card);
+                });
             }
 
             function filterAndDisplaySongs() {
                 const keyword = keywordInput.value.toLowerCase().trim();
-                const selectedTempo = tempoFilterSelect.value;
+                if (!keyword) {
+                    renderSongCards([]);
+                    return;
+                }
                 const filteredSongs = allSongs.filter(song => {
-                    const matchesKeyword = keyword === '' || song.title.toLowerCase().includes(keyword) || song.artist.toLowerCase().includes(keyword) || song.lyricsSnippet.toLowerCase().includes(keyword);
-                    const matchesTempo = selectedTempo === '' || song.tempo === selectedTempo;
-                    return matchesKeyword && matchesTempo;
+                    return song.title.toLowerCase().includes(keyword) || 
+                           song.artist.toLowerCase().includes(keyword);
                 });
-                displaySongs(filteredSongs);
+                renderSongCards(filteredSongs);
             }
 
-            if (searchButton) { searchButton.addEventListener('click', filterAndDisplaySongs); }
-            if (keywordInput) { keywordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') { filterAndDisplaySongs(); } }); }
+            if (searchButton) {
+                searchButton.addEventListener('click', filterAndDisplaySongs);
+            }
+            if(clearButton) {
+                clearButton.addEventListener('click', () => {
+                    keywordInput.value = '';
+                    renderSongCards([]);
+                });
+            }
+            if (keywordInput) {
+                keywordInput.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        filterAndDisplaySongs();
+                    }
+                });
+            }
             
-            filterAndDisplaySongs();
+            // Initially show no results until a search is performed
+            renderSongCards([]);
         });
     </script>
 
