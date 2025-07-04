@@ -38,7 +38,7 @@
         
         .playlist-sidebar { background: linear-gradient(180deg, #4a6da7 0%, #6b9ac4 100%); }
         .playlist-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
-        .playlist-item:hover { background-color: rgba(255, 255, 255, 0.1); border-left: 3px solid #a5c8e4; }
+        .playlist-item:hover, .playlist-item.active { background-color: rgba(255, 255, 255, 0.1); border-left: 3px solid #a5c8e4; }
         
         @keyframes waterfall { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
         
@@ -52,6 +52,13 @@
         .page-view { display: none; } /* Hide all views by default */
 
         .setlist-song-item.dragging { opacity: 0.6; background: #dbeafe; }
+
+        /* Styles for collapsible sidebar sections */
+        details summary { list-style: none; }
+        details summary::-webkit-details-marker { display: none; }
+        details summary .arrow { transition: transform 0.2s; }
+        details[open] summary .arrow { transform: rotate(90deg); }
+
     </style>
 </head>
 <body>
@@ -63,10 +70,47 @@
             <div class="p-4 flex flex-col h-full">
                 <button id="closeMobileMenuButton" class="md:hidden absolute top-3 right-3 p-2 text-white hover:text-blue-200"><i class="fas fa-times text-2xl"></i></button>
                 <div class="mt-8 md:mt-0 mb-6 text-center"><h1 class="text-2xl font-semibold">LHC Worship Prep</h1></div>
-                <div class="mb-4"><button id="createSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md w-full flex items-center justify-center"><i class="fas fa-plus-circle mr-2"></i> Create Song List</button></div>
-                <h3 class="text-lg font-semibold mb-3 flex items-center px-2"><i class="fas fa-list-ul mr-2"></i> Your Playlists</h3>
-                <div id="playlistItemsContainer" class="space-y-1 flex-grow"><p class="text-xs text-blue-200 italic px-2">Loading playlists...</p></div>
-                <div id="authStatus" class="flex-shrink-0 mt-4 p-2 bg-black/20 rounded text-center text-xs">Connecting...</div>
+                
+                <nav class="flex-1 space-y-4">
+                    <a href="#" class="nav-link playlist-item p-2 rounded-md flex items-center" data-page="songFinderView"><i class="fas fa-search w-6 text-center mr-2"></i> Song Finder</a>
+                    <a href="#" class="nav-link playlist-item p-2 rounded-md flex items-center" data-page="worshipOrderView"><i class="fas fa-calendar-alt w-6 text-center mr-2"></i> Worship Order</a>
+                    
+                    <details class="group" open>
+                        <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
+                            <div class="flex items-center">
+                                <i class="fas fa-folder-plus w-6 text-center mr-2"></i>
+                                <span class="font-semibold">Create Custom Songlist</span>
+                            </div>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </summary>
+                        <div id="playlistItemsContainer" class="pl-6 mt-2 space-y-1 border-l-2 border-white/20 ml-3"><p class="text-xs text-blue-200 italic px-2">Loading playlists...</p></div>
+                        <div class="pl-6 mt-2 ml-3">
+                             <button id="createSongListBtn" class="text-blue-200 hover:text-white text-sm flex items-center"><i class="fas fa-plus mr-2"></i> Add New Playlist</button>
+                        </div>
+                    </details>
+
+                    <details class="group">
+                        <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
+                            <div class="flex items-center">
+                                <i class="fas fa-users w-6 text-center mr-2"></i>
+                                <span class="font-semibold">Worship Leaders</span>
+                            </div>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </summary>
+                        <div class="pl-6 mt-2 space-y-1 border-l-2 border-white/20 ml-3">
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Dorine</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Edwin</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Peter</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Margaret</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Esther</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Lani</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Eva</a>
+                           <a href="#" class="block p-1 rounded-md hover:bg-white/10">Aaron</a>
+                        </div>
+                    </details>
+                </nav>
+
+                <div id="authStatus" class="flex-shrink-0 mt-auto p-2 bg-black/20 rounded text-center text-xs">Connecting...</div>
             </div>
         </aside>
         <div class="flex-1 flex flex-col"> 
@@ -76,10 +120,6 @@
                         <button id="mobileMenuButton" class="md:hidden text-gray-600 mr-4"><i class="fas fa-bars text-2xl"></i></button>
                         <div class="h-12 w-12 rounded-full bg-gradient-to-br from-[#4a6da7] to-[#a5c8e4] flex items-center justify-center text-white shadow-lg flex-shrink-0"><i class="fas fa-church text-xl"></i></div>
                         <div class="ml-3"><h1 class="text-xl sm:text-2xl font-semibold text-[#3a3a3a]">Luther House Chapel</h1><p class="text-xs sm:text-sm text-gray-500">Worship Song Selection Tool</p></div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button id="worshipOrderBtn" class="btn-primary text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base"><i class="fas fa-calendar-alt mr-2"></i><span class="hidden sm:inline">Worship</span> Order</button>
-                        <button id="songFinderBtn" class="btn-secondary text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base"><i class="fas fa-search mr-2"></i><span class="hidden sm:inline">Song</span> Finder</button>
                     </div>
                 </div>
             </header>
@@ -143,12 +183,10 @@
                 <div id="worshipSetlistPageView" class="page-view container mx-auto px-4 sm:px-6 py-8">
                     <div class="flex justify-between items-center mb-6">
                         <button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back to Finder</span></button>
-                        <button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i><span class="hidden sm:inline">Add Songs</span></button>
                     </div>
                     <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
                         <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
                         <div id="setlistSongsContainer" class="custom-scrollbar"></div>
-                        <div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-2 sm:space-x-4"></div>
                     </div>
                 </div>
             </div> 
@@ -341,7 +379,7 @@
 
         function setupEventListeners() {
             const pageViews = document.querySelectorAll('.page-view');
-
+            
             function switchPage(viewId) {
                 pageViews.forEach(view => {
                     view.style.display = view.id === viewId ? 'block' : 'none';
@@ -351,11 +389,11 @@
                 }
             }
 
-            DOMElements.worshipOrderBtn.addEventListener('click', () => switchPage('worshipOrderView'));
-            DOMElements.songFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
-            DOMElements.backToFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
+            if (DOMElements.worshipOrderLink) DOMElements.worshipOrderLink.addEventListener('click', (e) => { e.preventDefault(); switchPage('worshipOrderView')});
+            if (DOMElements.songFinderLink) DOMElements.songFinderLink.addEventListener('click', (e) => { e.preventDefault(); switchPage('songFinderView')});
+            if (DOMElements.backToFinderBtn) DOMElements.backToFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
 
-            switchPage('worshipOrderView'); // Default view
+            switchPage('songFinderView'); // Default view
 
             DOMElements.mobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.remove('-translate-x-full'));
             DOMElements.closeMobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.add('-translate-x-full'));
