@@ -79,7 +79,7 @@
                         <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
                             <div class="flex items-center">
                                 <i class="fas fa-folder-plus w-6 text-center mr-2"></i>
-                                <span class="font-semibold">Create Custom Songlist</span>
+                                <span class="font-semibold">Custom Songlists</span>
                             </div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </summary>
@@ -179,16 +179,32 @@
                         <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center"><i class="fas fa-music text-5xl text-[#6b9ac4] opacity-70 mb-4"></i><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above to begin.</p></div>
                     </main>
                 </div>
-                 <!-- VIEW 3: Setlist Page -->
-                <div id="worshipSetlistPageView" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                 <!-- VIEW 3: Playlist Detail Page -->
+                <main id="playlistDetailView" class="page-view container mx-auto px-4 sm:px-6 py-8">
                     <div class="flex justify-between items-center mb-6">
                         <button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back to Finder</span></button>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                        <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
-                        <div id="setlistSongsContainer" class="custom-scrollbar"></div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Column: Current Playlist -->
+                        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                            <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
+                            <div id="setlistSongsContainer" class="custom-scrollbar min-h-[50vh]"></div>
+                        </div>
+                        <!-- Right Column: Add Songs -->
+                        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                            <h3 class="text-xl font-semibold text-[#3a3a3a] mb-4">Add Songs to Playlist</h3>
+                            <div class="flex flex-col sm:flex-row items-stretch mb-4">
+                                <div class="relative flex-grow">
+                                    <input type="text" id="playlistSongSearch" placeholder="Search for songs..." class="w-full p-2 rounded-t-md sm:rounded-l-md sm:rounded-t-none bg-gray-50 pr-8">
+                                </div>
+                                <button id="playlistClearSearchBtn" class="bg-gray-200 text-gray-600 px-4 py-2 rounded-b-md sm:rounded-r-md sm:rounded-b-none flex items-center justify-center sm:ml-2 mt-2 sm:mt-0"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div id="playlistSongResults" class="min-h-[40vh] max-h-[40vh] overflow-y-auto custom-scrollbar border-t pt-2">
+                                <p class="text-center text-gray-500 p-4">Search to find songs to add.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </main>
             </div> 
         </div> 
     </div> 
@@ -247,7 +263,7 @@
         let currentSongForPlaylist = null;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipOrderView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "worshipOrderBtn", "songFinderBtn", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "worshipSetlistPageView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "addSongsToCurrentSetlistBtn", "playlistActionsContainer" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipOrderView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -379,18 +395,31 @@
 
         function setupEventListeners() {
             const pageViews = document.querySelectorAll('.page-view');
+            const navLinks = document.querySelectorAll('.nav-link');
             
             function switchPage(viewId) {
                 pageViews.forEach(view => {
                     view.style.display = view.id === viewId ? 'block' : 'none';
+                });
+                navLinks.forEach(link => {
+                    if(link.dataset.page === viewId){
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
                 });
                 if (window.innerWidth < 768) { 
                     DOMElements.playlistSidebar.classList.add('-translate-x-full');
                 }
             }
 
-            if (DOMElements.worshipOrderLink) DOMElements.worshipOrderLink.addEventListener('click', (e) => { e.preventDefault(); switchPage('worshipOrderView')});
-            if (DOMElements.songFinderLink) DOMElements.songFinderLink.addEventListener('click', (e) => { e.preventDefault(); switchPage('songFinderView')});
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchPage(link.dataset.page);
+                })
+            });
+            
             if (DOMElements.backToFinderBtn) DOMElements.backToFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
 
             switchPage('songFinderView'); // Default view
@@ -421,6 +450,12 @@
             DOMElements.confirmAddToListBtnModal.addEventListener('click', addSongToPlaylist);
             DOMElements.addToListModalCloseBtn.addEventListener('click', () => DOMElements.addToListModal.classList.add('hidden'));
             DOMElements.cancelAddToListBtnModal.addEventListener('click', () => DOMElements.addToListModal.classList.add('hidden'));
+            
+            DOMElements.playlistSongSearch.addEventListener('input', performPlaylistSongSearch);
+            DOMElements.playlistClearSearchBtn.addEventListener('click', () => {
+                DOMElements.playlistSongSearch.value = '';
+                performPlaylistSongSearch();
+            });
 
             setupDragAndDrop();
         }
@@ -568,9 +603,9 @@
             unsubscribePlaylists = onSnapshot(userDocRef, (docSnap) => {
                 sitePlaylists = (docSnap.exists() && docSnap.data().playlists) ? docSnap.data().playlists : [];
                 renderPlaylistSidebar();
-                const currentPlaylistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
-                if (DOMElements.worshipSetlistPageView.style.display === 'block' && currentPlaylistId) {
-                    displayWorshipSetlistPage(currentPlaylistId);
+                const currentPlaylistId = DOMElements.playlistDetailView.dataset.currentPlaylistId;
+                if (DOMElements.playlistDetailView.style.display === 'block' && currentPlaylistId) {
+                    displayPlaylistDetailPage(currentPlaylistId);
                 }
             }, err => {
                 console.error("Firestore onSnapshot error:", err);
@@ -592,16 +627,18 @@
             playlistItemsContainer.innerHTML = '';
             if (sitePlaylists.length > 0) {
                 sitePlaylists.forEach(p => {
-                    const item = document.createElement('div');
+                    const item = document.createElement('a');
+                    item.href = "#";
                     item.className = 'playlist-item p-2 cursor-pointer flex justify-between items-center';
                     item.innerHTML = `<div><p class="font-medium text-sm">${p.name}</p><p class="text-xs text-blue-100">${(p.songs || []).length} songs</p></div><button class="text-red-300 hover:text-white delete-playlist-btn" data-id="${p.id}"><i class="fas fa-trash-alt"></i></button>`;
                     item.addEventListener('click', (e) => {
+                        e.preventDefault();
                         if (e.target.closest('.delete-playlist-btn')) {
                             e.stopPropagation();
                             const newPlaylists = sitePlaylists.filter(pl => pl.id !== p.id);
                             updateFirestorePlaylists(newPlaylists);
                         } else {
-                            displayWorshipSetlistPage(p.id);
+                            displayPlaylistDetailPage(p.id);
                         }
                     });
                     playlistItemsContainer.appendChild(item);
@@ -611,17 +648,29 @@
             }
         }
 
-        function displayWorshipSetlistPage(playlistId) {
+        function displayPlaylistDetailPage(playlistId) {
             const playlist = sitePlaylists.find(p => p.id === playlistId);
             if (!playlist) { switchPage('songFinderView'); return; }
-            DOMElements.worshipSetlistPageView.dataset.currentPlaylistId = playlistId;
+            DOMElements.playlistDetailView.dataset.currentPlaylistId = playlistId;
             DOMElements.setlistNameDisplay.textContent = playlist.name;
+            renderPlaylistSongs(playlist);
+            performPlaylistSongSearch(); 
+            switchPage('playlistDetailView');
+        }
+
+        function renderPlaylistSongs(playlist) {
             const container = DOMElements.setlistSongsContainer;
             container.innerHTML = '';
             const songList = (playlist.songs || []).map(songId => allSongsData.find(s => s.id === songId)).filter(Boolean);
+
+            if (songList.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic p-3 text-center">This playlist is empty. Add songs from the right.</p>';
+                return;
+            }
+
             songList.forEach((song, index) => {
                 const item = document.createElement('div');
-                item.className = 'setlist-song-item p-3 border-b-2 border-gray-300 flex justify-between items-center cursor-grab';
+                item.className = 'setlist-song-item p-3 border-b flex justify-between items-center cursor-grab';
                 item.dataset.songId = song.id;
                 item.draggable = true;
                 item.innerHTML = `
@@ -632,20 +681,54 @@
                             <p class="text-sm text-gray-500">${song.artist}</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-2" title="Remove"><i class="fas fa-times-circle"></i></button>
-                    </div>`;
+                    <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-2" title="Remove"><i class="fas fa-times-circle"></i></button>`;
                 item.querySelector('.remove-from-playlist-btn').addEventListener('click', () => {
                     const updatedSongs = (playlist.songs || []).filter(sId => sId !== song.id);
-                    const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: updatedSongs} : p);
+                    const newPlaylists = sitePlaylists.map(p => p.id === playlist.id ? {...p, songs: updatedSongs} : p);
                     updateFirestorePlaylists(newPlaylists);
                 });
                 container.appendChild(item);
             });
-            if (songList.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 italic p-3">This setlist is empty. Click "Add Songs" to begin.</p>';
+        }
+
+        function performPlaylistSongSearch() {
+            const playlistId = DOMElements.playlistDetailView.dataset.currentPlaylistId;
+            const playlist = sitePlaylists.find(p => p.id === playlistId);
+            if (!playlist) return;
+
+            const query = DOMElements.playlistSongSearch.value.trim().toLowerCase();
+            const resultsContainer = DOMElements.playlistSongResults;
+            resultsContainer.innerHTML = '';
+
+            const songsInPlaylist = playlist.songs || [];
+            let results = allSongsData.filter(song => !songsInPlaylist.includes(song.id));
+
+            if (query) {
+                results = results.filter(song => song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query));
             }
-            switchPage('worshipSetlistPageView');
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-center text-gray-500 p-4">No songs found.</p>';
+                return;
+            }
+
+            results.slice(0, 50).forEach(song => { // Limit results for performance
+                const item = document.createElement('div');
+                item.className = 'p-2 border-b flex justify-between items-center';
+                item.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-sm">${song.title}</p>
+                        <p class="text-xs text-gray-500">${song.artist}</p>
+                    </div>
+                    <button class="add-to-this-playlist-btn btn-secondary text-white px-2 py-1 rounded text-xs" data-song-id="${song.id}"><i class="fas fa-plus"></i></button>`;
+                item.querySelector('.add-to-this-playlist-btn').addEventListener('click', (e) => {
+                    const songId = e.currentTarget.dataset.songId;
+                    const updatedSongs = [...(playlist.songs || []), songId];
+                    const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: updatedSongs} : p);
+                    updateFirestorePlaylists(newPlaylists);
+                });
+                resultsContainer.appendChild(item);
+            });
         }
 
         function saveNewPlaylist() {
@@ -706,7 +789,7 @@
                 if (draggedSongElement) {
                     draggedSongElement.classList.remove('dragging');
                     draggedSongElement = null;
-                    const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                    const playlistId = DOMElements.playlistDetailView.dataset.currentPlaylistId;
                     const newSongOrder = [...container.querySelectorAll('.setlist-song-item')].map(item => item.dataset.songId);
                     const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: newSongOrder} : p);
                     updateFirestorePlaylists(newPlaylists);
