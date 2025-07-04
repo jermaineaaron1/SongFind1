@@ -59,11 +59,6 @@
         details summary .arrow { transition: transform 0.2s; }
         details[open] summary .arrow { transform: rotate(90deg); }
 
-        .diag-split { position: relative; background: #e5e7eb; }
-        .diag-split-line { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top right, transparent calc(50% - 1px), #a0aec0, transparent calc(50% + 1px)); }
-        .diag-split-top { position: absolute; top: 4px; right: 8px; font-size: 0.75rem; font-weight: 600; color: #4a5568; }
-        .diag-split-bottom { position: absolute; bottom: 4px; left: 8px; font-size: 0.75rem; font-weight: 600; color: #4a5568; }
-
     </style>
 </head>
 <body>
@@ -130,8 +125,8 @@
             </header>
             <div id="main-content-container" class="flex-1 overflow-y-auto">
                 <!-- VIEW 1: Worship Roster Page -->
-                <main id="worshipRosterView" class="page-view container mx-auto px-0 sm:px-6 py-8">
-                    <div id="rosterGridContainer" class="sm:p-6">
+                <main id="worshipRosterView" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <div id="rosterCardContainer" class="sm:p-6">
                         <!-- The roster will be dynamically generated here -->
                         <p class="text-center text-gray-500 py-8">Loading Roster...</p>
                     </div>
@@ -252,7 +247,7 @@
         let currentSongForPlaylist = null;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults", "rosterGridContainer" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults", "rosterCardContainer" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -296,8 +291,7 @@
             if (isAppInitialized) return;
             isAppInitialized = true;
             try {
-                // Using a local sample for roster, but still fetching songs
-                await Promise.all([fetchSongData(), useSampleRosterData()]);
+                await Promise.all([fetchSongData(), fetchRosterData()]);
             } catch (error) {
                 console.error("Failed during initial data fetch:", error);
             }
@@ -341,79 +335,17 @@
             }
         }
 
-        function useSampleRosterData() {
-            const sampleRoster = [
-                {
-                    month: "JULY 2025",
-                    sundays: [
-                        {
-                            title: "First Sunday", date: "6",
-                            roles: [
-                                { name: "Worship Leader", people: ["Edwin"] },
-                                { name: "Vocalist 1", people: ["Lani"] },
-                                { name: "Vocalist 2", people: ["Eva"] },
-                                { name: "Keyboardist", people: ["Peter"] },
-                                { name: "Acoustic Guitar", people: ["Aaron"] },
-                                { name: "Electric Guitar", people: ["-"] },
-                                { name: "Bassist", people: ["Margaret"] },
-                                { name: "Drummer", people: ["Esther"] },
-                                { name: "Sound", people: ["Tech Team"] },
-                                { name: "Media", people: ["Tech Team"] }
-                            ]
-                        },
-                        {
-                            title: "Second Sunday", date: "13",
-                            roles: [
-                                { name: "Worship Leader", people: ["Dorine"] },
-                                { name: "Vocalist 1", people: ["Aaron"] },
-                                { name: "Vocalist 2", people: ["Margaret"] },
-                                { name: "Keyboardist", people: ["Esther"] },
-                                { name: "Acoustic Guitar", people: ["Edwin"] },
-                                { name: "Electric Guitar", people: ["-"] },
-                                { name: "Bassist", people: ["Peter"] },
-                                { name: "Drummer", people: ["Lani"] },
-                                { name: "Sound", people: ["Tech Team"] },
-                                { name: "Media", people: ["Tech Team"] }
-                            ]
-                        },
-                        {
-                            title: "Third Sunday", date: "20",
-                            roles: [
-                                { name: "Worship Leader", people: ["Peter"] },
-                                { name: "Vocalist 1", people: ["Eva"] },
-                                { name: "Vocalist 2", people: ["Dorine"] },
-                                { name: "Keyboardist", people: ["Margaret"] },
-                                { name: "Acoustic Guitar", people: ["Lani"] },
-                                { name: "Electric Guitar", people: ["Aaron"] },
-                                { name: "Bassist", people: ["-"] },
-                                { name: "Drummer", people: ["Edwin"] },
-                                { name: "Sound", people: ["Tech Team"] },
-                                { name: "Media", people: ["Tech Team"] }
-                            ]
-                        },
-                        {
-                            title: "Fourth Sunday", date: "27",
-                            roles: [
-                                { name: "Worship Leader", people: ["Margaret"] },
-                                { name: "Vocalist 1", people: ["Esther"] },
-                                { name: "Vocalist 2", people: ["Lani"] },
-                                { name: "Keyboardist", people: ["Dorine"] },
-                                { name: "Acoustic Guitar", people: ["Peter"] },
-                                { name: "Electric Guitar", people: ["-"] },
-                                { name: "Bassist", people: ["Edwin"] },
-                                { name: "Drummer", people: ["Aaron"] },
-                                { name: "Sound", people: ["Tech Team"] },
-                                { name: "Media", people: ["Tech Team"] }
-                            ]
-                        }
-                    ]
-                }
-            ];
-            allRosterData = sampleRoster;
-            renderRosterGrid(allRosterData);
-            return Promise.resolve();
+        async function fetchRosterData() {
+             try {
+                const data = await fetchDataWithJSONP('roster');
+                allRosterData = data;
+                renderRosterCards(allRosterData);
+            } catch (error) {
+                console.error("Error fetching roster data:", error);
+                if (DOMElements.rosterCardContainer) DOMElements.rosterCardContainer.innerHTML = `<p class="text-center p-4 text-red-500">Could not load roster data: ${error.message}</p>`;
+            }
         }
-
+        
         function processSongData(rawData) {
             allSongsData = rawData.map((song, index) => ({
                 ...song,
@@ -868,77 +800,47 @@
             });
         }
         
-        function renderRosterGrid(allRosters) {
-            const container = DOMElements.rosterGridContainer;
+        function renderRosterCards(allRosters) {
+            const container = DOMElements.rosterCardContainer;
             if (!container || !allRosters || allRosters.length === 0) {
                 if(container) container.innerHTML = '<p class="text-center p-4 text-gray-500">No roster data available.</p>';
                 return;
             }
-            let desktopTableHTML = '';
-            let mobileCardsHTML = '';
+            container.innerHTML = ''; 
+
             allRosters.forEach(rosterData => {
-                const allRoles = new Set();
-                rosterData.sundays.forEach(sunday => sunday.roles.forEach(role => allRoles.add(role.name)));
-                const rolesInOrder = Array.from(allRoles);
-                desktopTableHTML += `
-                    <div class="text-center mb-6 mt-8">
-                        <h3 class="text-4xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
-                    </div>
-                    <table class="w-full border-collapse">
-                        <thead><tr class="bg-gray-200">
-                            <th class="border border-gray-400 p-2 text-left w-1/5 diag-split">
-                                <div class="diag-split-line"></div>
-                                <div class="diag-split-top">Role</div>
-                                <div class="diag-split-bottom">Date</div>
-                            </th>
-                            ${rosterData.sundays.map(sunday => `
-                                <th class="border border-gray-400 p-2 text-center">
-                                    <div class="font-semibold text-sm">${sunday.title}</div>
-                                    <div class="font-bold text-lg mt-1">${sunday.date}</div>
-                                </th>
-                            `).join('')}
-                        </tr></thead>
-                        <tbody>
-                            ${rolesInOrder.map(roleName => `
-                                <tr class="border-t border-gray-300">
-                                    <td class="border border-gray-400 p-2 font-bold text-right align-top">${roleName}</td>
-                                    ${rosterData.sundays.map(sunday => {
-                                        const role = sunday.roles.find(r => r.name === roleName);
-                                        const people = role ? role.people.join('<br>') : '';
-                                        return `<td class="border border-gray-400 p-2 text-center align-top ${!people ? 'bg-gray-100' : ''}">${people}</td>`;
-                                    }).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>`;
-                mobileCardsHTML += `
-                    <div class="text-center mb-6 mt-4">
-                        <h3 class="text-2xl font-bold uppercase tracking-wider">${rosterData.month}</h3>
-                    </div>`;
-                mobileCardsHTML += rosterData.sundays.map(sunday => `
-                    <div class="border rounded-lg shadow-md mb-6">
-                        <div class="bg-gray-200 p-3 rounded-t-lg">
-                            <p class="font-semibold text-center text-sm">${sunday.title}</p>
-                            <p class="font-bold text-base text-center">${sunday.date}</p>
+                const monthHeader = document.createElement('h2');
+                monthHeader.className = 'text-4xl font-bold text-gray-500 tracking-widest text-center uppercase mb-8';
+                monthHeader.textContent = rosterData.month;
+                container.appendChild(monthHeader);
+
+                const sundayGrid = document.createElement('div');
+                sundayGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8';
+                
+                rosterData.sundays.forEach(sunday => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-lg shadow-md p-5 border-t-4 border-blue-500 flex flex-col';
+                    
+                    let rolesHTML = '';
+                    sunday.roles.forEach(role => {
+                        rolesHTML += `<p class="text-sm text-gray-600"><strong class="font-semibold text-gray-800">${role.name}:</strong> ${role.people.join(', ')}</p>`;
+                    });
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-gray-700">${sunday.title} - ${sunday.date}</h3>
+                            <a href="#" title="View Order of Service" class="music-button bg-green-500 text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-600 transition duration-300 transform hover:scale-110">
+                                <i class="fas fa-music"></i>
+                            </a>
                         </div>
-                        <div class="p-4 space-y-3">
-                            ${sunday.roles.map(role => `
-                                <div>
-                                    <p class="font-bold text-sm text-gray-700">${role.name}</p>
-                                    ${role.people.length > 0 
-                                        ? `<div class="pl-4 text-sm text-gray-600">${role.people.join('<br>')}</div>` 
-                                        : '<p class="pl-4 text-sm text-gray-400 italic">--</p>'
-                                    }
-                                </div>
-                            `).join('')}
+                        <div class="mt-4 flex-grow space-y-1">
+                            ${rolesHTML}
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                    sundayGrid.appendChild(card);
+                });
+                container.appendChild(sundayGrid);
             });
-            container.innerHTML = `
-                <div class="hidden sm:block overflow-x-auto">${desktopTableHTML}</div>
-                <div class="block sm:hidden px-4 py-2">${mobileCardsHTML}</div>
-            `;
         }
 
     </script>
