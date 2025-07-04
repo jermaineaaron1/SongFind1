@@ -50,6 +50,8 @@
         @keyframes pulse-note { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
 
         .page-view { display: none; } /* Hide all views by default */
+
+        .setlist-song-item.dragging { opacity: 0.6; background: #dbeafe; }
     </style>
 </head>
 <body>
@@ -61,6 +63,8 @@
             <div class="p-4 flex flex-col h-full">
                 <button id="closeMobileMenuButton" class="md:hidden absolute top-3 right-3 p-2 text-white hover:text-blue-200"><i class="fas fa-times text-2xl"></i></button>
                 <div class="mt-8 md:mt-0 mb-6 text-center"><h1 class="text-2xl font-semibold">LHC Worship Prep</h1></div>
+                <div class="mb-4"><button id="createSongListBtn" class="btn-secondary text-white px-4 py-2 rounded-md w-full flex items-center justify-center"><i class="fas fa-plus-circle mr-2"></i> Create Song List</button></div>
+                <h3 class="text-lg font-semibold mb-3 flex items-center px-2"><i class="fas fa-list-ul mr-2"></i> Your Playlists</h3>
                 <div id="playlistItemsContainer" class="space-y-1 flex-grow"><p class="text-xs text-blue-200 italic px-2">Loading playlists...</p></div>
                 <div id="authStatus" class="flex-shrink-0 mt-4 p-2 bg-black/20 rounded text-center text-xs">Connecting...</div>
             </div>
@@ -135,10 +139,59 @@
                         <div id="emptyState" class="bg-white rounded-lg shadow-md p-10 text-center"><i class="fas fa-music text-5xl text-[#6b9ac4] opacity-70 mb-4"></i><h3 class="text-xl font-semibold mb-2 text-[#4a6da7]">Find the Perfect Worship Songs</h3><p class="text-gray-600 mb-6">Use the search and filters above to begin.</p></div>
                     </main>
                 </div>
+                 <!-- VIEW 3: Setlist Page -->
+                <div id="worshipSetlistPageView" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <button id="backToFinderBtn" class="btn-secondary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back to Finder</span></button>
+                        <button id="addSongsToCurrentSetlistBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center"><i class="fas fa-plus mr-2"></i><span class="hidden sm:inline">Add Songs</span></button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h2 id="setlistNameDisplay" class="text-3xl font-semibold text-[#3a3a3a] mb-6">Worship Setlist</h2>
+                        <div id="setlistSongsContainer" class="custom-scrollbar"></div>
+                        <div id="playlistActionsContainer" class="mt-8 flex justify-end space-x-2 sm:space-x-4"></div>
+                    </div>
+                </div>
             </div> 
         </div> 
     </div> 
+    
+    <!-- Modals -->
+    <div id="addToListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-[#3a3a3a]">Add "<span id="songToAddNameModal"></span>" to...</h3>
+                <button id="addToListModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="mb-4">
+                <label for="playlistSelectModal" class="block text-sm font-medium text-gray-700 mb-1">Select Playlist:</label>
+                <select id="playlistSelectModal" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50"></select>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmAddToListBtnModal" class="btn-primary text-white px-4 py-2 rounded-md">Add to Playlist</button>
+                <button id="cancelAddToListBtnModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancel</button>
+            </div>
+        </div>
+    </div>
 
+    <div id="createPlaylistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg max-h-[95vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-semibold text-[#3a3a3a]">Create New Song List</h3>
+                <button id="createPlaylistModalCloseBtn" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 space-y-4">
+                <div>
+                    <label for="newPlaylistName" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="newPlaylistName" placeholder="E.g., Sunday Morning Worship" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button id="saveNewPlaylistBtn" class="btn-primary text-white px-4 py-2 rounded-md"><i class="fas fa-save mr-2"></i>Save Playlist</button>
+                <button id="cancelNewPlaylistBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
@@ -153,9 +206,10 @@
         let isAppInitialized = false;
         let currentPage = 1, songsPerPage = 20;
         let fuse;
+        let currentSongForPlaylist = null;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipOrderView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "worshipOrderBtn", "songFinderBtn" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipOrderView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "worshipOrderBtn", "songFinderBtn", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "worshipSetlistPageView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "addSongsToCurrentSetlistBtn", "playlistActionsContainer" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -186,6 +240,7 @@
                     userId = user.uid;
                     if (DOMElements.authStatus) DOMElements.authStatus.innerHTML = `<i class="fas fa-check-circle text-green-300 mr-1"></i> Synced`;
                     if (!isAppInitialized) startApp();
+                    loadPlaylistsFromFirestore();
                 } else {
                     signInAnonymously(auth).catch(err => {
                         if (!isAppInitialized) startApp();
@@ -291,26 +346,45 @@
                 pageViews.forEach(view => {
                     view.style.display = view.id === viewId ? 'block' : 'none';
                 });
-                if (window.innerWidth < 768) { // On mobile, close sidebar after switching
+                if (window.innerWidth < 768) { 
                     DOMElements.playlistSidebar.classList.add('-translate-x-full');
                 }
             }
 
             DOMElements.worshipOrderBtn.addEventListener('click', () => switchPage('worshipOrderView'));
             DOMElements.songFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
+            DOMElements.backToFinderBtn.addEventListener('click', () => switchPage('songFinderView'));
 
-            // Initial page load
-            switchPage('worshipOrderView');
+            switchPage('worshipOrderView'); // Default view
 
-            // Mobile menu buttons
             DOMElements.mobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.remove('-translate-x-full'));
             DOMElements.closeMobileMenuButton.addEventListener('click', () => DOMElements.playlistSidebar.classList.add('-translate-x-full'));
 
-            // Song Finder Listeners
             DOMElements.searchBtn.addEventListener('click', performSearchAndFilter);
             DOMElements.clearBtn.addEventListener('click', resetToEmptyState);
             [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', performSearchAndFilter); });
             initAutosuggest(DOMElements.search, DOMElements.autosuggestDropdown);
+
+            // Playlist event listeners
+            DOMElements.createSongListBtn.addEventListener('click', () => {
+                DOMElements.createPlaylistModal.classList.remove('hidden');
+            });
+            DOMElements.createPlaylistModalCloseBtn.addEventListener('click', () => DOMElements.createPlaylistModal.classList.add('hidden'));
+            DOMElements.cancelNewPlaylistBtn.addEventListener('click', () => DOMElements.createPlaylistModal.classList.add('hidden'));
+            DOMElements.saveNewPlaylistBtn.addEventListener('click', saveNewPlaylist);
+
+            DOMElements.songCardsContainer.addEventListener('click', (e) => {
+                const addBtn = e.target.closest('.add-to-list-btn');
+                if (addBtn) {
+                    const songId = addBtn.dataset.songId;
+                    openAddToListModal(songId);
+                }
+            });
+            DOMElements.confirmAddToListBtnModal.addEventListener('click', addSongToPlaylist);
+            DOMElements.addToListModalCloseBtn.addEventListener('click', () => DOMElements.addToListModal.classList.add('hidden'));
+            DOMElements.cancelAddToListBtnModal.addEventListener('click', () => DOMElements.addToListModal.classList.add('hidden'));
+
+            setupDragAndDrop();
         }
 
         function initAutosuggest(inputElement, dropdownElement) {
@@ -448,6 +522,159 @@
             }
         }
 
+        // --- Playlist Functions ---
+        function loadPlaylistsFromFirestore() {
+            if (!userId) return;
+            if (unsubscribePlaylists) unsubscribePlaylists();
+            const userDocRef = doc(db, 'users', userId);
+            unsubscribePlaylists = onSnapshot(userDocRef, (docSnap) => {
+                sitePlaylists = (docSnap.exists() && docSnap.data().playlists) ? docSnap.data().playlists : [];
+                renderPlaylistSidebar();
+                const currentPlaylistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                if (DOMElements.worshipSetlistPageView.style.display === 'block' && currentPlaylistId) {
+                    displayWorshipSetlistPage(currentPlaylistId);
+                }
+            }, err => {
+                console.error("Firestore onSnapshot error:", err);
+            });
+        }
+
+        async function updateFirestorePlaylists(newPlaylists) {
+            if (!userId) return;
+            try {
+                await setDoc(doc(db, 'users', userId), { playlists: newPlaylists });
+            } catch (error) {
+                console.error("Error updating Firestore:", error);
+            }
+        }
+
+        function renderPlaylistSidebar() {
+            const { playlistItemsContainer } = DOMElements;
+            if(!playlistItemsContainer) return;
+            playlistItemsContainer.innerHTML = '';
+            if (sitePlaylists.length > 0) {
+                sitePlaylists.forEach(p => {
+                    const item = document.createElement('div');
+                    item.className = 'playlist-item p-2 cursor-pointer flex justify-between items-center';
+                    item.innerHTML = `<div><p class="font-medium text-sm">${p.name}</p><p class="text-xs text-blue-100">${(p.songs || []).length} songs</p></div><button class="text-red-300 hover:text-white delete-playlist-btn" data-id="${p.id}"><i class="fas fa-trash-alt"></i></button>`;
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-playlist-btn')) {
+                            e.stopPropagation();
+                            const newPlaylists = sitePlaylists.filter(pl => pl.id !== p.id);
+                            updateFirestorePlaylists(newPlaylists);
+                        } else {
+                            displayWorshipSetlistPage(p.id);
+                        }
+                    });
+                    playlistItemsContainer.appendChild(item);
+                });
+            } else {
+                playlistItemsContainer.innerHTML = '<p class="text-xs text-blue-200 italic px-2">No playlists yet.</p>';
+            }
+        }
+
+        function displayWorshipSetlistPage(playlistId) {
+            const playlist = sitePlaylists.find(p => p.id === playlistId);
+            if (!playlist) { switchPage('songFinderView'); return; }
+            DOMElements.worshipSetlistPageView.dataset.currentPlaylistId = playlistId;
+            DOMElements.setlistNameDisplay.textContent = playlist.name;
+            const container = DOMElements.setlistSongsContainer;
+            container.innerHTML = '';
+            const songList = (playlist.songs || []).map(songId => allSongsData.find(s => s.id === songId)).filter(Boolean);
+            songList.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = 'setlist-song-item p-3 border-b-2 border-gray-300 flex justify-between items-center cursor-grab';
+                item.dataset.songId = song.id;
+                item.draggable = true;
+                item.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="font-bold text-gray-500 w-6 text-center">${index + 1}.</span>
+                        <div class="ml-4">
+                            <p class="font-semibold text-md text-[#3a5d97]">${song.title}</p>
+                            <p class="text-sm text-gray-500">${song.artist}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-red-500 hover:text-red-700 remove-from-playlist-btn p-2" title="Remove"><i class="fas fa-times-circle"></i></button>
+                    </div>`;
+                item.querySelector('.remove-from-playlist-btn').addEventListener('click', () => {
+                    const updatedSongs = (playlist.songs || []).filter(sId => sId !== song.id);
+                    const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: updatedSongs} : p);
+                    updateFirestorePlaylists(newPlaylists);
+                });
+                container.appendChild(item);
+            });
+            if (songList.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic p-3">This setlist is empty. Click "Add Songs" to begin.</p>';
+            }
+            switchPage('worshipSetlistPageView');
+        }
+
+        function saveNewPlaylist() {
+            const name = DOMElements.newPlaylistName.value.trim();
+            if(!name) { alert('Playlist name is required.'); return; }
+            const newPlaylist = { id: `playlist_${Date.now()}`, name, songs: [] };
+            updateFirestorePlaylists([...sitePlaylists, newPlaylist]);
+            DOMElements.createPlaylistModal.classList.add('hidden');
+            DOMElements.newPlaylistName.value = '';
+        }
+
+        function openAddToListModal(songId) {
+            const song = allSongsData.find(s => s.id === songId);
+            if (!song) return;
+            currentSongForPlaylist = song;
+            DOMElements.songToAddNameModal.textContent = song.title;
+            DOMElements.playlistSelectModal.innerHTML = '<option value="">Select playlist...</option>';
+            sitePlaylists.forEach(p => DOMElements.playlistSelectModal.add(new Option(p.name, p.id)));
+            DOMElements.addToListModal.classList.remove('hidden');
+        }
+
+        function addSongToPlaylist() {
+            const playlistId = DOMElements.playlistSelectModal.value;
+            if (!playlistId || !currentSongForPlaylist) return;
+            const newPlaylists = sitePlaylists.map(p => {
+                if (p.id === playlistId) {
+                    const songs = p.songs || [];
+                    if (!songs.includes(currentSongForPlaylist.id)) {
+                        return { ...p, songs: [...songs, currentSongForPlaylist.id] };
+                    }
+                }
+                return p;
+            });
+            updateFirestorePlaylists(newPlaylists);
+            DOMElements.addToListModal.classList.add('hidden');
+        }
+
+        function setupDragAndDrop() {
+            let draggedSongElement = null;
+            const container = DOMElements.setlistSongsContainer;
+            if(!container) return;
+            container.addEventListener('dragstart', e => {
+                if (e.target.classList.contains('setlist-song-item')) {
+                    draggedSongElement = e.target;
+                    setTimeout(() => e.target.classList.add('dragging'), 0);
+                }
+            });
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                const target = e.target.closest('.setlist-song-item');
+                if (target && draggedSongElement && target !== draggedSongElement) {
+                    const rect = target.getBoundingClientRect();
+                    const next = e.clientY > rect.top + rect.height / 2;
+                    container.insertBefore(draggedSongElement, next ? target.nextSibling : target);
+                }
+            });
+            container.addEventListener('dragend', () => {
+                if (draggedSongElement) {
+                    draggedSongElement.classList.remove('dragging');
+                    draggedSongElement = null;
+                    const playlistId = DOMElements.worshipSetlistPageView.dataset.currentPlaylistId;
+                    const newSongOrder = [...container.querySelectorAll('.setlist-song-item')].map(item => item.dataset.songId);
+                    const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: newSongOrder} : p);
+                    updateFirestorePlaylists(newPlaylists);
+                }
+            });
+        }
     </script>
 </body>
 </html>
