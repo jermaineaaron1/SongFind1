@@ -235,6 +235,27 @@
                         <div id="setlistSongsContainer" class="custom-scrollbar min-h-[50vh]"></div>
                     </div>
                 </main>
+                <!-- VIEW 4: Worship Order Page -->
+                <main id="worshipOrderView" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                            <div>
+                                <p id="worshipOrderDate" class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Worship Order</p>
+                                <h2 id="worshipOrderTitle" class="text-3xl font-bold text-[#3a3a3a]">Service Title</h2>
+                                <p id="worshipOrderSubtitle" class="text-gray-500">0 songs</p>
+                            </div>
+                            <div class="flex space-x-2 mt-4 md:mt-0">
+                                <button id="worshipOrderPlayAllBtn" class="btn-secondary text-white px-4 py-2 rounded-md text-sm"><i class="fas fa-play mr-2"></i>Play All Chords</button>
+                                <button id="worshipOrderShareBtn" class="btn-secondary text-white px-4 py-2 rounded-md text-sm"><i class="fas fa-share-alt mr-2"></i>Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-xl font-semibold text-[#3a3a3a] mb-4">Order of Service</h3>
+                        <div id="worshipOrderSongsContainer" class="custom-scrollbar min-h-[50vh]"></div>
+                    </div>
+                </main>
             </div> 
         </div> 
     </div> 
@@ -357,7 +378,7 @@
         let currentChordDocs = [], currentChordIndex = 0;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification", "worshipOrderView", "worshipOrderDate", "worshipOrderTitle", "worshipOrderSubtitle", "worshipOrderPlayAllBtn", "worshipOrderShareBtn", "worshipOrderSongsContainer" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -611,6 +632,14 @@
             if (DOMElements.shareModalCloseBtn) DOMElements.shareModalCloseBtn.addEventListener('click', () => DOMElements.shareModal.classList.remove('active'));
             if (DOMElements.copyShareLinkBtn) DOMElements.copyShareLinkBtn.addEventListener('click', copyShareLink);
 
+            if (DOMElements.rosterCardContainer) DOMElements.rosterCardContainer.addEventListener('click', (e) => {
+                const musicListBtn = e.target.closest('.music-list-btn');
+                if (musicListBtn) {
+                    const date = musicListBtn.dataset.date;
+                    const title = musicListBtn.dataset.title;
+                    displayWorshipOrderPage(date, title);
+                }
+            });
 
             setupDragAndDrop();
         }
@@ -832,13 +861,21 @@
             DOMElements.playlistDetailTitle.textContent = playlist.name;
             const songCount = (playlist.songs || []).length;
             DOMElements.playlistDetailSubtitle.textContent = `${songCount} song${songCount === 1 ? '' : 's'}`;
-            renderPlaylistSongs(playlist);
+            renderPlaylistSongs(playlist, DOMElements.setlistSongsContainer);
             performPlaylistSongSearch(); 
             switchPage('playlistDetailView');
         }
+        
+        function displayWorshipOrderPage(date, title) {
+            DOMElements.worshipOrderDate.textContent = date;
+            DOMElements.worshipOrderTitle.textContent = title;
+            // For now, we'll just show an empty list.
+            // In a future step, we would load the songs for this specific date.
+            DOMElements.worshipOrderSongsContainer.innerHTML = '<p class="text-gray-500 italic p-3 text-center">Add songs to this worship order.</p>';
+            switchPage('worshipOrderView');
+        }
 
-        function renderPlaylistSongs(playlist) {
-            const container = DOMElements.setlistSongsContainer;
+        function renderPlaylistSongs(playlist, container) {
             container.innerHTML = '';
             const songList = (playlist.songs || []).map(songId => allSongsData.find(s => s.id === songId)).filter(Boolean);
 
@@ -1029,24 +1066,28 @@
                 rosterData.sundays.forEach(sunday => {
                     const card = document.createElement('div');
                     const cardColor = sunday.title.toLowerCase().includes('communion') ? 'purple' : 'blue';
-                    card.className = `bg-white rounded-lg shadow-md p-5 border-t-4 border-${cardColor}-500 flex flex-col`;
+                    card.className = `bg-white rounded-lg shadow-md flex flex-col`;
                     
                     let rolesHTML = '';
                     if(sunday.roles && sunday.roles.length > 0) {
-                        sunday.roles.forEach(role => {
+                        sunday.roles.forEach((role, index) => {
                             const people = (role.people && role.people.length > 0) ? role.people.join(', ') : '-';
-                            rolesHTML += `<p class="text-sm text-gray-600"><strong class="font-semibold text-gray-800">${role.name}:</strong> ${people}</p>`;
+                            const borderClass = index > 0 ? 'border-t border-gray-200 mt-2 pt-2' : '';
+                            rolesHTML += `<p class="text-sm text-gray-600 ${borderClass}"><strong class="font-semibold text-gray-800">${role.name}:</strong> ${people}</p>`;
                         });
                     }
 
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
+                        <div class="bg-${cardColor}-500 text-white p-3 rounded-t-lg flex justify-between items-center">
                             <div>
-                                <h3 class="text-lg font-bold text-gray-700">${sunday.date}</h3>
-                                <p class="text-sm text-gray-500">${sunday.title}</p>
+                                <h3 class="text-lg font-bold">${sunday.date}</h3>
+                                <p class="text-sm opacity-90">${sunday.title}</p>
                             </div>
+                            <a href="#" class="music-list-btn text-white hover:bg-white/20 p-2 rounded-full" data-date="${sunday.date}" data-title="${sunday.title}" title="View Music List">
+                                <i class="fas fa-music"></i>
+                            </a>
                         </div>
-                        <div class="mt-2 flex-grow space-y-1">
+                        <div class="p-5 flex-grow space-y-1">
                             ${rolesHTML}
                         </div>
                     `;
