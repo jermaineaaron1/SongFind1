@@ -115,6 +115,17 @@
                         </div>
                     </details>
 
+                    <details class="group" open>
+                        <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
+                            <div class="flex items-center">
+                                <i class="fas fa-clipboard-list w-6 text-center mr-2"></i>
+                                <span class="font-semibold">Worship Orders</span>
+                            </div>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </summary>
+                        <div id="worshipOrdersContainer" class="pl-6 mt-2 space-y-1 border-l-2 border-white/20 ml-3"><p class="text-xs text-blue-200 italic px-2">No orders generated.</p></div>
+                    </details>
+
                     <details class="group">
                         <summary class="flex items-center justify-between cursor-pointer p-2 rounded-md hover:bg-white/10">
                             <div class="flex items-center">
@@ -383,7 +394,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwq8nh0klWHIPuEx0hedcinNfhLIwWeD2klb80Vf53ZI-nCQ7IgzYDEV4qhL3QIejTb/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby630PO38PHtMw_xKIe2pA-0kPe0cgmRhkgSEiQhG5KDLCyt491RyNwLD38PxPIxiJs/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -392,10 +403,11 @@
         let fuse;
         let currentSongForPlaylist = null;
         let activePlaylistFilters = { season: [], theme: [], style: [] };
+        let activeWorshipOrderFilters = { season: [], theme: [], style: [] };
         let currentChordDocs = [], currentChordIndex = 0;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification", "worshipOrderView", "worshipOrderDate", "worshipOrderTitle", "worshipOrderSongsContainer", "worshipOrderSongSearch", "worshipOrderSearchClearBtn", "worshipOrderAutosuggestDropdown", "worshipOrderSearchBtn", "worshipOrderSeasonFilterBtn", "worshipOrderThemeFilterBtn", "worshipOrderStyleFilterBtn", "worshipOrderClearFiltersBtn", "worshipOrderSongResults" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification", "worshipOrderView", "worshipOrderDate", "worshipOrderTitle", "worshipOrderSongsContainer", "worshipOrderSongSearch", "worshipOrderSearchClearBtn", "worshipOrderAutosuggestDropdown", "worshipOrderSearchBtn", "worshipOrderSeasonFilterBtn", "worshipOrderThemeFilterBtn", "worshipOrderStyleFilterBtn", "worshipOrderClearFiltersBtn", "worshipOrderSongResults", "worshipOrdersContainer" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -656,7 +668,8 @@
                 }
             });
 
-            setupDragAndDrop();
+            setupDragAndDrop(DOMElements.setlistSongsContainer, 'playlist');
+            setupDragAndDrop(DOMElements.worshipOrderSongsContainer, 'worshipOrder');
         }
 
         function handleUrlParameters() {
@@ -843,11 +856,15 @@
         }
 
         function renderPlaylistSidebar() {
-            const { playlistItemsContainer } = DOMElements;
-            if(!playlistItemsContainer) return;
+            const { playlistItemsContainer, worshipOrdersContainer } = DOMElements;
+            if(!playlistItemsContainer || !worshipOrdersContainer) return;
+
+            const customPlaylists = sitePlaylists.filter(p => p.type !== 'worship-order');
+            const worshipOrders = sitePlaylists.filter(p => p.type === 'worship-order');
+
             playlistItemsContainer.innerHTML = '';
-            if (sitePlaylists.length > 0) {
-                sitePlaylists.forEach(p => {
+            if (customPlaylists.length > 0) {
+                customPlaylists.forEach(p => {
                     const item = document.createElement('a');
                     item.href = "#";
                     item.className = 'playlist-item p-2 cursor-pointer flex justify-between items-center';
@@ -867,6 +884,29 @@
             } else {
                 playlistItemsContainer.innerHTML = '<p class="text-xs text-blue-200 italic px-2">No playlists yet.</p>';
             }
+            
+            worshipOrdersContainer.innerHTML = '';
+            if (worshipOrders.length > 0) {
+                 worshipOrders.forEach(p => {
+                    const item = document.createElement('a');
+                    item.href = "#";
+                    item.className = 'playlist-item p-2 cursor-pointer flex justify-between items-center';
+                    item.innerHTML = `<div><p class="font-medium text-sm">${p.name}</p><p class="text-xs text-blue-100">${(p.songs || []).length} songs</p></div><button class="text-red-300 hover:text-white delete-playlist-btn" data-id="${p.id}"><i class="fas fa-trash-alt"></i></button>`;
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (e.target.closest('.delete-playlist-btn')) {
+                            e.stopPropagation();
+                            const newPlaylists = sitePlaylists.filter(pl => pl.id !== p.id);
+                            updateFirestorePlaylists(newPlaylists);
+                        } else {
+                            displayWorshipOrderPage(p.date, p.title, p.id);
+                        }
+                    });
+                    worshipOrdersContainer.appendChild(item);
+                });
+            } else {
+                 worshipOrdersContainer.innerHTML = '<p class="text-xs text-blue-200 italic px-2">No orders generated.</p>';
+            }
         }
 
         function displayPlaylistDetailPage(playlistId) {
@@ -881,14 +921,29 @@
             switchPage('playlistDetailView');
         }
         
-        function displayWorshipOrderPage(date, title) {
+        async function displayWorshipOrderPage(date, title, orderId) {
+            let id = orderId;
+            if (!id) {
+                id = `wo_${date.replace(/[^a-zA-Z0-9]/g, '')}`;
+            }
+
+            let worshipOrder = sitePlaylists.find(p => p.id === id);
+
+            if (!worshipOrder) {
+                worshipOrder = { id, name: `WO - ${date}`, date, title, songs: [], type: 'worship-order' };
+                const newPlaylists = [...sitePlaylists, worshipOrder];
+                await updateFirestorePlaylists(newPlaylists);
+            }
+
+            DOMElements.worshipOrderView.dataset.currentOrderId = id;
             DOMElements.worshipOrderDate.textContent = date;
             DOMElements.worshipOrderTitle.textContent = title;
-            // For now, we'll just show an empty list.
-            // In a future step, we would load the songs for this specific date.
-            DOMElements.worshipOrderSongsContainer.innerHTML = '<p class="text-gray-500 italic p-3 text-center">Add songs to this worship order.</p>';
+            
+            renderPlaylistSongs(worshipOrder, DOMElements.worshipOrderSongsContainer);
+            // We'll add the search functionality for this page later
             switchPage('worshipOrderView');
         }
+
 
         function renderPlaylistSongs(playlist, container) {
             container.innerHTML = '';
@@ -1030,9 +1085,8 @@
             DOMElements.addToListModal.classList.add('hidden');
         }
 
-        function setupDragAndDrop() {
+        function setupDragAndDrop(container, type) {
             let draggedSongElement = null;
-            const container = DOMElements.setlistSongsContainer;
             if(!container) return;
             container.addEventListener('dragstart', e => {
                 if (e.target.classList.contains('setlist-song-item')) {
@@ -1053,7 +1107,14 @@
                 if (draggedSongElement) {
                     draggedSongElement.classList.remove('dragging');
                     draggedSongElement = null;
-                    const playlistId = DOMElements.playlistDetailView.dataset.currentPlaylistId;
+                    
+                    let playlistId;
+                    if (type === 'playlist') {
+                        playlistId = DOMElements.playlistDetailView.dataset.currentPlaylistId;
+                    } else {
+                        playlistId = DOMElements.worshipOrderView.dataset.currentOrderId;
+                    }
+
                     const newSongOrder = [...container.querySelectorAll('.setlist-song-item')].map(item => item.dataset.songId);
                     const newPlaylists = sitePlaylists.map(p => p.id === playlistId ? {...p, songs: newSongOrder} : p);
                     updateFirestorePlaylists(newPlaylists);
