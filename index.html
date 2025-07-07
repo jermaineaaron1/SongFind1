@@ -152,6 +152,7 @@
             <div id="main-content-container" class="flex-1 overflow-y-auto">
                 <!-- VIEW 1: Worship Roster Page -->
                 <main id="worshipRosterView" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h2 class="text-3xl font-bold text-gray-700 mb-8 text-center">LHC Worship Roster</h2>
                     <div id="rosterCardContainer" class="sm:p-6">
                         <!-- The roster will be dynamically generated here -->
                         <p class="text-center text-gray-500 py-8">Loading Roster...</p>
@@ -344,8 +345,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFr8tWz7-UmbzINYWP7Qfxk5srHvwEvriH4htdPTYOxkaPsKCFbEjo8JBpZF6nbQDM/exec";
-
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9vNQMYgEzW2vpt03NxrW2VYoMV8c6ApLZL0zxxu_XIMeQ4bYhcUtH66IVaDMgq4gX/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
