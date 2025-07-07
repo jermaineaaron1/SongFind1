@@ -195,6 +195,7 @@
                     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                             <div>
+                                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Custom Playlist</p>
                                 <h2 id="playlistDetailTitle" class="text-3xl font-bold text-[#3a3a3a]">Playlist Title</h2>
                                 <p id="playlistDetailSubtitle" class="text-gray-500">0 songs</p>
                             </div>
@@ -214,7 +215,7 @@
                                 <button id="playlistSearchClearBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"><i class="fas fa-times-circle"></i></button>
                                 <div id="playlistAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div>
                             </div>
-                            <button id="playlistSearchBtn" class="btn-primary text-white px-4 py-2 rounded-md flex items-center justify-center sm:ml-2 mt-2 sm:mt-0"><i class="fas fa-search mr-2"></i> Search</button>
+                            <button id="playlistSearchBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center justify-center sm:ml-2 mt-2 sm:mt-0 transition-colors duration-300"><i class="fas fa-search mr-2"></i> Search</button>
                         </div>
                         <div class="flex flex-wrap gap-2 mb-4">
                             <button id="playlistSeasonFilterBtn" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Liturgical Season</button>
@@ -343,7 +344,8 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvNq5QDwLAcY4bVvfDZBetIlgkimtQZcQ_Xad0OwKM_ECBpAqHajuqaZFYlzfyfDzM/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkwaWjKo_AwIYLE61OLwQDRKTcKPWpuju8iemTAzXWE1PgdCiTiHgfo-JxkagLgx_z/exec";
+        const ROSTER_URL = "https://script.google.com/macros/s/AKfycbwkwaWjKo_AwIYLE61OLwQDRKTcKPWpuju8iemTAzXWE1PgdCiTiHgfo-JxkagLgx_z/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -355,7 +357,7 @@
         let currentChordDocs = [], currentChordIndex = 0;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistClearSearchBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -542,15 +544,18 @@
             if (DOMElements.searchBtn) DOMElements.searchBtn.addEventListener('click', performSearchAndFilter);
             if (DOMElements.clearBtn) DOMElements.clearBtn.addEventListener('click', resetToEmptyState);
             [DOMElements.theme, DOMElements.key, DOMElements.style, DOMElements.tempoFilter, DOMElements.liturgicalSeasonFilter, DOMElements.sortBy].forEach(el => { if(el) el.addEventListener('change', performSearchAndFilter); });
+            
             if (DOMElements.search) {
                 initAutosuggest(DOMElements.search, DOMElements.autosuggestDropdown);
                 DOMElements.search.addEventListener('input', () => DOMElements.mainSearchClearBtn.classList.toggle('hidden', !DOMElements.search.value));
             }
-            if (DOMElements.mainSearchClearBtn) DOMElements.mainSearchClearBtn.addEventListener('click', () => {
-                DOMElements.search.value = '';
-                DOMElements.mainSearchClearBtn.classList.add('hidden');
-                resetToEmptyState();
-            });
+            if (DOMElements.mainSearchClearBtn) {
+                DOMElements.mainSearchClearBtn.addEventListener('click', () => {
+                    DOMElements.search.value = '';
+                    DOMElements.mainSearchClearBtn.classList.add('hidden');
+                    performSearchAndFilter();
+                });
+            }
 
 
             // Playlist event listeners
@@ -576,11 +581,13 @@
                 initAutosuggest(DOMElements.playlistSongSearch, DOMElements.playlistAutosuggestDropdown);
                 DOMElements.playlistSongSearch.addEventListener('input', () => DOMElements.playlistSearchClearBtn.classList.toggle('hidden', !DOMElements.playlistSongSearch.value));
             }
-            if (DOMElements.playlistSearchClearBtn) DOMElements.playlistSearchClearBtn.addEventListener('click', () => {
-                DOMElements.playlistSongSearch.value = '';
-                DOMElements.playlistSearchClearBtn.classList.add('hidden');
-                performPlaylistSongSearch();
-            });
+            if (DOMElements.playlistSearchClearBtn) {
+                DOMElements.playlistSearchClearBtn.addEventListener('click', () => {
+                    DOMElements.playlistSongSearch.value = '';
+                    DOMElements.playlistSearchClearBtn.classList.add('hidden');
+                    performPlaylistSongSearch();
+                });
+            }
             
             if (DOMElements.playlistSeasonFilterBtn) DOMElements.playlistSeasonFilterBtn.addEventListener('click', () => openFilterModal('season'));
             if (DOMElements.playlistThemeFilterBtn) DOMElements.playlistThemeFilterBtn.addEventListener('click', () => openFilterModal('theme'));
@@ -1220,26 +1227,6 @@
             toast.textContent = 'Link copied to clipboard!';
             toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-        
-        function handleUrlParameters() {
-            const params = new URLSearchParams(window.location.search);
-            const playlistId = params.get('playlist');
-            if (playlistId) {
-                const interval = setInterval(() => {
-                    if (allSongsData.length > 0 && sitePlaylists.length > 0) {
-                        clearInterval(interval);
-                        const playlist = sitePlaylists.find(p => p.id === playlistId);
-                        if (playlist) {
-                           displayPlaylistDetailPage(playlistId);
-                        } else {
-                           switchPage('songFinderView');
-                        }
-                    }
-                }, 200);
-            } else {
-                switchPage('songFinderView');
-            }
         }
 
     </script>
