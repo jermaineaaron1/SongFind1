@@ -237,23 +237,40 @@
                 </main>
                 <!-- VIEW 4: Worship Order Page -->
                 <main id="worshipOrderView" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-                            <div>
-                                <p id="worshipOrderDate" class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Worship Order</p>
-                                <h2 id="worshipOrderTitle" class="text-3xl font-bold text-[#3a3a3a]">Service Title</h2>
-                                <p id="worshipOrderSubtitle" class="text-gray-500">0 songs</p>
-                            </div>
-                            <div class="flex space-x-2 mt-4 md:mt-0">
-                                <button id="worshipOrderPlayAllBtn" class="btn-secondary text-white px-4 py-2 rounded-md text-sm"><i class="fas fa-play mr-2"></i>Play All Chords</button>
-                                <button id="worshipOrderShareBtn" class="btn-secondary text-white px-4 py-2 rounded-md text-sm"><i class="fas fa-share-alt mr-2"></i>Share</button>
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <!-- Left Column: Order of Service -->
+                        <div class="lg:w-1/2">
+                             <div class="bg-white rounded-lg shadow-md p-6">
+                                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Worship Order</p>
+                                <h2 id="worshipOrderDate" class="text-3xl font-bold text-[#3a3a3a] mt-1">Date</h2>
+                                <p id="worshipOrderTitle" class="text-gray-500 mb-4">Service Title</p>
+                                <div id="worshipOrderSongsContainer" class="custom-scrollbar min-h-[50vh]"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                        <h3 class="text-xl font-semibold text-[#3a3a3a] mb-4">Order of Service</h3>
-                        <div id="worshipOrderSongsContainer" class="custom-scrollbar min-h-[50vh]"></div>
+                        <!-- Right Column: Add Songs -->
+                        <div class="lg:w-1/2">
+                            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                                <h3 class="text-xl font-semibold text-[#3a3a3a] mb-4">Add Songs to Order</h3>
+                                <div class="flex flex-col sm:flex-row items-stretch mb-4">
+                                    <div class="relative flex-grow">
+                                        <input type="text" id="worshipOrderSongSearch" placeholder="Search for songs..." class="w-full p-2 rounded-md bg-gray-50 pr-8">
+                                        <button id="worshipOrderSearchClearBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"><i class="fas fa-times-circle"></i></button>
+                                        <div id="worshipOrderAutosuggestDropdown" class="autosuggest-dropdown custom-scrollbar"></div>
+                                    </div>
+                                    <button id="worshipOrderSearchBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center justify-center sm:ml-2 mt-2 sm:mt-0 transition-colors duration-300"><i class="fas fa-search mr-2"></i> Search</button>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <button id="worshipOrderSeasonFilterBtn" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Liturgical Season</button>
+                                    <button id="worshipOrderThemeFilterBtn" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Song Theme</button>
+                                    <button id="worshipOrderStyleFilterBtn" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Song Style</button>
+                                    <button id="worshipOrderClearFiltersBtn" class="btn-secondary text-white px-3 py-1 rounded-full text-sm">Clear</button>
+                                </div>
+                                <div id="worshipOrderSongResults" class="min-h-[20vh] max-h-[40vh] overflow-y-auto custom-scrollbar border-t pt-2 mt-4 hidden">
+                                    <!-- Search results will appear here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div> 
@@ -366,7 +383,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3BSqrCq5JQ8ZzA568oM8Ax0bBF_iM2f4uOyqAcqPcYe0jpV7sUQCdbTkva03audhF/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxanWKOOVaQP7Bpv2K_jDw_8b5Ee4dIyXZBRcL_wLSKCTiHE_NKwV1ecL-j6nE6Nfe1/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -378,7 +395,7 @@
         let currentChordDocs = [], currentChordIndex = 0;
         
         const DOMElements = {};
-        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification", "worshipOrderView", "worshipOrderDate", "worshipOrderTitle", "worshipOrderSubtitle", "worshipOrderPlayAllBtn", "worshipOrderShareBtn", "worshipOrderSongsContainer" ];
+        const elementIds = [ "loadingIndicator", "mobileMenuButton", "closeMobileMenuButton", "playlistSidebar", "songFinderView", "worshipRosterView", "searchBtn", "clearBtn", "theme", "key", "style", "search", "songResults", "emptyState", "songCardsContainer", "resultCount", "showingCount", "totalCount", "activeFilters", "sortBy", "liturgicalSeasonFilter", "tempoFilter", "autosuggestDropdown", "pagination", "playlistItemsContainer", "createSongListBtn", "authStatus", "songResultsHeader", "addToListModal", "songToAddNameModal", "playlistSelectModal", "confirmAddToListBtnModal", "cancelAddToListBtnModal", "addToListModalCloseBtn", "createPlaylistModal", "newPlaylistName", "saveNewPlaylistBtn", "cancelNewPlaylistBtn", "createPlaylistModalCloseBtn", "playlistDetailView", "setlistNameDisplay", "setlistSongsContainer", "backToFinderBtn", "playlistSongSearch", "playlistSearchClearBtn", "playlistSongResults", "rosterCardContainer", "playlistDetailTitle", "playlistDetailSubtitle", "playlistSearchBtn", "playlistToggleFilterBtn", "playlistFilterContainer", "previewModal", "previewModalTitle", "previewModalCloseBtn", "previewModalIframe", "filterModal", "filterModalTitle", "filterModalList", "filterModalCloseBtn", "playlistSeasonFilterBtn", "playlistThemeFilterBtn", "playlistStyleFilterBtn", "playlistClearFiltersBtn", "filterModalApplyBtn", "playlistAutosuggestDropdown", "mainSearchClearBtn", "playAllChordsBtn", "chordPlayerModal", "chordPlayerTitle", "chordPlayerCloseBtn", "chordPlayerIframe", "chordPlayerPrevBtn", "chordPlayerNextBtn", "chordPlayerCounter", "sharePlaylistBtn", "shareModal", "shareModalCloseBtn", "shareWhatsapp", "shareFacebook", "shareEmail", "shareLinkInput", "copyShareLinkBtn", "toast-notification", "worshipOrderView", "worshipOrderDate", "worshipOrderTitle", "worshipOrderSongsContainer", "worshipOrderSongSearch", "worshipOrderSearchClearBtn", "worshipOrderAutosuggestDropdown", "worshipOrderSearchBtn", "worshipOrderSeasonFilterBtn", "worshipOrderThemeFilterBtn", "worshipOrderStyleFilterBtn", "worshipOrderClearFiltersBtn", "worshipOrderSongResults" ];
         
         document.addEventListener("DOMContentLoaded", main);
 
@@ -602,13 +619,11 @@
                 initAutosuggest(DOMElements.playlistSongSearch, DOMElements.playlistAutosuggestDropdown);
                 DOMElements.playlistSongSearch.addEventListener('input', () => DOMElements.playlistSearchClearBtn.classList.toggle('hidden', !DOMElements.playlistSongSearch.value));
             }
-            if (DOMElements.playlistSearchClearBtn) {
-                DOMElements.playlistSearchClearBtn.addEventListener('click', () => {
-                    DOMElements.playlistSongSearch.value = '';
-                    DOMElements.playlistSearchClearBtn.classList.add('hidden');
-                    performPlaylistSongSearch();
-                });
-            }
+            if (DOMElements.playlistSearchClearBtn) DOMElements.playlistSearchClearBtn.addEventListener('click', () => {
+                DOMElements.playlistSongSearch.value = '';
+                DOMElements.playlistSearchClearBtn.classList.add('hidden');
+                performPlaylistSongSearch();
+            });
             
             if (DOMElements.playlistSeasonFilterBtn) DOMElements.playlistSeasonFilterBtn.addEventListener('click', () => openFilterModal('season'));
             if (DOMElements.playlistThemeFilterBtn) DOMElements.playlistThemeFilterBtn.addEventListener('click', () => openFilterModal('theme'));
