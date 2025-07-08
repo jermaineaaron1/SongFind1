@@ -394,7 +394,7 @@
 
         // --- CONFIG & GLOBAL STATE ---
         const firebaseConfig = { apiKey: "AIzaSyC5cXBoPSfhpnCl32NzL7HyiCkv4zNsBoM", authDomain: "worship-song-finder.firebaseapp.com", projectId: "worship-song-finder", storageBucket: "worship-song-finder.appspot.com", messagingSenderId: "34741956145", appId: "1:34741956145:web:b721c5f2532f9ea3fe2f10" };
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby630PO38PHtMw_xKIe2pA-0kPe0cgmRhkgSEiQhG5KDLCyt491RyNwLD38PxPIxiJs/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1Hcdb2PoltmeaqNf0h64Pjr-9ytUiaLYE-Ip8t6HWYBBncCLuO0SXbWvZjnPvcTaE/exec";
         
         let allSongsData = [], allRosterData = [], sitePlaylists = [];
         let app, auth, db, userId, unsubscribePlaylists = null;
@@ -940,7 +940,7 @@
             DOMElements.worshipOrderTitle.textContent = title;
             
             renderPlaylistSongs(worshipOrder, DOMElements.worshipOrderSongsContainer);
-            // We'll add the search functionality for this page later
+            performWorshipOrderSongSearch();
             switchPage('worshipOrderView');
         }
 
